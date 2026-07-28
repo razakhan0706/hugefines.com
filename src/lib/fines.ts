@@ -272,3 +272,86 @@ export function seasonAwards(stats: PlayerStat[], currency: string): Award[] {
 
   return awards;
 }
+export interface Breakdown {
+  label: string;
+  total: number;
+  count: number;
+  rounds: number;
+  avg: number;
+  photo?: string | null;
+}
+
+/** Groups fines by an attribute of the round they belong to. */
+export function roundAttributeBreakdown(
+  fines: Fine[],
+  rounds: Round[],
+  pick: (r: Round) => string | null | undefined,
+  photo?: (r: Round) => string | null | undefined,
+): Breakdown[] {
+  const map = new Map<string, { total: number; count: number; rounds: Set<string>; photo?: string | null }>();
+  for (const r of rounds) {
+    const key = (pick(r) ?? "").trim();
+    if (!key) continue;
+    const row = map.get(key) ?? { total: 0, count: 0, rounds: new Set<string>(), photo: photo?.(r) };
+    if (!row.photo && photo?.(r)) row.photo = photo(r);
+    row.rounds.add(r.id);
+    for (const f of fines) {
+      if (f.round_id !== r.id) continue;
+      row.total += Number(f.amount);
+      row.count += 1;
+    }
+    map.set(key, row);
+  }
+  return [...map.entries()]
+    .map(([label, v]) => ({
+      label,
+      total: v.total,
+      count: v.count,
+      rounds: v.rounds.size,
+      avg: v.rounds.size ? v.total / v.rounds.size : 0,
+      photo: v.photo,
+    }))
+    .sort((a, b) => b.total - a.total);
+}
+
+export function finesMasterBreakdown(fines: Fine[], rounds: Round[]) {
+  return roundAttributeBreakdown(
+    fines,
+    rounds,
+    (r) => r.fines_master,
+    (r) => r.fines_master_photo_url,
+  );
+}
+
+export function opponentBreakdown(fines: Fine[], rounds: Round[]) {
+  return roundAttributeBreakdown(
+    fines,
+    rounds,
+    (r) => r.opponent,
+    (r) => r.opponent_logo_url,
+  );
+}
+
+export function venueBreakdown(fines: Fine[], rounds: Round[]) {
+  return roundAttributeBreakdown(fines, rounds, (r) => r.venue);
+}
+
+/** Buckets results into Win / Loss / Draw-ish groups using the free-text result. */
+export function resultBucket(result: string | null | undefined) {
+  const v = (result ?? "").toLowerCase();
+  if (!v.trim()) return null;
+  if (/\bwon|\bwin/.test(v)) return "Wins";
+  if (/\blost|\bloss|\bdefeat/.test(v)) return "Losses";
+  if (/draw|tie|abandon|wash/.test(v)) return "Draws";
+  return "Other";
+}
+
+export function resultBreakdown(fines: Fine[], rounds: Round[]) {
+  return roundAttributeBreakdown(fines, rounds, (r) => resultBucket(r.result));
+}
+
+export function dateBreakdown(fines: Fine[], rounds: Round[]) {
+  return roundAttributeBreakdown(fines, rounds, (r) => r.played_on).sort((a, b) =>
+    a.label.localeCompare(b.label),
+  );
+}

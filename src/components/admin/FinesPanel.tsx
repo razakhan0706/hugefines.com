@@ -29,6 +29,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const [roundId, setRoundId] = useState(latestRound);
   const [categoryId, setCategoryId] = useState("");
   const [description, setDescription] = useState("");
+  const [quote, setQuote] = useState("");
   const [amount, setAmount] = useState("1");
   const [filterPlayer, setFilterPlayer] = useState("all");
   const [newCategory, setNewCategory] = useState("");
@@ -69,16 +70,19 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   async function addFine() {
     if (!playerId) return toast.error("Pick a player");
     const cat = data.categories.find((c) => c.id === categoryId);
+    const base = description.trim() || cat?.label || "Fine";
+    const q = quote.trim();
     const { error } = await supabase.from("fines").insert({
       team_id: data.team.id,
       player_id: playerId,
       round_id: roundId || null,
       category_id: categoryId || null,
-      description: description.trim() || cat?.label || "Fine",
+      description: isQuoteCategory && q ? `${base} — "${q}"` : base,
       amount: Number(amount) || 0,
     });
     if (error) return toast.error(error.message);
     setDescription("");
+    setQuote("");
     refresh();
     toast.success("Fine added");
   }

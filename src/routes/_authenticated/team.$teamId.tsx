@@ -46,26 +46,26 @@ function TeamWorkspace() {
             </div>
 
             <Tabs defaultValue="rounds">
-              <TabsList className="flex h-auto w-full gap-1 overflow-x-auto p-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-                <TabsTrigger className="shrink-0" value="rounds">
+              <TabsList className="grid h-auto w-full grid-cols-3 gap-1 p-1 sm:grid-cols-7">
+                <TabsTrigger className="w-full" value="rounds">
                   Rounds
                 </TabsTrigger>
-                <TabsTrigger className="shrink-0" value="players">
+                <TabsTrigger className="w-full" value="players">
                   Players
                 </TabsTrigger>
-                <TabsTrigger className="shrink-0" value="fines">
+                <TabsTrigger className="w-full" value="fines">
                   Fines
                 </TabsTrigger>
-                <TabsTrigger className="shrink-0" value="voting">
+                <TabsTrigger className="w-full" value="voting">
                   Voting
                 </TabsTrigger>
-                <TabsTrigger className="shrink-0" value="stats">
+                <TabsTrigger className="w-full" value="stats">
                   Stats
                 </TabsTrigger>
-                <TabsTrigger className="shrink-0" value="recaps">
+                <TabsTrigger className="w-full" value="recaps">
                   AI recaps
                 </TabsTrigger>
-                <TabsTrigger className="shrink-0" value="settings">
+                <TabsTrigger className="w-full" value="settings">
                   Settings
                 </TabsTrigger>
               </TabsList>

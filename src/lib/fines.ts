@@ -12,6 +12,7 @@ export interface Player {
   name: string;
   nickname: string | null;
   jersey_number: number | null;
+  photo_url: string | null;
   active: boolean;
 }
 

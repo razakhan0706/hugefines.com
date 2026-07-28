@@ -257,22 +257,6 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
         </CardContent>
       </Card>
 
-      {false && (
-        <Card>
-          <CardContent className="flex gap-2 p-4">
-            <Input
-              className="h-8 w-44"
-              placeholder="New category"
-              value={newCategory}
-              onChange={(e) => setNewCategory(e.target.value)}
-            />
-            <Button size="sm" variant="outline" onClick={addCategory} disabled={!newCategory.trim()}>
-              <Plus className="size-4" />
-            </Button>
-          </CardContent>
-        </Card>
-      )}
-
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Select value={filterPlayer} onValueChange={setFilterPlayer}>
           <SelectTrigger className="w-56">

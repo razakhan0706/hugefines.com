@@ -14,10 +14,17 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   buildPlayerStats,
   categoryBreakdown,
+  dateBreakdown,
+  finesMasterBreakdown,
   money,
+  opponentBreakdown,
+  resultBreakdown,
   roundTotals,
   seasonAwards,
+  venueBreakdown,
+  type Breakdown,
 } from "@/lib/fines";
+import { PhotoAvatar } from "@/components/PhotoAvatar";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { Trophy } from "lucide-react";
 
@@ -35,6 +42,11 @@ export function StatsView({ data }: { data: TeamBundle }) {
   const byRound = roundTotals(data.fines, data.rounds);
   const byCat = categoryBreakdown(data.fines, data.categories);
   const awards = seasonAwards(stats, currency);
+  const byMaster = finesMasterBreakdown(data.fines, data.rounds);
+  const byOpponent = opponentBreakdown(data.fines, data.rounds);
+  const byVenue = venueBreakdown(data.fines, data.rounds);
+  const byResult = resultBreakdown(data.fines, data.rounds);
+  const byDate = dateBreakdown(data.fines, data.rounds);
 
   const summaryTiles = [
     { label: "Season pot", value: money(total, currency) },
@@ -63,7 +75,11 @@ export function StatsView({ data }: { data: TeamBundle }) {
           {awards.map((a) => (
             <Card key={a.title} className="border-accent/40">
               <CardContent className="flex gap-3 p-5">
-                <Trophy className="size-5 shrink-0 text-accent" />
+                {a.photo ? (
+                  <PhotoAvatar url={a.photo} name={a.winner} className="size-11" />
+                ) : (
+                  <Trophy className="size-5 shrink-0 text-accent" />
+                )}
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
                     {a.title}
@@ -97,7 +113,16 @@ export function StatsView({ data }: { data: TeamBundle }) {
                 {stats.map((s, i) => (
                   <tr key={s.player.id} className="border-t border-border">
                     <td className="stat-num py-2 text-muted-foreground">{i + 1}</td>
-                    <td className="font-medium">{s.player.name}</td>
+                    <td className="font-medium">
+                      <span className="flex items-center gap-2">
+                        <PhotoAvatar
+                          url={s.player.photo_url}
+                          name={s.player.name}
+                          className="size-8"
+                        />
+                        {s.player.name}
+                      </span>
+                    </td>
                     <td className="stat-num text-right font-bold">{money(s.total, currency)}</td>
                     <td className="stat-num text-right">{s.count}</td>
                     <td className="stat-num text-right">{money(s.avgPerRound, currency)}</td>
@@ -161,6 +186,99 @@ export function StatsView({ data }: { data: TeamBundle }) {
           </CardContent>
         </Card>
       </div>
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        <BreakdownCard
+          title="Fines by fines master"
+          rows={byMaster}
+          currency={currency}
+          unit="Rounds run"
+          empty="Add a fines master to a round to see this."
+        />
+        <BreakdownCard
+          title="Fines by opponent"
+          rows={byOpponent}
+          currency={currency}
+          unit="Matches"
+          empty="Add opponents to your rounds to see this."
+        />
+        <BreakdownCard
+          title="Fines by venue"
+          rows={byVenue}
+          currency={currency}
+          unit="Matches"
+          empty="Add venues to your rounds to see this."
+        />
+        <BreakdownCard
+          title="Fines by result"
+          rows={byResult}
+          currency={currency}
+          unit="Matches"
+          empty="Add results to your rounds to see this."
+        />
+        <BreakdownCard
+          title="Fines by date"
+          rows={byDate}
+          currency={currency}
+          unit="Matches"
+          empty="Add match dates to your rounds to see this."
+        />
+      </div>
     </div>
+  );
+}
+
+function BreakdownCard({
+  title,
+  rows,
+  currency,
+  unit,
+  empty,
+}: {
+  title: string;
+  rows: Breakdown[];
+  currency: string;
+  unit: string;
+  empty: string;
+}) {
+  return (
+    <Card>
+      <CardContent className="p-5">
+        <h3 className="text-lg font-bold">{title}</h3>
+        {rows.length === 0 ? (
+          <p className="mt-3 text-sm text-muted-foreground">{empty}</p>
+        ) : (
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-muted-foreground">
+                  <th className="py-2">Name</th>
+                  <th className="text-right">Total</th>
+                  <th className="text-right">Fines</th>
+                  <th className="text-right">{unit}</th>
+                  <th className="text-right">Avg</th>
+                </tr>
+              </thead>
+              <tbody>
+                {rows.map((r) => (
+                  <tr key={r.label} className="border-t border-border">
+                    <td className="py-2">
+                      <span className="flex items-center gap-2 font-medium">
+                        <PhotoAvatar url={r.photo} name={r.label} className="size-8" />
+                        {r.label}
+                      </span>
+                    </td>
+                    <td className="stat-num text-right font-bold">{money(r.total, currency)}</td>
+                    <td className="stat-num text-right">{r.count}</td>
+                    <td className="stat-num text-right">{r.rounds}</td>
+                    <td className="stat-num text-right">{money(r.avg, currency)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

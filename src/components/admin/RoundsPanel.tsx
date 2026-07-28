@@ -40,7 +40,11 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     setBusy(id + field);
     try {
       const url = await uploadPhoto(data.team.id, file);
-      const { error } = await supabase.from("rounds").update({ [field]: url }).eq("id", id);
+      const patch =
+        field === "fines_master_photo_url"
+          ? { fines_master_photo_url: url }
+          : { opponent_logo_url: url };
+      const { error } = await supabase.from("rounds").update(patch).eq("id", id);
       if (error) throw error;
       refresh();
     } catch (e) {

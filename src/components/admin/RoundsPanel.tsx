@@ -14,6 +14,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   const [playedOn, setPlayedOn] = useState("");
   const [venue, setVenue] = useState("");
   const [result, setResult] = useState("");
+  const [finesMaster, setFinesMaster] = useState("");
 
   async function addRound() {
     const { error } = await supabase.from("rounds").insert({
@@ -24,12 +25,14 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
       played_on: playedOn || null,
       venue: venue || null,
       result: result || null,
+      fines_master: finesMaster || null,
     });
     if (error) return toast.error(error.message);
     setOpponent("");
     setPlayedOn("");
     setVenue("");
     setResult("");
+    setFinesMaster("");
     refresh();
   }
 
@@ -42,7 +45,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   return (
     <div className="space-y-6">
       <Card>
-        <CardContent className="grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-5">
+        <CardContent className="grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-6">
           <div>
             <label className="text-sm font-medium">Opponent</label>
             <Input value={opponent} onChange={(e) => setOpponent(e.target.value)} />
@@ -58,6 +61,14 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
           <div>
             <label className="text-sm font-medium">Result</label>
             <Input value={result} onChange={(e) => setResult(e.target.value)} placeholder="Won by 4 wkts" />
+          </div>
+          <div>
+            <label className="text-sm font-medium">Fines master</label>
+            <Input
+              value={finesMaster}
+              onChange={(e) => setFinesMaster(e.target.value)}
+              placeholder="Who ran the fines"
+            />
           </div>
           <div className="flex items-end">
             <Button className="w-full" onClick={addRound}>
@@ -85,6 +96,12 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   <p className="text-sm text-muted-foreground">
                     {[r.played_on, r.venue, r.result].filter(Boolean).join(" · ") || "No details"}
                   </p>
+                  {r.fines_master && (
+                    <p className="text-sm">
+                      <span className="text-muted-foreground">Fines master: </span>
+                      <span className="font-medium">{r.fines_master}</span>
+                    </p>
+                  )}
                 </div>
                 <div className="text-right">
                   <p className="stat-num text-lg font-bold text-accent">

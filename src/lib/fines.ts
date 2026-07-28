@@ -24,6 +24,7 @@ export interface Round {
   played_on: string | null;
   venue: string | null;
   result: string | null;
+  fines_master?: string | null;
 }
 
 export interface FineCategory {

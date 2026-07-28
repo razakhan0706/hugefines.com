@@ -46,26 +46,26 @@ function TeamWorkspace() {
             </div>
 
             <Tabs defaultValue="rounds">
-              <TabsList className="grid h-auto w-full grid-cols-3 gap-1 p-1 sm:grid-cols-7">
-                <TabsTrigger className="w-full" value="rounds">
+              <TabsList className="grid h-auto w-full grid-cols-4 gap-1 p-1 text-xs sm:grid-cols-7 sm:text-sm">
+                <TabsTrigger className="w-full px-1" value="rounds">
                   Rounds
                 </TabsTrigger>
-                <TabsTrigger className="w-full" value="players">
+                <TabsTrigger className="w-full px-1" value="players">
                   Players
                 </TabsTrigger>
-                <TabsTrigger className="w-full" value="fines">
+                <TabsTrigger className="w-full px-1" value="fines">
                   Fines
                 </TabsTrigger>
-                <TabsTrigger className="w-full" value="voting">
+                <TabsTrigger className="w-full px-1" value="voting">
                   Voting
                 </TabsTrigger>
-                <TabsTrigger className="w-full" value="stats">
+                <TabsTrigger className="w-full px-1" value="stats">
                   Stats
                 </TabsTrigger>
-                <TabsTrigger className="w-full" value="recaps">
-                  AI recaps
+                <TabsTrigger className="w-full px-1" value="recaps">
+                  Recaps
                 </TabsTrigger>
-                <TabsTrigger className="w-full" value="settings">
+                <TabsTrigger className="w-full px-1" value="settings">
                   Settings
                 </TabsTrigger>
               </TabsList>

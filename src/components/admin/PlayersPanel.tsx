@@ -9,18 +9,15 @@ import type { TeamBundle } from "@/lib/useTeamData";
 
 export function PlayersPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const [name, setName] = useState("");
-  const [jersey, setJersey] = useState("");
   const remaining = data.team.player_limit - data.players.length;
 
   async function addPlayer() {
     const { error } = await supabase.from("players").insert({
       team_id: data.team.id,
       name: name.trim(),
-      jersey_number: jersey ? Number(jersey) : null,
     });
     if (error) return toast.error(error.message);
     setName("");
-    setJersey("");
     refresh();
   }
 
@@ -39,12 +36,6 @@ export function PlayersPanel({ data, refresh }: { data: TeamBundle; refresh: () 
               Player name
             </label>
             <Input id="pname" value={name} onChange={(e) => setName(e.target.value)} />
-          </div>
-          <div className="w-24">
-            <label className="text-sm font-medium" htmlFor="pnum">
-              #
-            </label>
-            <Input id="pnum" value={jersey} onChange={(e) => setJersey(e.target.value)} />
           </div>
           <Button onClick={addPlayer} disabled={!name.trim() || remaining <= 0}>
             Add player
@@ -66,7 +57,7 @@ export function PlayersPanel({ data, refresh }: { data: TeamBundle; refresh: () 
             <Card key={p.id}>
               <CardContent className="flex items-center gap-3 p-4">
                 <span className="stat-num flex size-10 items-center justify-center rounded-full bg-secondary text-sm font-bold">
-                  {p.jersey_number ?? p.name.slice(0, 1).toUpperCase()}
+                  {p.name.slice(0, 1).toUpperCase()}
                 </span>
                 <div className="flex-1">
                   <p className="font-semibold">{p.name}</p>

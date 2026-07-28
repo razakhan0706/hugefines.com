@@ -45,25 +45,39 @@ function TeamWorkspace() {
               <h1 className="text-3xl font-bold">{bundle.data.team.name}</h1>
             </div>
 
-            <Tabs defaultValue="fines">
-              <TabsList className="flex flex-wrap">
-                <TabsTrigger value="fines">Fines</TabsTrigger>
-                <TabsTrigger value="players">Players</TabsTrigger>
-                <TabsTrigger value="rounds">Rounds</TabsTrigger>
-                <TabsTrigger value="voting">Voting</TabsTrigger>
-                <TabsTrigger value="stats">Stats</TabsTrigger>
-                <TabsTrigger value="recaps">AI recaps</TabsTrigger>
-                <TabsTrigger value="settings">Settings</TabsTrigger>
+            <Tabs defaultValue="rounds">
+              <TabsList className="flex h-auto w-full gap-1 overflow-x-auto p-1 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
+                <TabsTrigger className="shrink-0" value="rounds">
+                  Rounds
+                </TabsTrigger>
+                <TabsTrigger className="shrink-0" value="players">
+                  Players
+                </TabsTrigger>
+                <TabsTrigger className="shrink-0" value="fines">
+                  Fines
+                </TabsTrigger>
+                <TabsTrigger className="shrink-0" value="voting">
+                  Voting
+                </TabsTrigger>
+                <TabsTrigger className="shrink-0" value="stats">
+                  Stats
+                </TabsTrigger>
+                <TabsTrigger className="shrink-0" value="recaps">
+                  AI recaps
+                </TabsTrigger>
+                <TabsTrigger className="shrink-0" value="settings">
+                  Settings
+                </TabsTrigger>
               </TabsList>
               <div className="mt-6">
-                <TabsContent value="fines">
-                  <FinesPanel data={bundle.data} refresh={refresh} />
+                <TabsContent value="rounds">
+                  <RoundsPanel data={bundle.data} refresh={refresh} />
                 </TabsContent>
                 <TabsContent value="players">
                   <PlayersPanel data={bundle.data} refresh={refresh} />
                 </TabsContent>
-                <TabsContent value="rounds">
-                  <RoundsPanel data={bundle.data} refresh={refresh} />
+                <TabsContent value="fines">
+                  <FinesPanel data={bundle.data} refresh={refresh} />
                 </TabsContent>
                 <TabsContent value="voting">
                   <VotingPanel data={bundle.data} refresh={refresh} />

@@ -19,6 +19,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { slugify, type Team } from "@/lib/fines";
 import { Plus, Users } from "lucide-react";
+import { uploadPhoto } from "@/lib/photos";
+import { PhotoAvatar } from "@/components/PhotoAvatar";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -49,6 +51,19 @@ function Dashboard() {
   const [sport, setSport] = useState("Cricket");
   const [format, setFormat] = useState("3-2-1");
   const [busy, setBusy] = useState(false);
+  const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [uploading, setUploading] = useState(false);
+
+  async function pickLogo(file: File) {
+    setUploading(true);
+    try {
+      setLogoUrl(await uploadPhoto("teams", file));
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   const teams = useQuery({
     queryKey: ["my-teams"],
@@ -79,6 +94,7 @@ function Dashboard() {
           name,
           slug,
           season_name: season,
+          logo_url: logoUrl,
           sport,
           vote_format: format,
         })
@@ -96,6 +112,7 @@ function Dashboard() {
 
       toast.success("Team created");
       setOpen(false);
+      setLogoUrl(null);
       navigate({ to: "/team/$teamId", params: { teamId: data.id } });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not create team");
@@ -126,6 +143,19 @@ function Dashboard() {
                 <DialogTitle>Create a team</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <PhotoAvatar
+                    url={logoUrl}
+                    name={name}
+                    className="size-14"
+                    busy={uploading}
+                    title="Team photo"
+                    onPick={pickLogo}
+                  />
+                  <p className="text-sm text-muted-foreground">
+                    Add a team photo or badge (optional)
+                  </p>
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="tname">Team name</Label>
                   <Input
@@ -184,13 +214,16 @@ function Dashboard() {
           {teams.data?.map((t) => (
             <Link key={t.id} to="/team/$teamId" params={{ teamId: t.id }}>
               <Card className="h-full transition-colors hover:border-accent">
-                <CardContent className="p-6">
+                <CardContent className="flex gap-4 p-6">
+                  <PhotoAvatar url={t.logo_url} name={t.name} className="size-12" />
+                  <div>
                   <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
                     {t.sport}
                   </p>
                   <h2 className="mt-1 text-xl font-bold">{t.name}</h2>
                   <p className="text-sm text-muted-foreground">{t.season_name}</p>
                   <p className="mt-4 text-xs text-muted-foreground">/t/{t.slug}</p>
+                  </div>
                 </CardContent>
               </Card>
             </Link>

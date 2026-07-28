@@ -219,9 +219,11 @@ export type Database = {
         Row: {
           created_at: string
           fines_master: string | null
+          fines_master_photo_url: string | null
           id: string
           label: string | null
           opponent: string | null
+          opponent_logo_url: string | null
           played_on: string | null
           result: string | null
           round_number: number
@@ -231,9 +233,11 @@ export type Database = {
         Insert: {
           created_at?: string
           fines_master?: string | null
+          fines_master_photo_url?: string | null
           id?: string
           label?: string | null
           opponent?: string | null
+          opponent_logo_url?: string | null
           played_on?: string | null
           result?: string | null
           round_number: number
@@ -243,9 +247,11 @@ export type Database = {
         Update: {
           created_at?: string
           fines_master?: string | null
+          fines_master_photo_url?: string | null
           id?: string
           label?: string | null
           opponent?: string | null
+          opponent_logo_url?: string | null
           played_on?: string | null
           result?: string | null
           round_number?: number

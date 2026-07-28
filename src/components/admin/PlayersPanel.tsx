@@ -4,24 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Trash2, Camera, Loader2 } from "lucide-react";
+import { Trash2, Loader2 } from "lucide-react";
 import type { TeamBundle } from "@/lib/useTeamData";
-
-const TEN_YEARS = 60 * 60 * 24 * 3650;
-
-async function uploadPhoto(teamId: string, file: File) {
-  const ext = file.name.split(".").pop()?.toLowerCase() || "jpg";
-  const path = `${teamId}/${crypto.randomUUID()}.${ext}`;
-  const { error } = await supabase.storage
-    .from("player-photos")
-    .upload(path, file, { upsert: true, contentType: file.type });
-  if (error) throw error;
-  const { data, error: signError } = await supabase.storage
-    .from("player-photos")
-    .createSignedUrl(path, TEN_YEARS);
-  if (signError) throw signError;
-  return data.signedUrl;
-}
+import { uploadPhoto } from "@/lib/photos";
+import { PhotoAvatar } from "@/components/PhotoAvatar";
 
 export function PlayersPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const [name, setName] = useState("");
@@ -120,34 +106,12 @@ export function PlayersPanel({ data, refresh }: { data: TeamBundle; refresh: () 
           return (
             <Card key={p.id}>
               <CardContent className="flex items-center gap-3 p-4">
-                <label className="group relative cursor-pointer" title="Upload photo">
-                  {p.photo_url ? (
-                    <img
-                      src={p.photo_url}
-                      alt={p.name}
-                      className="size-10 rounded-full object-cover"
-                    />
-                  ) : (
-                    <span className="flex size-10 items-center justify-center rounded-full bg-secondary text-muted-foreground">
-                      <Camera className="size-4" />
-                    </span>
-                  )}
-                  {busy === p.id && (
-                    <span className="absolute inset-0 flex items-center justify-center rounded-full bg-background/70">
-                      <Loader2 className="size-4 animate-spin" />
-                    </span>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="sr-only"
-                    onChange={(e) => {
-                      const f = e.target.files?.[0];
-                      if (f) changePhoto(p.id, f);
-                      e.target.value = "";
-                    }}
-                  />
-                </label>
+                <PhotoAvatar
+                  url={p.photo_url}
+                  name={p.name}
+                  busy={busy === p.id}
+                  onPick={(f) => changePhoto(p.id, f)}
+                />
                 <div className="flex-1">
                   <p className="font-semibold">{p.name}</p>
                   <p className="text-sm text-muted-foreground">

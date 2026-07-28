@@ -12,6 +12,7 @@ import {
 import { toast } from "sonner";
 import { VOTE_FORMATS } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
+import { PhotoAvatar } from "@/components/PhotoAvatar";
 
 export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const points = VOTE_FORMATS[data.team.vote_format] ?? VOTE_FORMATS["3-2-1"];
@@ -64,6 +65,7 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   const tally = [...data.players]
     .map((p) => ({
       name: p.name,
+      photo: p.photo_url,
       total: data.votes.filter((v) => v.player_id === p.id).reduce((s, v) => s + v.points, 0),
     }))
     .filter((p) => p.total > 0)
@@ -93,11 +95,18 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
             </SelectContent>
           </Select>
 
-          {points.map((p) => (
+          {points.map((p) => {
+            const picked = data.players.find((pl) => pl.id === picks[p]);
+            return (
             <div key={p} className="flex items-center gap-3">
-              <span className="stat-num flex size-9 shrink-0 items-center justify-center rounded-full bg-accent font-bold text-accent-foreground">
-                {p}
-              </span>
+              <div className="flex shrink-0 items-center gap-2 rounded-full bg-accent px-2 py-1 text-accent-foreground">
+                <span className="stat-num flex size-7 items-center justify-center rounded-full bg-accent-foreground/15 font-bold">
+                  {p}
+                </span>
+                <span className="max-w-28 truncate text-sm font-semibold">
+                  {picked ? picked.name : `${p} vote${p > 1 ? "s" : ""}`}
+                </span>
+              </div>
               <Select
                 value={picks[p] ?? ""}
                 onValueChange={(v) => setPicks((s) => ({ ...s, [p]: v }))}
@@ -114,7 +123,8 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                 </SelectContent>
               </Select>
             </div>
-          ))}
+            );
+          })}
 
           <Button className="w-full" onClick={saveVotes} disabled={busy}>
             {roundVotes.length ? "Replace votes for this round" : "Save votes"}
@@ -135,6 +145,7 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                 className="flex items-center gap-3 rounded-md border border-border px-3 py-2"
               >
                 <span className="stat-num w-6 text-muted-foreground">{i + 1}</span>
+                <PhotoAvatar url={row.photo} name={row.name} className="size-8" />
                 <span className="flex-1 font-medium">{row.name}</span>
                 <span className="stat-num font-bold text-accent">{row.total}</span>
               </div>

@@ -7,13 +7,20 @@ import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Trash2, Plus } from "lucide-react";
-import { money } from "@/lib/fines";
+import {
+  DEFAULT_FINE_CATEGORIES,
+  FINE_CATEGORY_GROUPS,
+  groupForCategory,
+  money,
+} from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 
 export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
@@ -37,6 +44,23 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const categoryLabel = useMemo(
     () => new Map(data.categories.map((c) => [c.id, c.label])),
     [data.categories],
+  );
+
+  const groupedCategories = useMemo(() => {
+    const order = [...FINE_CATEGORY_GROUPS.map((g) => g.group), "Other"];
+    const map = new Map<string, typeof data.categories>();
+    for (const c of data.categories) {
+      const g = groupForCategory(c.label);
+      map.set(g, [...(map.get(g) ?? []), c]);
+    }
+    return order
+      .filter((g) => map.get(g)?.length)
+      .map((g) => ({ group: g, items: map.get(g)! }));
+  }, [data.categories]);
+
+  const missingDefaults = DEFAULT_FINE_CATEGORIES.filter(
+    (label) =>
+      !data.categories.some((c) => c.label.trim().toLowerCase() === label.toLowerCase()),
   );
 
   const visible = data.fines.filter((f) => filterPlayer === "all" || f.player_id === filterPlayer);
@@ -65,6 +89,26 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
       .insert({ team_id: data.team.id, label: newCategory.trim(), default_amount: 1 });
     if (error) return toast.error(error.message);
     setNewCategory("");
+    refresh();
+  }
+
+  async function addDefaultCategories() {
+    const { error } = await supabase.from("fine_categories").insert(
+      missingDefaults.map((label) => ({
+        team_id: data.team.id,
+        label,
+        default_amount: 1,
+      })),
+    );
+    if (error) return toast.error(error.message);
+    refresh();
+    toast.success("Default fine categories added");
+  }
+
+  async function removeCategory(id: string) {
+    const { error } = await supabase.from("fine_categories").delete().eq("id", id);
+    if (error) return toast.error(error.message);
+    if (categoryId === id) setCategoryId("");
     refresh();
   }
 
@@ -126,10 +170,15 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
-                {data.categories.map((c) => (
-                  <SelectItem key={c.id} value={c.id}>
-                    {c.label}
-                  </SelectItem>
+                {groupedCategories.map((g) => (
+                  <SelectGroup key={g.group}>
+                    <SelectLabel>{g.group}</SelectLabel>
+                    {g.items.map((c) => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.label}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
                 ))}
               </SelectContent>
             </Select>
@@ -154,14 +203,63 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
       </Card>
 
       <Card>
-        <CardContent className="flex flex-wrap items-center gap-2 p-4">
-          <span className="text-sm font-medium">Categories:</span>
-          {data.categories.map((c) => (
-            <Badge key={c.id} variant="secondary">
-              {c.label}
-            </Badge>
+        <CardContent className="space-y-4 p-4">
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="text-sm font-medium">Fine categories</span>
+            {missingDefaults.length > 0 && (
+              <Button size="sm" variant="outline" onClick={addDefaultCategories}>
+                Add default categories
+              </Button>
+            )}
+            <div className="ml-auto flex gap-2">
+              <Input
+                className="h-8 w-44"
+                placeholder="New category"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+              />
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={addCategory}
+                disabled={!newCategory.trim()}
+              >
+                <Plus className="size-4" />
+              </Button>
+            </div>
+          </div>
+          {groupedCategories.map((g) => (
+            <div key={g.group} className="space-y-1">
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                {g.group}
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {g.items.map((c) => (
+                  <Badge
+                    key={c.id}
+                    variant="secondary"
+                    className="cursor-pointer gap-1"
+                    onClick={() => removeCategory(c.id)}
+                    title="Remove category"
+                  >
+                    {c.label}
+                    <Trash2 className="size-3 opacity-60" />
+                  </Badge>
+                ))}
+              </div>
+            </div>
           ))}
-          <div className="ml-auto flex gap-2">
+          {groupedCategories.length === 0 && (
+            <p className="text-sm text-muted-foreground">
+              No categories yet — add the defaults to get started.
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {false && (
+        <Card>
+          <CardContent className="flex gap-2 p-4">
             <Input
               className="h-8 w-44"
               placeholder="New category"
@@ -171,9 +269,9 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
             <Button size="sm" variant="outline" onClick={addCategory} disabled={!newCategory.trim()}>
               <Plus className="size-4" />
             </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <Select value={filterPlayer} onValueChange={setFilterPlayer}>

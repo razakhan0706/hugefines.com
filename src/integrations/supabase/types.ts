@@ -218,6 +218,7 @@ export type Database = {
       rounds: {
         Row: {
           created_at: string
+          fines_master: string | null
           id: string
           label: string | null
           opponent: string | null
@@ -229,6 +230,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          fines_master?: string | null
           id?: string
           label?: string | null
           opponent?: string | null
@@ -240,6 +242,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          fines_master?: string | null
           id?: string
           label?: string | null
           opponent?: string | null

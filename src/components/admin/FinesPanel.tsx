@@ -29,6 +29,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const [roundId, setRoundId] = useState(latestRound);
   const [categoryId, setCategoryId] = useState("");
   const [description, setDescription] = useState("");
+  const [quote, setQuote] = useState("");
   const [amount, setAmount] = useState("1");
   const [filterPlayer, setFilterPlayer] = useState("all");
   const [newCategory, setNewCategory] = useState("");
@@ -63,22 +64,29 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
       !data.categories.some((c) => c.label.trim().toLowerCase() === label.toLowerCase()),
   );
 
+  const isQuoteCategory =
+    data.categories.find((c) => c.id === categoryId)?.label.trim().toLowerCase() ===
+    "rubbish chat";
+
   const visible = data.fines.filter((f) => filterPlayer === "all" || f.player_id === filterPlayer);
   const total = visible.reduce((s, f) => s + Number(f.amount), 0);
 
   async function addFine() {
     if (!playerId) return toast.error("Pick a player");
     const cat = data.categories.find((c) => c.id === categoryId);
+    const base = description.trim() || cat?.label || "Fine";
+    const q = quote.trim();
     const { error } = await supabase.from("fines").insert({
       team_id: data.team.id,
       player_id: playerId,
       round_id: roundId || null,
       category_id: categoryId || null,
-      description: description.trim() || cat?.label || "Fine",
+      description: isQuoteCategory && q ? `${base} — "${q}"` : base,
       amount: Number(amount) || 0,
     });
     if (error) return toast.error(error.message);
     setDescription("");
+    setQuote("");
     refresh();
     toast.success("Fine added");
   }
@@ -162,6 +170,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               value={categoryId}
               onValueChange={(v) => {
                 setCategoryId(v);
+                setQuote("");
                 const c = data.categories.find((x) => x.id === v);
                 if (c) setAmount(String(c.default_amount));
               }}
@@ -199,6 +208,16 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
+          {isQuoteCategory && (
+            <div className="lg:col-span-6">
+              <label className="text-sm font-medium">Exact quote</label>
+              <Input
+                placeholder='What did they actually say? e.g. "I could bowl faster than that"'
+                value={quote}
+                onChange={(e) => setQuote(e.target.value)}
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 

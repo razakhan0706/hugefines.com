@@ -64,6 +64,10 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
       !data.categories.some((c) => c.label.trim().toLowerCase() === label.toLowerCase()),
   );
 
+  const isQuoteCategory =
+    data.categories.find((c) => c.id === categoryId)?.label.trim().toLowerCase() ===
+    "rubbish chat";
+
   const visible = data.fines.filter((f) => filterPlayer === "all" || f.player_id === filterPlayer);
   const total = visible.reduce((s, f) => s + Number(f.amount), 0);
 
@@ -166,6 +170,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               value={categoryId}
               onValueChange={(v) => {
                 setCategoryId(v);
+                setQuote("");
                 const c = data.categories.find((x) => x.id === v);
                 if (c) setAmount(String(c.default_amount));
               }}
@@ -203,6 +208,16 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               onChange={(e) => setDescription(e.target.value)}
             />
           </div>
+          {isQuoteCategory && (
+            <div className="lg:col-span-6">
+              <label className="text-sm font-medium">Exact quote</label>
+              <Input
+                placeholder='What did they actually say? e.g. "I could bowl faster than that"'
+                value={quote}
+                onChange={(e) => setQuote(e.target.value)}
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 

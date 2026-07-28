@@ -22,6 +22,7 @@ import {
   money,
 } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
+import { PhotoAvatar } from "@/components/PhotoAvatar";
 
 export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const latestRound = data.rounds.at(-1)?.id ?? "";
@@ -36,6 +37,10 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
 
   const playerName = useMemo(
     () => new Map(data.players.map((p) => [p.id, p.name])),
+    [data.players],
+  );
+  const playerPhoto = useMemo(
+    () => new Map(data.players.map((p) => [p.id, p.photo_url])),
     [data.players],
   );
   const roundLabel = useMemo(
@@ -117,11 +122,6 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
     const { error } = await supabase.from("fine_categories").delete().eq("id", id);
     if (error) return toast.error(error.message);
     if (categoryId === id) setCategoryId("");
-    refresh();
-  }
-
-  async function togglePaid(id: string, paid: boolean) {
-    await supabase.from("fines").update({ paid: !paid }).eq("id", id);
     refresh();
   }
 
@@ -303,6 +303,10 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
         {visible.map((f) => (
           <Card key={f.id}>
             <CardContent className="flex flex-wrap items-center gap-3 p-4">
+              <PhotoAvatar
+                url={playerPhoto.get(f.player_id)}
+                name={playerName.get(f.player_id)}
+              />
               <div className="flex-1 min-w-45">
                 <p className="font-semibold">{playerName.get(f.player_id) ?? "Unknown"}</p>
                 <p className="text-sm text-muted-foreground">
@@ -314,13 +318,6 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               <span className="stat-num text-lg font-bold">
                 {money(Number(f.amount), data.team.currency)}
               </span>
-              <Button
-                size="sm"
-                variant={f.paid ? "default" : "outline"}
-                onClick={() => togglePaid(f.id, f.paid)}
-              >
-                {f.paid ? "Paid" : "Unpaid"}
-              </Button>
               <Button variant="ghost" size="icon" onClick={() => removeFine(f.id)}>
                 <Trash2 className="size-4" />
               </Button>

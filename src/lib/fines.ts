@@ -73,6 +73,40 @@ export function money(amount: number, currency = "$") {
   return `${currency}${amount.toFixed(2).replace(/\.00$/, "")}`;
 }
 
+export const FINE_CATEGORY_GROUPS: { group: string; labels: string[] }[] = [
+  {
+    group: "General",
+    labels: [
+      "Dummy spit",
+      "Rubbish chat",
+      "Getting into a fight",
+      "Late arrival",
+      "Lost/forgetting equipment",
+    ],
+  },
+  {
+    group: "Batting",
+    labels: ["Filthy hack", "BBQ", "Getting clean bowled", "Missing a straight one"],
+  },
+  {
+    group: "Bowling",
+    labels: ["Half tracker", "Getting whacked out of the ground", "No ball", "Wide"],
+  },
+  {
+    group: "Fielding",
+    labels: ["Dropped a sitter", "Misfield", "Asleep in the field", "Custard arm"],
+  },
+];
+
+export const DEFAULT_FINE_CATEGORIES = FINE_CATEGORY_GROUPS.flatMap((g) => g.labels);
+
+export function groupForCategory(label: string) {
+  const found = FINE_CATEGORY_GROUPS.find((g) =>
+    g.labels.some((l) => l.toLowerCase() === label.trim().toLowerCase()),
+  );
+  return found?.group ?? "Other";
+}
+
 export function slugify(value: string) {
   return value
     .toLowerCase()

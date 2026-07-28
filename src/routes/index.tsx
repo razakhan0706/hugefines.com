@@ -28,7 +28,7 @@ const FEATURES = [
   {
     icon: ClipboardList,
     title: "Fines in two taps",
-    body: "Reusable categories and one-off fines, logged against a player and a round on the sideline.",
+    body: "Reusable categories and one-off fines, logged against a player and a round.",
   },
   {
     icon: BarChart3,
@@ -48,12 +48,12 @@ const FEATURES = [
   {
     icon: Share2,
     title: "Live public link",
-    body: "Share one read-only link with the whole club. It updates the moment you save a fine.",
+    body: "Share one read-only link with the whole team. It updates the moment you save a fine.",
   },
   {
     icon: Users,
     title: "Shared admin access",
-    body: "Invite a co-admin the way you'd share a doc. Everyone else just watches.",
+    body: "Invite a co-admin the way you'd share a doc.",
   },
 ];
 
@@ -66,15 +66,15 @@ function Index() {
         <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-[1.1fr_0.9fr] md:py-24">
           <div>
             <span className="inline-flex items-center rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-accent-strong">
-              Built for club sport
+              BUILT FOR LOCAL SPORT
             </span>
             <h1 className="mt-5 text-5xl font-extrabold leading-[1.05] md:text-6xl">
               Your team's fines book,
               <span className="text-accent"> finally worth reading.</span>
             </h1>
             <p className="mt-5 max-w-xl text-lg text-muted-foreground">
-              Kill the spreadsheet. Log $1 fines for bad haircuts and worse parking, run
-              player-of-the-season voting, and let the whole club follow a live leaderboard all
+              Kill the spreadsheet. Log fines for bad haircuts and worse parking. Run
+              player-of-the-season voting, and let the whole team follow a live leaderboard all
               season.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -86,7 +86,7 @@ function Index() {
               </Button>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
-              Standard team — 20 player profiles, full season. No cut of your fines money.
+              Standard team — 20 player profiles, 12 months of usage. No cut of your fines money. All for $19.99
             </p>
           </div>
 
@@ -97,10 +97,10 @@ function Index() {
               </p>
               <ul className="mt-4 space-y-3">
                 {[
-                  ["Dev Patel", "$34", "Late to warm-up ×6"],
-                  ["Josh Reid", "$28", "Pink shorts"],
-                  ["Sam Okafor", "$21", "Shocking parking"],
-                  ["Tom Lacey", "$12", "Dropped a sitter"],
+                  ["Dev Patel", "$94", "Late to warm-up ×6"],
+                  ["Josh Reid", "$88", "Pink shorts"],
+                  ["Sam Okafor", "$71", "Shocking parking"],
+                  ["Tom Lacey", "$62", "Dropped a sitter"],
                 ].map(([name, amount, reason], i) => (
                   <li key={name} className="flex items-center gap-3 border-b border-border pb-3 last:border-0">
                     <span className="stat-num w-6 text-muted-foreground">{i + 1}</span>
@@ -138,8 +138,8 @@ function Index() {
         <div className="mx-auto max-w-6xl px-4 py-14 text-center">
           <h2 className="text-3xl font-bold">Set your team up in five minutes</h2>
           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-            Create a season, add up to 20 players, and start fining. The end-of-season party fund
-            counts itself.
+            Create a season, add up to 20 players, and start fining. The end-of-season party funds
+            itself.
           </p>
           <Button asChild size="lg" className="mt-7">
             <Link to="/auth">Create free account</Link>

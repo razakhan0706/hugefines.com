@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -19,6 +19,20 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   const [picks, setPicks] = useState<Record<number, string>>({});
   const [busy, setBusy] = useState(false);
 
+  // When the selected round changes (or votes refresh), load any existing
+  // votes for that round into the picks so the editor reflects saved state.
+  useEffect(() => {
+    if (!roundId) {
+      setPicks({});
+      return;
+    }
+    const existing: Record<number, string> = {};
+    for (const v of data.votes) {
+      if (v.round_id === roundId) existing[v.points] = v.player_id;
+    }
+    setPicks(existing);
+  }, [roundId, data.votes]);
+
   const roundVotes = data.votes.filter((v) => v.round_id === roundId);
 
   async function saveVotes() {
@@ -35,11 +49,14 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     if (!rows.length) return toast.error("Select at least one player");
 
     setBusy(true);
-    await supabase.from("votes").delete().eq("round_id", roundId);
+    const { error: delError } = await supabase.from("votes").delete().eq("round_id", roundId);
+    if (delError) {
+      setBusy(false);
+      return toast.error(delError.message);
+    }
     const { error } = await supabase.from("votes").insert(rows);
     setBusy(false);
     if (error) return toast.error(error.message);
-    setPicks({});
     refresh();
     toast.success("Votes saved");
   }

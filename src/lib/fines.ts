@@ -26,6 +26,8 @@ export interface Round {
   venue: string | null;
   result: string | null;
   fines_master?: string | null;
+  fines_master_photo_url?: string | null;
+  opponent_logo_url?: string | null;
 }
 
 export interface FineCategory {
@@ -62,6 +64,7 @@ export interface Team {
   slug: string;
   sport: string;
   season_name: string;
+  logo_url?: string | null;
   accent_color: string;
   vote_format: VoteFormat;
   votes_public: boolean;

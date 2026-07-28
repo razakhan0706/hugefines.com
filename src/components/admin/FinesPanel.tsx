@@ -192,22 +192,6 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               </SelectContent>
             </Select>
           </div>
-          <div>
-            <label className="text-sm font-medium">Amount</label>
-            <Input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" />
-          </div>
-          <div className="flex items-end">
-            <Button className="w-full" onClick={addFine}>
-              Add fine
-            </Button>
-          </div>
-          <div className="lg:col-span-6">
-            <Input
-              placeholder="What did they do? (optional — defaults to the category)"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-            />
-          </div>
           {isQuoteCategory && (
             <div className="lg:col-span-6">
               <label className="text-sm font-medium">Exact quote</label>
@@ -218,6 +202,23 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               />
             </div>
           )}
+          <div className="lg:col-span-6">
+            <label className="text-sm font-medium">Custom</label>
+            <Input
+              placeholder="Custom (optional — defaults to the category)"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium">Amount</label>
+            <Input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" />
+          </div>
+          <div className="flex items-end">
+            <Button className="w-full" onClick={addFine}>
+              Add fine
+            </Button>
+          </div>
         </CardContent>
       </Card>
 

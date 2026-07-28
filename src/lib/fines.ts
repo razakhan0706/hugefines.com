@@ -218,6 +218,7 @@ export interface Award {
   title: string;
   winner: string;
   detail: string;
+  photo?: string | null;
 }
 
 export function seasonAwards(stats: PlayerStat[], currency: string): Award[] {
@@ -230,6 +231,7 @@ export function seasonAwards(stats: PlayerStat[], currency: string): Award[] {
     awards.push({
       title: "Player of the Season",
       winner: mvp.player.name,
+      photo: mvp.player.photo_url,
       detail: `${mvp.votePoints} votes across ${mvp.voteRounds} rounds`,
     });
   }
@@ -239,6 +241,7 @@ export function seasonAwards(stats: PlayerStat[], currency: string): Award[] {
     awards.push({
       title: "Most Fined",
       winner: most.player.name,
+      photo: most.player.photo_url,
       detail: `${money(most.total, currency)} from ${most.count} fines`,
     });
   }
@@ -248,6 +251,7 @@ export function seasonAwards(stats: PlayerStat[], currency: string): Award[] {
     awards.push({
       title: "Best Behaviour",
       winner: cleanest.player.name,
+      photo: cleanest.player.photo_url,
       detail: `Only ${money(cleanest.total, currency)} all season`,
     });
   }
@@ -257,6 +261,7 @@ export function seasonAwards(stats: PlayerStat[], currency: string): Award[] {
     awards.push({
       title: "Repeat Offender",
       winner: streaky.player.name,
+      photo: streaky.player.photo_url,
       detail: `Fined in ${streaky.streak} rounds in a row`,
     });
   }
@@ -266,6 +271,7 @@ export function seasonAwards(stats: PlayerStat[], currency: string): Award[] {
     awards.push({
       title: "Biggest Single Fine",
       winner: bigOne.player.name,
+      photo: bigOne.player.photo_url,
       detail: money(bigOne.biggest, currency),
     });
   }

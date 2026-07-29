@@ -90,15 +90,16 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
         <CardContent className="grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-6">
           <div>
             <label className="text-sm font-medium">Opponent</label>
-            <div className="flex items-center gap-2">
+            <Input value={opponent} onChange={(e) => setOpponent(e.target.value)} />
+            <div className="mt-2">
               <PhotoAvatar
                 url={opponentLogo}
                 name={opponent}
                 busy={busy === "opp"}
-                title="Opposition photo"
+                title="Opposition logo"
+                label="Opposition logo"
                 onPick={(f) => pickPhoto("opp", f, setOpponentLogo)}
               />
-              <Input value={opponent} onChange={(e) => setOpponent(e.target.value)} />
             </div>
           </div>
           <div>
@@ -115,18 +116,19 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
           </div>
           <div>
             <label className="text-sm font-medium">Fines master</label>
-            <div className="flex items-center gap-2">
+            <Input
+              value={finesMaster}
+              onChange={(e) => setFinesMaster(e.target.value)}
+              placeholder="Who ran the fines"
+            />
+            <div className="mt-2">
               <PhotoAvatar
                 url={finesMasterPhoto}
                 name={finesMaster}
                 busy={busy === "fm"}
                 title="Fines master photo"
+                label="Fines master photo"
                 onPick={(f) => pickPhoto("fm", f, setFinesMasterPhoto)}
-              />
-              <Input
-                value={finesMaster}
-                onChange={(e) => setFinesMaster(e.target.value)}
-                placeholder="Who ran the fines"
               />
             </div>
           </div>
@@ -155,7 +157,8 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   url={r.opponent_logo_url}
                   name={r.opponent}
                   busy={busy === r.id + "opponent_logo_url"}
-                  title="Opposition photo"
+                  title="Opposition logo"
+                  label="Add logo"
                   onPick={(f) => updateRoundPhoto(r.id, "opponent_logo_url", f)}
                 />
                 <div className="flex-1 min-w-40">
@@ -167,9 +170,10 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                     <PhotoAvatar
                       url={r.fines_master_photo_url}
                       name={r.fines_master}
-                      className="size-7"
+                      className="size-8"
                       busy={busy === r.id + "fines_master_photo_url"}
                       title="Fines master photo"
+                      label="Add photo"
                       onPick={(f) => updateRoundPhoto(r.id, "fines_master_photo_url", f)}
                     />
                     <p className="text-sm">

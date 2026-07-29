@@ -142,6 +142,35 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
       <Card className="border-2">
         <CardContent className="grid gap-3 p-5 lg:grid-cols-6">
           <div className="lg:col-span-2">
+            <label className="text-sm font-medium">Round</label>
+            <Select value={roundId} onValueChange={setRoundId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Round" />
+              </SelectTrigger>
+              <SelectContent>
+                {data.rounds.map((r) => (
+                  <SelectItem key={r.id} value={r.id}>
+                    {roundDayLabel(r)}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          {isTwoDay && (
+            <div>
+              <label className="text-sm font-medium">Week</label>
+              <Select value={week} onValueChange={setWeek}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Week" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">Day 1</SelectItem>
+                  <SelectItem value="2">Day 2</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          <div className="lg:col-span-2">
             <label className="text-sm font-medium">Player</label>
             <Select value={playerId} onValueChange={setPlayerId}>
               <SelectTrigger>
@@ -151,21 +180,6 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                 {data.players.map((p) => (
                   <SelectItem key={p.id} value={p.id}>
                     {p.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          <div>
-            <label className="text-sm font-medium">Round</label>
-            <Select value={roundId} onValueChange={setRoundId}>
-              <SelectTrigger>
-                <SelectValue placeholder="Round" />
-              </SelectTrigger>
-              <SelectContent>
-                {data.rounds.map((r) => (
-                  <SelectItem key={r.id} value={r.id}>
-                    {r.label || `Round ${r.round_number}`}
                   </SelectItem>
                 ))}
               </SelectContent>

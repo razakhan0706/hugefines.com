@@ -14,7 +14,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Trash2, Plus } from "lucide-react";
+import { Trash2, Plus, Pencil, Check, X } from "lucide-react";
 import {
   DEFAULT_FINE_CATEGORIES,
   FINE_CATEGORY_GROUPS,
@@ -36,6 +36,48 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const [amount, setAmount] = useState("1");
   const [filterPlayer, setFilterPlayer] = useState("all");
   const [newCategory, setNewCategory] = useState("");
+  const [editId, setEditId] = useState<string | null>(null);
+  const [edit, setEdit] = useState({
+    player_id: "",
+    round_id: "",
+    category_id: "",
+    week: "1",
+    description: "",
+    amount: "0",
+  });
+
+  function startEdit(f: TeamBundle["fines"][number]) {
+    setEditId(f.id);
+    setEdit({
+      player_id: f.player_id,
+      round_id: f.round_id ?? "",
+      category_id: f.category_id ?? "",
+      week: String(f.week ?? 1),
+      description: f.description,
+      amount: String(f.amount),
+    });
+  }
+
+  async function saveEdit() {
+    if (!editId) return;
+    const { error } = await supabase
+      .from("fines")
+      .update({
+        player_id: edit.player_id,
+        round_id: edit.round_id || null,
+        category_id: edit.category_id || null,
+        week: data.rounds.find((r) => r.id === edit.round_id)?.two_day
+          ? Number(edit.week) || 1
+          : null,
+        description: edit.description.trim() || "Fine",
+        amount: Number(edit.amount) || 0,
+      })
+      .eq("id", editId);
+    if (error) return toast.error(error.message);
+    setEditId(null);
+    refresh();
+    toast.success("Fine updated");
+  }
 
   const playerName = useMemo(
     () => new Map(data.players.map((p) => [p.id, p.name])),
@@ -323,6 +365,109 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
       <div className="space-y-2">
         {visible.map((f) => (
           <Card key={f.id}>
+            {editId === f.id ? (
+              <CardContent className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
+                <div>
+                  <label className="text-sm font-medium">Player</label>
+                  <Select
+                    value={edit.player_id}
+                    onValueChange={(v) => setEdit((s) => ({ ...s, player_id: v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Player" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {data.players.map((p) => (
+                        <SelectItem key={p.id} value={p.id}>
+                          {p.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Round</label>
+                  <Select
+                    value={edit.round_id}
+                    onValueChange={(v) => setEdit((s) => ({ ...s, round_id: v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Round" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {data.rounds.map((r) => (
+                        <SelectItem key={r.id} value={r.id}>
+                          {roundDayLabel(r)}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                {data.rounds.find((r) => r.id === edit.round_id)?.two_day && (
+                  <div>
+                    <label className="text-sm font-medium">Week</label>
+                    <Select
+                      value={edit.week}
+                      onValueChange={(v) => setEdit((s) => ({ ...s, week: v }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="1">Day 1</SelectItem>
+                        <SelectItem value="2">Day 2</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                )}
+                <div>
+                  <label className="text-sm font-medium">Category</label>
+                  <Select
+                    value={edit.category_id}
+                    onValueChange={(v) => setEdit((s) => ({ ...s, category_id: v }))}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {groupedCategories.map((g) => (
+                        <SelectGroup key={g.group}>
+                          <SelectLabel>{g.group}</SelectLabel>
+                          {g.items.map((c) => (
+                            <SelectItem key={c.id} value={c.id}>
+                              {c.label}
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="sm:col-span-2">
+                  <label className="text-sm font-medium">Description</label>
+                  <Input
+                    value={edit.description}
+                    onChange={(e) => setEdit((s) => ({ ...s, description: e.target.value }))}
+                  />
+                </div>
+                <div>
+                  <label className="text-sm font-medium">Amount</label>
+                  <Input
+                    value={edit.amount}
+                    inputMode="decimal"
+                    onChange={(e) => setEdit((s) => ({ ...s, amount: e.target.value }))}
+                  />
+                </div>
+                <div className="flex items-end gap-2">
+                  <Button className="flex-1" onClick={saveEdit}>
+                    <Check className="size-4" /> Save
+                  </Button>
+                  <Button variant="outline" onClick={() => setEditId(null)}>
+                    <X className="size-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            ) : (
             <CardContent className="flex flex-wrap items-center gap-3 p-4">
               <PhotoAvatar
                 url={playerPhoto.get(f.player_id)}
@@ -339,10 +484,14 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               <span className="stat-num text-lg font-bold">
                 {money(Number(f.amount), data.team.currency)}
               </span>
+              <Button variant="ghost" size="icon" onClick={() => startEdit(f)} title="Edit fine">
+                <Pencil className="size-4" />
+              </Button>
               <Button variant="ghost" size="icon" onClick={() => removeFine(f.id)}>
                 <Trash2 className="size-4" />
               </Button>
             </CardContent>
+            )}
           </Card>
         ))}
         {visible.length === 0 && (

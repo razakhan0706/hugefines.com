@@ -366,8 +366,25 @@ export function resultBreakdown(fines: Fine[], rounds: Round[]) {
   return roundAttributeBreakdown(fines, rounds, (r) => resultBucket(r.result));
 }
 
-export function dateBreakdown(fines: Fine[], rounds: Round[]) {
-  return roundAttributeBreakdown(fines, rounds, (r) => r.played_on).sort((a, b) =>
-    a.label.localeCompare(b.label),
-  );
+/** Fines grouped by round, split into days for two-day rounds. */
+export function weekBreakdown(fines: Fine[], rounds: Round[]): Breakdown[] {
+  const ordered = [...rounds].sort((a, b) => a.round_number - b.round_number);
+  const rows: Breakdown[] = [];
+  for (const r of ordered) {
+    const mine = fines.filter((f) => f.round_id === r.id);
+    const days = r.two_day ? [1, 2] : [null];
+    for (const d of days) {
+      const subset = d === null ? mine : mine.filter((f) => (f.week ?? 1) === d);
+      const total = subset.reduce((s, f) => s + Number(f.amount), 0);
+      rows.push({
+        label: roundDayLabel(r, d),
+        total,
+        count: subset.length,
+        rounds: 1,
+        avg: total,
+        photo: r.opponent_logo_url,
+      });
+    }
+  }
+  return rows;
 }

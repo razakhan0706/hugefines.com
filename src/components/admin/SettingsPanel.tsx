@@ -7,6 +7,8 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Copy } from "lucide-react";
 import type { TeamBundle } from "@/lib/useTeamData";
+import { PhotoAvatar } from "@/components/PhotoAvatar";
+import { uploadPhoto } from "@/lib/photos";
 
 export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const [name, setName] = useState(data.team.name);
@@ -14,6 +16,22 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
   const [currency, setCurrency] = useState(data.team.currency);
   const [isPublic, setIsPublic] = useState(data.team.is_public);
   const [votesPublic, setVotesPublic] = useState(data.team.votes_public);
+  const [uploading, setUploading] = useState(false);
+
+  async function pickLogo(file: File) {
+    setUploading(true);
+    try {
+      const url = await uploadPhoto(data.team.id, file);
+      const { error } = await supabase.from("teams").update({ logo_url: url }).eq("id", data.team.id);
+      if (error) throw error;
+      refresh();
+      toast.success("Team photo updated");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Upload failed");
+    } finally {
+      setUploading(false);
+    }
+  }
 
   const link =
     typeof window !== "undefined" ? `${window.location.origin}/t/${data.team.slug}` : "";
@@ -39,6 +57,20 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
       <Card>
         <CardContent className="space-y-4 p-5">
           <h3 className="text-lg font-bold">Team details</h3>
+          <div className="flex items-center gap-3">
+            <PhotoAvatar
+              url={data.team.logo_url}
+              name={data.team.name}
+              className="size-14"
+              busy={uploading}
+              title="Team photo"
+              label="Add team photo"
+              onPick={pickLogo}
+            />
+            {data.team.logo_url && (
+              <p className="text-sm text-muted-foreground">Tap the photo to change it</p>
+            )}
+          </div>
           <div>
             <label className="text-sm font-medium">Team name</label>
             <Input value={name} onChange={(e) => setName(e.target.value)} />

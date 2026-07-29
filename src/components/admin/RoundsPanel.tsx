@@ -113,8 +113,50 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
             </div>
           </div>
           <div>
-            <label className="text-sm font-medium">Date</label>
-            <Input type="date" value={playedOn} onChange={(e) => setPlayedOn(e.target.value)} />
+            <label className="text-sm font-medium">Round</label>
+            <Input
+              value={roundNumber}
+              onChange={(e) => setRoundNumber(e.target.value)}
+              inputMode="numeric"
+              placeholder={String(nextNumber)}
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium">2 dayer</label>
+            <div className="mt-1 flex gap-2">
+              <Button
+                type="button"
+                variant={twoDay ? "default" : "outline"}
+                className="flex-1"
+                onClick={() => setTwoDay(true)}
+              >
+                Yes
+              </Button>
+              <Button
+                type="button"
+                variant={!twoDay ? "default" : "outline"}
+                className="flex-1"
+                onClick={() => setTwoDay(false)}
+              >
+                No
+              </Button>
+            </div>
+            {twoDay && (
+              <div className="mt-2 flex gap-2">
+                {[1, 2].map((d) => (
+                  <Button
+                    key={d}
+                    type="button"
+                    size="sm"
+                    variant={day === d ? "default" : "outline"}
+                    className="flex-1"
+                    onClick={() => setDay(d)}
+                  >
+                    Day {d}
+                  </Button>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <label className="text-sm font-medium">Venue</label>
@@ -144,7 +186,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
           </div>
           <div className="flex items-end">
             <Button className="w-full" onClick={addRound}>
-              Add round {nextNumber}
+              Save
             </Button>
           </div>
         </CardContent>

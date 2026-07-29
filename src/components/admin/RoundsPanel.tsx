@@ -14,7 +14,7 @@ import { roundDayLabel } from "@/lib/fines";
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const nextNumber = (data.rounds.at(-1)?.round_number ?? 0) + 1;
   const [opponent, setOpponent] = useState("");
-  const [roundNumber, setRoundNumber] = useState(String(nextNumber));
+  const [roundName, setRoundName] = useState(String(nextNumber));
   const [twoDay, setTwoDay] = useState(false);
   const [day, setDay] = useState<number>(1);
   const [playedOn, setPlayedOn] = useState("");
@@ -59,11 +59,13 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   }
 
   async function addRound() {
-    const num = Number(roundNumber) || nextNumber;
+    const typed = roundName.trim();
+    const num = Number(typed.match(/\d+/)?.[0] ?? NaN) || nextNumber;
+    const base = typed || `Round ${num}`;
     const { error } = await supabase.from("rounds").insert({
       team_id: data.team.id,
       round_number: num,
-      label: twoDay ? `Round ${num} - Day ${day}` : `Round ${num}`,
+      label: twoDay ? `${base} - Day ${day}` : base,
       two_day: twoDay,
       day: twoDay ? day : null,
       opponent: opponent || null,
@@ -76,7 +78,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     });
     if (error) return toast.error(error.message);
     setOpponent("");
-    setRoundNumber(String(num + 1));
+    setRoundName(String(num + 1));
     setTwoDay(false);
     setDay(1);
     setPlayedOn("");
@@ -115,10 +117,9 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
           <div>
             <label className="text-sm font-medium">Round</label>
             <Input
-              value={roundNumber}
-              onChange={(e) => setRoundNumber(e.target.value)}
-              inputMode="numeric"
-              placeholder={String(nextNumber)}
+              value={roundName}
+              onChange={(e) => setRoundName(e.target.value)}
+              placeholder={`e.g. ${nextNumber} or Trial Match 1`}
             />
           </div>
           <div>

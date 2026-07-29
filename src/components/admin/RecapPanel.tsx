@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Sparkles, Trash2 } from "lucide-react";
-import { buildPlayerStats, money } from "@/lib/fines";
+import { buildPlayerStats, money, roundDayLabel } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 
 export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
@@ -33,7 +33,7 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
     const lines = [
       `Team: ${data.team.name} (${data.team.sport}), season ${data.team.season_name}.`,
       isRound
-        ? `Round: ${round?.label ?? ""} vs ${round?.opponent ?? "unknown"} — ${round?.result ?? "result unrecorded"}.`
+        ? `Round: ${round ? roundDayLabel(round) : ""} vs ${round?.opponent ?? "unknown"} — ${round?.result ?? "result unrecorded"}.`
         : `Whole season across ${data.rounds.length} rounds.`,
       "",
       "Fines:",
@@ -99,7 +99,7 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                 <SelectItem value="season">Whole season</SelectItem>
                 {[...data.rounds].reverse().map((r) => (
                   <SelectItem key={r.id} value={r.id}>
-                    {r.label || `Round ${r.round_number}`}
+                    {roundDayLabel(r)}
                     {r.opponent ? ` vs ${r.opponent}` : ""}
                   </SelectItem>
                 ))}

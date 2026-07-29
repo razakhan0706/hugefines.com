@@ -52,9 +52,15 @@ export interface Fine {
   week?: number | null;
 }
 
-/** "ROUND 4" or "ROUND 4 - DAY 2" for a round (optionally a specific day). */
+/** The name the admin typed (e.g. "Trial Match 1"), falling back to "Round 4". */
+export function roundBaseLabel(round: Round) {
+  const typed = (round.label ?? "").replace(/\s*-\s*day\s*\d+\s*$/i, "").trim();
+  return typed || `Round ${round.round_number}`;
+}
+
+/** "TRIAL MATCH 1" or "TRIAL MATCH 1 - DAY 2" for a round (optionally a specific day). */
 export function roundDayLabel(round: Round, day?: number | null) {
-  const base = `Round ${round.round_number}`;
+  const base = roundBaseLabel(round);
   const d = day ?? round.day ?? null;
   return round.two_day && d ? `${base} - Day ${d}` : base;
 }
@@ -216,7 +222,7 @@ export function roundTotals(fines: Fine[], rounds: Round[]) {
   return [...rounds]
     .sort((a, b) => a.round_number - b.round_number)
     .map((r) => ({
-      name: r.label || `R${r.round_number}`,
+      name: roundBaseLabel(r),
       total: fines
         .filter((f) => f.round_id === r.id)
         .reduce((s, f) => s + Number(f.amount), 0),

@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { VOTE_FORMATS } from "@/lib/fines";
+import { VOTE_FORMATS, roundDayLabel } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
 
@@ -88,7 +88,7 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
             <SelectContent>
               {data.rounds.map((r) => (
                 <SelectItem key={r.id} value={r.id}>
-                  {r.label || `Round ${r.round_number}`}
+                  {roundDayLabel(r)}
                   {r.opponent ? ` vs ${r.opponent}` : ""}
                 </SelectItem>
               ))}

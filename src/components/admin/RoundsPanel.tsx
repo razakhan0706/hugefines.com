@@ -373,6 +373,9 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   </p>
                   <p className="text-xs text-muted-foreground">{roundFines.length} fines</p>
                 </div>
+                <Button variant="ghost" size="icon" onClick={() => startEdit(r)} title="Edit round">
+                  <Pencil className="size-4" />
+                </Button>
                 <Button variant="ghost" size="icon" onClick={() => removeRound(r.id)}>
                   <Trash2 className="size-4" />
                 </Button>

@@ -110,6 +110,7 @@ export function PlayersPanel({ data, refresh }: { data: TeamBundle; refresh: () 
                   url={p.photo_url}
                   name={p.name}
                   busy={busy === p.id}
+                  title="Player photo"
                   onPick={(f) => changePhoto(p.id, f)}
                 />
                 <div className="flex-1">

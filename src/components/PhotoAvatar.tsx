@@ -8,30 +8,36 @@ interface Props {
   busy?: boolean;
   onPick?: (file: File) => void;
   title?: string;
+  /** Short text shown next to the avatar when it is an upload target and empty. */
+  label?: string;
 }
 
 /** Round avatar that optionally doubles as a photo upload button. */
-export function PhotoAvatar({ url, name, className, busy, onPick, title }: Props) {
+export function PhotoAvatar({ url, name, className, busy, onPick, title, label }: Props) {
+  const initial = (name ?? "?").trim().charAt(0).toUpperCase() || "?";
+
   const inner = (
     <>
       {url ? (
         <img
           src={url}
           alt={name ?? "Photo"}
-          className={cn("size-10 rounded-full object-cover", className)}
+          className={cn("size-11 rounded-full object-cover", className)}
         />
       ) : (
         <span
           className={cn(
-            "flex size-10 items-center justify-center rounded-full bg-secondary text-muted-foreground",
+            "flex size-11 items-center justify-center rounded-full bg-secondary text-sm font-bold text-muted-foreground",
+            onPick && "border-2 border-dashed border-accent/70 bg-accent/5 text-accent-strong",
             className,
           )}
         >
-          {onPick ? (
-            <Camera className="size-4" />
-          ) : (
-            <span className="text-sm font-bold">{(name ?? "?").charAt(0).toUpperCase()}</span>
-          )}
+          {initial === "?" && onPick ? <Camera className="size-4" /> : initial}
+        </span>
+      )}
+      {onPick && !url && !busy && (
+        <span className="pointer-events-none absolute -bottom-0.5 -right-0.5 flex size-4 items-center justify-center rounded-full bg-accent text-accent-foreground ring-2 ring-background">
+          <Camera className="size-2.5" />
         </span>
       )}
       {busy && (
@@ -45,8 +51,16 @@ export function PhotoAvatar({ url, name, className, busy, onPick, title }: Props
   if (!onPick) return <span className="relative inline-block shrink-0">{inner}</span>;
 
   return (
-    <label className="relative inline-block shrink-0 cursor-pointer" title={title ?? "Upload photo"}>
-      {inner}
+    <label
+      className="relative inline-flex shrink-0 cursor-pointer items-center gap-2"
+      title={title ?? "Upload photo"}
+    >
+      <span className="relative inline-block shrink-0">{inner}</span>
+      {label && !url && (
+        <span className="whitespace-nowrap text-xs font-medium text-accent-strong underline">
+          {label}
+        </span>
+      )}
       <input
         type="file"
         accept="image/*"

@@ -9,10 +9,14 @@ import { money } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { uploadPhoto } from "@/lib/photos";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
+import { roundDayLabel } from "@/lib/fines";
 
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const nextNumber = (data.rounds.at(-1)?.round_number ?? 0) + 1;
   const [opponent, setOpponent] = useState("");
+  const [roundNumber, setRoundNumber] = useState(String(nextNumber));
+  const [twoDay, setTwoDay] = useState(false);
+  const [day, setDay] = useState<number>(1);
   const [playedOn, setPlayedOn] = useState("");
   const [venue, setVenue] = useState("");
   const [result, setResult] = useState("");
@@ -55,10 +59,13 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   }
 
   async function addRound() {
+    const num = Number(roundNumber) || nextNumber;
     const { error } = await supabase.from("rounds").insert({
       team_id: data.team.id,
-      round_number: nextNumber,
-      label: `Round ${nextNumber}`,
+      round_number: num,
+      label: twoDay ? `Round ${num} - Day ${day}` : `Round ${num}`,
+      two_day: twoDay,
+      day: twoDay ? day : null,
       opponent: opponent || null,
       played_on: playedOn || null,
       venue: venue || null,
@@ -69,6 +76,9 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     });
     if (error) return toast.error(error.message);
     setOpponent("");
+    setRoundNumber(String(num + 1));
+    setTwoDay(false);
+    setDay(1);
     setPlayedOn("");
     setVenue("");
     setResult("");

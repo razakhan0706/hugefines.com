@@ -88,7 +88,7 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
             <SelectContent>
               {data.rounds.map((r) => (
                 <SelectItem key={r.id} value={r.id}>
-                  {r.label || `Round ${r.round_number}`}
+                  {roundDayLabel(r)}
                   {r.opponent ? ` vs ${r.opponent}` : ""}
                 </SelectItem>
               ))}

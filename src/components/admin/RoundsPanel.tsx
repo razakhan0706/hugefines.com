@@ -9,10 +9,14 @@ import { money } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { uploadPhoto } from "@/lib/photos";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
+import { roundDayLabel } from "@/lib/fines";
 
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const nextNumber = (data.rounds.at(-1)?.round_number ?? 0) + 1;
   const [opponent, setOpponent] = useState("");
+  const [roundNumber, setRoundNumber] = useState(String(nextNumber));
+  const [twoDay, setTwoDay] = useState(false);
+  const [day, setDay] = useState<number>(1);
   const [playedOn, setPlayedOn] = useState("");
   const [venue, setVenue] = useState("");
   const [result, setResult] = useState("");
@@ -55,10 +59,13 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   }
 
   async function addRound() {
+    const num = Number(roundNumber) || nextNumber;
     const { error } = await supabase.from("rounds").insert({
       team_id: data.team.id,
-      round_number: nextNumber,
-      label: `Round ${nextNumber}`,
+      round_number: num,
+      label: twoDay ? `Round ${num} - Day ${day}` : `Round ${num}`,
+      two_day: twoDay,
+      day: twoDay ? day : null,
       opponent: opponent || null,
       played_on: playedOn || null,
       venue: venue || null,
@@ -69,6 +76,9 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     });
     if (error) return toast.error(error.message);
     setOpponent("");
+    setRoundNumber(String(num + 1));
+    setTwoDay(false);
+    setDay(1);
     setPlayedOn("");
     setVenue("");
     setResult("");
@@ -103,8 +113,50 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
             </div>
           </div>
           <div>
-            <label className="text-sm font-medium">Date</label>
-            <Input type="date" value={playedOn} onChange={(e) => setPlayedOn(e.target.value)} />
+            <label className="text-sm font-medium">Round</label>
+            <Input
+              value={roundNumber}
+              onChange={(e) => setRoundNumber(e.target.value)}
+              inputMode="numeric"
+              placeholder={String(nextNumber)}
+            />
+          </div>
+          <div>
+            <label className="text-sm font-medium">2 dayer</label>
+            <div className="mt-1 flex gap-2">
+              <Button
+                type="button"
+                variant={twoDay ? "default" : "outline"}
+                className="flex-1"
+                onClick={() => setTwoDay(true)}
+              >
+                Yes
+              </Button>
+              <Button
+                type="button"
+                variant={!twoDay ? "default" : "outline"}
+                className="flex-1"
+                onClick={() => setTwoDay(false)}
+              >
+                No
+              </Button>
+            </div>
+            {twoDay && (
+              <div className="mt-2 flex gap-2">
+                {[1, 2].map((d) => (
+                  <Button
+                    key={d}
+                    type="button"
+                    size="sm"
+                    variant={day === d ? "default" : "outline"}
+                    className="flex-1"
+                    onClick={() => setDay(d)}
+                  >
+                    Day {d}
+                  </Button>
+                ))}
+              </div>
+            )}
           </div>
           <div>
             <label className="text-sm font-medium">Venue</label>
@@ -134,7 +186,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
           </div>
           <div className="flex items-end">
             <Button className="w-full" onClick={addRound}>
-              Add round {nextNumber}
+              Save
             </Button>
           </div>
         </CardContent>
@@ -162,9 +214,11 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   onPick={(f) => updateRoundPhoto(r.id, "opponent_logo_url", f)}
                 />
                 <div className="flex-1 min-w-40">
-                  <p className="font-semibold">{r.opponent ? `vs ${r.opponent}` : r.label}</p>
+                  <p className="font-semibold uppercase">
+                    {r.opponent ? `vs ${r.opponent}` : roundDayLabel(r)}
+                  </p>
                   <p className="text-sm text-muted-foreground">
-                    {[r.played_on, r.venue, r.result].filter(Boolean).join(" · ") || "No details"}
+                    {[roundDayLabel(r), r.venue, r.result].filter(Boolean).join(" · ")}
                   </p>
                   <div className="mt-1 flex items-center gap-2">
                     <PhotoAvatar

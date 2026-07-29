@@ -28,6 +28,8 @@ export interface Round {
   fines_master?: string | null;
   fines_master_photo_url?: string | null;
   opponent_logo_url?: string | null;
+  two_day?: boolean | null;
+  day?: number | null;
 }
 
 export interface FineCategory {
@@ -47,6 +49,14 @@ export interface Fine {
   amount: number;
   paid: boolean;
   created_at: string;
+  week?: number | null;
+}
+
+/** "ROUND 4" or "ROUND 4 - DAY 2" for a round (optionally a specific day). */
+export function roundDayLabel(round: Round, day?: number | null) {
+  const base = `Round ${round.round_number}`;
+  const d = day ?? round.day ?? null;
+  return round.two_day && d ? `${base} - Day ${d}` : base;
 }
 
 export interface Vote {
@@ -356,8 +366,25 @@ export function resultBreakdown(fines: Fine[], rounds: Round[]) {
   return roundAttributeBreakdown(fines, rounds, (r) => resultBucket(r.result));
 }
 
-export function dateBreakdown(fines: Fine[], rounds: Round[]) {
-  return roundAttributeBreakdown(fines, rounds, (r) => r.played_on).sort((a, b) =>
-    a.label.localeCompare(b.label),
-  );
+/** Fines grouped by round, split into days for two-day rounds. */
+export function weekBreakdown(fines: Fine[], rounds: Round[]): Breakdown[] {
+  const ordered = [...rounds].sort((a, b) => a.round_number - b.round_number);
+  const rows: Breakdown[] = [];
+  for (const r of ordered) {
+    const mine = fines.filter((f) => f.round_id === r.id);
+    const days = r.two_day ? [1, 2] : [null];
+    for (const d of days) {
+      const subset = d === null ? mine : mine.filter((f) => (f.week ?? 1) === d);
+      const total = subset.reduce((s, f) => s + Number(f.amount), 0);
+      rows.push({
+        label: roundDayLabel(r, d),
+        total,
+        count: subset.length,
+        rounds: 1,
+        avg: total,
+        photo: r.opponent_logo_url,
+      });
+    }
+  }
+  return rows;
 }

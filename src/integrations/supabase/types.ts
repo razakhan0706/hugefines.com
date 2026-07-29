@@ -57,6 +57,7 @@ export type Database = {
           player_id: string
           round_id: string | null
           team_id: string
+          week: number | null
         }
         Insert: {
           amount?: number
@@ -68,6 +69,7 @@ export type Database = {
           player_id: string
           round_id?: string | null
           team_id: string
+          week?: number | null
         }
         Update: {
           amount?: number
@@ -79,6 +81,7 @@ export type Database = {
           player_id?: string
           round_id?: string | null
           team_id?: string
+          week?: number | null
         }
         Relationships: [
           {
@@ -218,6 +221,7 @@ export type Database = {
       rounds: {
         Row: {
           created_at: string
+          day: number | null
           fines_master: string | null
           fines_master_photo_url: string | null
           id: string
@@ -228,10 +232,12 @@ export type Database = {
           result: string | null
           round_number: number
           team_id: string
+          two_day: boolean
           venue: string | null
         }
         Insert: {
           created_at?: string
+          day?: number | null
           fines_master?: string | null
           fines_master_photo_url?: string | null
           id?: string
@@ -242,10 +248,12 @@ export type Database = {
           result?: string | null
           round_number: number
           team_id: string
+          two_day?: boolean
           venue?: string | null
         }
         Update: {
           created_at?: string
+          day?: number | null
           fines_master?: string | null
           fines_master_photo_url?: string | null
           id?: string
@@ -256,6 +264,7 @@ export type Database = {
           result?: string | null
           round_number?: number
           team_id?: string
+          two_day?: boolean
           venue?: string | null
         }
         Relationships: [

@@ -20,6 +20,7 @@ import {
   FINE_CATEGORY_GROUPS,
   groupForCategory,
   money,
+  roundDayLabel,
 } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
@@ -29,6 +30,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const [playerId, setPlayerId] = useState("");
   const [roundId, setRoundId] = useState(latestRound);
   const [categoryId, setCategoryId] = useState("");
+  const [week, setWeek] = useState("1");
   const [description, setDescription] = useState("");
   const [quote, setQuote] = useState("");
   const [amount, setAmount] = useState("1");
@@ -44,7 +46,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
     [data.players],
   );
   const roundLabel = useMemo(
-    () => new Map(data.rounds.map((r) => [r.id, r.label || `Round ${r.round_number}`])),
+    () => new Map(data.rounds.map((r) => [r.id, roundDayLabel(r)])),
     [data.rounds],
   );
   const categoryLabel = useMemo(
@@ -69,6 +71,9 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
       !data.categories.some((c) => c.label.trim().toLowerCase() === label.toLowerCase()),
   );
 
+  const selectedRound = data.rounds.find((r) => r.id === roundId);
+  const isTwoDay = Boolean(selectedRound?.two_day);
+
   const isQuoteCategory =
     data.categories.find((c) => c.id === categoryId)?.label.trim().toLowerCase() ===
     "rubbish chat";
@@ -79,14 +84,16 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   async function addFine() {
     if (!playerId) return toast.error("Pick a player");
     const cat = data.categories.find((c) => c.id === categoryId);
-    const base = description.trim() || cat?.label || "Fine";
+    const custom = description.trim();
+    const base = custom || cat?.label || "Fine";
     const q = quote.trim();
     const { error } = await supabase.from("fines").insert({
       team_id: data.team.id,
       player_id: playerId,
       round_id: roundId || null,
-      category_id: categoryId || null,
-      description: isQuoteCategory && q ? `${base} — "${q}"` : base,
+      category_id: custom ? null : categoryId || null,
+      week: isTwoDay ? Number(week) || 1 : null,
+      description: !custom && isQuoteCategory && q ? `${base} — "${q}"` : base,
       amount: Number(amount) || 0,
     });
     if (error) return toast.error(error.message);

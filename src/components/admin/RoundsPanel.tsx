@@ -214,9 +214,11 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   onPick={(f) => updateRoundPhoto(r.id, "opponent_logo_url", f)}
                 />
                 <div className="flex-1 min-w-40">
-                  <p className="font-semibold">{r.opponent ? `vs ${r.opponent}` : r.label}</p>
+                  <p className="font-semibold uppercase">
+                    {r.opponent ? `vs ${r.opponent}` : roundDayLabel(r)}
+                  </p>
                   <p className="text-sm text-muted-foreground">
-                    {[r.played_on, r.venue, r.result].filter(Boolean).join(" · ") || "No details"}
+                    {[roundDayLabel(r), r.venue, r.result].filter(Boolean).join(" · ")}
                   </p>
                   <div className="mt-1 flex items-center gap-2">
                     <PhotoAvatar

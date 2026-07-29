@@ -95,7 +95,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
 
       <Card>
         <CardContent className="p-5">
-          <h3 className="text-lg font-bold">Fines leaderboard</h3>
+          <h3 className="text-lg font-bold uppercase tracking-wide">Fines leaderboard</h3>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
@@ -144,7 +144,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardContent className="p-5">
-            <h3 className="text-lg font-bold">Fines by round</h3>
+            <h3 className="text-lg font-bold uppercase tracking-wide">Fines by round</h3>
             <div className="mt-4 h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={byRound}>
@@ -167,7 +167,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
 
         <Card>
           <CardContent className="p-5">
-            <h3 className="text-lg font-bold">Top offence categories</h3>
+            <h3 className="text-lg font-bold uppercase tracking-wide">Top offence categories</h3>
             <div className="mt-4 h-64">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={byCat.slice(0, 7)}>

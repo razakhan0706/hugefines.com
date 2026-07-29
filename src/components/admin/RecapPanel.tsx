@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Sparkles, Trash2 } from "lucide-react";
-import { buildPlayerStats, money } from "@/lib/fines";
+import { buildPlayerStats, money, roundDayLabel } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 
 export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {

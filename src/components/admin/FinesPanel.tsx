@@ -34,6 +34,8 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const [description, setDescription] = useState("");
   const [quote, setQuote] = useState("");
   const [amount, setAmount] = useState("1");
+  const [hasCap, setHasCap] = useState("no");
+  const [cap, setCap] = useState("");
   const [filterPlayer, setFilterPlayer] = useState("all");
   const [newCategory, setNewCategory] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
@@ -129,6 +131,12 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
     const custom = description.trim();
     const base = custom || cat?.label || "Fine";
     const q = quote.trim();
+    let finalAmount = Number(amount) || 0;
+    if (hasCap === "yes") {
+      const capValue = Number(cap);
+      if (!cap.trim() || Number.isNaN(capValue)) return toast.error("Enter a cap amount");
+      finalAmount = Math.min(finalAmount, capValue);
+    }
     const { error } = await supabase.from("fines").insert({
       team_id: data.team.id,
       player_id: playerId,
@@ -136,7 +144,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
       category_id: custom ? null : categoryId || null,
       week: isTwoDay ? Number(week) || 1 : null,
       description: !custom && isQuoteCategory && q ? `${base} — "${q}"` : base,
-      amount: Number(amount) || 0,
+      amount: finalAmount,
     });
     if (error) return toast.error(error.message);
     setDescription("");
@@ -277,6 +285,29 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
             <label className="text-sm font-medium">Amount</label>
             <Input value={amount} onChange={(e) => setAmount(e.target.value)} inputMode="decimal" />
           </div>
+          <div>
+            <label className="text-sm font-medium">Cap (max)</label>
+            <Select value={hasCap} onValueChange={setHasCap}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="no">No</SelectItem>
+                <SelectItem value="yes">Yes</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+          {hasCap === "yes" && (
+            <div>
+              <label className="text-sm font-medium">Max amount</label>
+              <Input
+                value={cap}
+                onChange={(e) => setCap(e.target.value)}
+                inputMode="decimal"
+                placeholder="e.g. 10"
+              />
+            </div>
+          )}
           <div className="flex items-end">
             <Button className="w-full" onClick={addFine}>
               Add fine

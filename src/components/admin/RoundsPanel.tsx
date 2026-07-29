@@ -4,12 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { Trash2, Pencil, Check, X } from "lucide-react";
 import { money } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { uploadPhoto } from "@/lib/photos";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
-import { roundDayLabel } from "@/lib/fines";
+import { roundDayLabel, roundBaseLabel } from "@/lib/fines";
 
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const nextNumber = (data.rounds.at(-1)?.round_number ?? 0) + 1;
@@ -24,6 +24,52 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   const [finesMasterPhoto, setFinesMasterPhoto] = useState<string | null>(null);
   const [opponentLogo, setOpponentLogo] = useState<string | null>(null);
   const [busy, setBusy] = useState<string | null>(null);
+  const [editId, setEditId] = useState<string | null>(null);
+  const [edit, setEdit] = useState({
+    opponent: "",
+    label: "",
+    two_day: false,
+    day: 1,
+    venue: "",
+    result: "",
+    fines_master: "",
+  });
+
+  function startEdit(r: TeamBundle["rounds"][number]) {
+    setEditId(r.id);
+    setEdit({
+      opponent: r.opponent ?? "",
+      label: roundBaseLabel(r),
+      two_day: Boolean(r.two_day),
+      day: r.day ?? 1,
+      venue: r.venue ?? "",
+      result: r.result ?? "",
+      fines_master: r.fines_master ?? "",
+    });
+  }
+
+  async function saveEdit() {
+    if (!editId) return;
+    const base = edit.label.trim() || "Round";
+    const num = Number(base.match(/\d+/)?.[0] ?? NaN);
+    const { error } = await supabase
+      .from("rounds")
+      .update({
+        opponent: edit.opponent.trim() || null,
+        label: edit.two_day ? `${base} - Day ${edit.day}` : base,
+        two_day: edit.two_day,
+        day: edit.two_day ? edit.day : null,
+        venue: edit.venue.trim() || null,
+        result: edit.result.trim() || null,
+        fines_master: edit.fines_master.trim() || null,
+        ...(Number.isFinite(num) ? { round_number: num } : {}),
+      })
+      .eq("id", editId);
+    if (error) return toast.error(error.message);
+    setEditId(null);
+    refresh();
+    toast.success("Round updated");
+  }
 
   async function pickPhoto(key: string, file: File, set: (url: string) => void) {
     setBusy(key);

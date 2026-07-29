@@ -28,6 +28,8 @@ export interface Round {
   fines_master?: string | null;
   fines_master_photo_url?: string | null;
   opponent_logo_url?: string | null;
+  two_day?: boolean | null;
+  day?: number | null;
 }
 
 export interface FineCategory {
@@ -47,6 +49,14 @@ export interface Fine {
   amount: number;
   paid: boolean;
   created_at: string;
+  week?: number | null;
+}
+
+/** "ROUND 4" or "ROUND 4 - DAY 2" for a round (optionally a specific day). */
+export function roundDayLabel(round: Round, day?: number | null) {
+  const base = `Round ${round.round_number}`;
+  const d = day ?? round.day ?? null;
+  return round.two_day && d ? `${base} - Day ${d}` : base;
 }
 
 export interface Vote {

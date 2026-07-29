@@ -14,7 +14,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   buildPlayerStats,
   categoryBreakdown,
-  dateBreakdown,
+  weekBreakdown,
   finesMasterBreakdown,
   money,
   opponentBreakdown,
@@ -46,7 +46,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
   const byOpponent = opponentBreakdown(data.fines, data.rounds);
   const byVenue = venueBreakdown(data.fines, data.rounds);
   const byResult = resultBreakdown(data.fines, data.rounds);
-  const byDate = dateBreakdown(data.fines, data.rounds);
+  const byWeek = weekBreakdown(data.fines, data.rounds);
 
   const summaryTiles = [
     { label: "Season pot", value: money(total, currency) },
@@ -189,7 +189,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
 
       <div className="grid gap-6 lg:grid-cols-2">
         <BreakdownCard
-          title="Fines by fines master"
+          title="Fines master"
           rows={byMaster}
           currency={currency}
           unit="Rounds run"
@@ -217,11 +217,11 @@ export function StatsView({ data }: { data: TeamBundle }) {
           empty="Add results to your rounds to see this."
         />
         <BreakdownCard
-          title="Fines by date"
-          rows={byDate}
+          title="Fines by week"
+          rows={byWeek}
           currency={currency}
           unit="Matches"
-          empty="Add match dates to your rounds to see this."
+          empty="Add rounds to see this."
         />
       </div>
     </div>
@@ -244,14 +244,14 @@ function BreakdownCard({
   return (
     <Card>
       <CardContent className="p-5">
-        <h3 className="text-lg font-bold">{title}</h3>
+        <h3 className="text-lg font-bold uppercase tracking-wide">{title}</h3>
         {rows.length === 0 ? (
           <p className="mt-3 text-sm text-muted-foreground">{empty}</p>
         ) : (
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-muted-foreground">
+                <tr className="text-left uppercase text-muted-foreground">
                   <th className="py-2">Name</th>
                   <th className="text-right">Total</th>
                   <th className="text-right">Fines</th>
@@ -263,7 +263,7 @@ function BreakdownCard({
                 {rows.map((r) => (
                   <tr key={r.label} className="border-t border-border">
                     <td className="py-2">
-                      <span className="flex items-center gap-2 font-medium">
+                      <span className="flex items-center gap-2 font-medium uppercase">
                         <PhotoAvatar url={r.photo} name={r.label} className="size-8" />
                         {r.label}
                       </span>

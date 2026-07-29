@@ -1,40 +1,24 @@
-## What I checked
+## What's happening
 
-I inspected your live team page at 393px wide. The code from last turn is in place and running:
+The "Round" box only accepts a number. When you type `Trial Match 1`, the form converts it to a number, fails, and silently falls back to the next round number. It then builds the name itself as `Round 1` — your text is never stored.
 
-- Tabs render as: Rounds, Players, Fines, Voting, Stats, Recaps, Settings
-- The Rounds tab currently has 4 working photo-upload inputs (team/fines-master/opposition slots)
-- `PhotoAvatar` is wired into Players, Rounds, Fines list, Voting, Stats and the My teams cards
-- `finesMasterBreakdown`, `opponentBreakdown`, `venueBreakdown`, `resultBreakdown`, `dateBreakdown` all exist and render as tables in the Stats tab
-
-What the page actually renders right now: zero images, because no photo has been uploaded yet. Every slot is showing as a small grey circle with a faint camera icon and no label — on a phone that reads as "nothing changed". The round card also shows `Fines master: Ahmed` as plain text, with the upload circle easy to miss.
-
-So the work landed, but it is invisible until you upload something. That's the real problem to fix.
+Confirmed in the code: the round form runs `Number(roundNumber) || nextNumber`, saves `label: "Round N"`, and every display helper rebuilds the name from the number instead of reading the saved label.
 
 ## What I'll change
 
-**1. Make every photo slot obviously tappable**
-- Bigger circle with a dashed accent-coloured border when empty, instead of a flat grey dot
-- A short label next to it: "Add photo", "Fines master photo", "Opposition logo", "Team logo"
-- Slightly larger tap target on mobile
+**1. Let the Round box accept anything you type**
+- Type `Trial Match 1`, `Grand Final`, or just `4` — whatever you write is saved as the round's name.
+- A number is still pulled out of the text where one exists (so `Trial Match 1` sorts as round 1); if there's no number, it takes the next slot automatically for ordering only.
 
-**2. Rounds tab layout on mobile**
-- Put the Fines master name + its photo slot together as one labelled row, and the Opponent name + logo slot as another, so it's clear which photo belongs to which
-- Same on the saved round cards
+**2. Show your text everywhere the round appears**
+- Round cards, the round dropdown in Fines, Voting, AI recaps, and the Stats "FINES BY WEEK" table all show your typed name instead of `Round N`.
+- Two-dayers still append the day: `TRIAL MATCH 1 - DAY 2`.
+- The square number badge on the round card stays as the sort number.
 
-**3. Players / Fines / Voting**
-- Empty player avatars show the player's initial again (currently a camera icon everywhere), with the camera badge in the corner so you can still tap to upload
-- Fines list and voting pills inherit the same treatment
-
-**4. Verify it end to end**
-- Drive the live preview at 393px: upload a player photo, a fines master photo and an opposition logo, then confirm they appear in the Players list, the round card, the fines list, the voting pills and the Stats breakdown tables
-- Screenshot each so you can see it actually working
-
-**5. Stats tab check**
-- Confirm the five new breakdown cards (fines master, opponent, venue, result, date) render with your existing round data, and show a clear "add match dates/venues to your rounds" message where a field is blank rather than an empty card
+**3. Existing rounds** keep working — anything already saved as `Round 1` still reads `Round 1`.
 
 ## Technical notes
 
-- Changes are presentational only: `src/components/PhotoAvatar.tsx` (empty-state variant + label prop), plus call-site tweaks in `PlayersPanel.tsx`, `RoundsPanel.tsx`, `FinesPanel.tsx`, `VotingPanel.tsx`, `StatsView.tsx` and `dashboard.tsx`.
-- No database or schema change — `photo_url`, `fines_master_photo_url`, `opponent_logo_url` and `logo_url` already exist.
-- Verification uses Playwright against the running preview with a generated test image.
+- `src/lib/fines.ts`: `roundDayLabel()` uses `round.label` as the base when present, falling back to `Round ${round_number}`; `weekBreakdown`/`roundTotals` inherit this automatically.
+- `src/components/admin/RoundsPanel.tsx`: free-text round input; parse trailing/leading digits for `round_number`, store raw text in `label`, append `- Day N` for two-dayers.
+- No database change — the `label` column already exists.

@@ -248,6 +248,90 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
           const total = roundFines.reduce((s, f) => s + Number(f.amount), 0);
           return (
             <Card key={r.id}>
+              {editId === r.id ? (
+                <CardContent className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
+                  <div>
+                    <label className="text-sm font-medium">Opponent</label>
+                    <Input
+                      value={edit.opponent}
+                      onChange={(e) => setEdit((s) => ({ ...s, opponent: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Round</label>
+                    <Input
+                      value={edit.label}
+                      onChange={(e) => setEdit((s) => ({ ...s, label: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">2 dayer</label>
+                    <div className="mt-1 flex gap-2">
+                      <Button
+                        type="button"
+                        variant={edit.two_day ? "default" : "outline"}
+                        className="flex-1"
+                        onClick={() => setEdit((s) => ({ ...s, two_day: true }))}
+                      >
+                        Yes
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={!edit.two_day ? "default" : "outline"}
+                        className="flex-1"
+                        onClick={() => setEdit((s) => ({ ...s, two_day: false }))}
+                      >
+                        No
+                      </Button>
+                    </div>
+                    {edit.two_day && (
+                      <div className="mt-2 flex gap-2">
+                        {[1, 2].map((d) => (
+                          <Button
+                            key={d}
+                            type="button"
+                            size="sm"
+                            variant={edit.day === d ? "default" : "outline"}
+                            className="flex-1"
+                            onClick={() => setEdit((s) => ({ ...s, day: d }))}
+                          >
+                            Day {d}
+                          </Button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Venue</label>
+                    <Input
+                      value={edit.venue}
+                      onChange={(e) => setEdit((s) => ({ ...s, venue: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Result</label>
+                    <Input
+                      value={edit.result}
+                      onChange={(e) => setEdit((s) => ({ ...s, result: e.target.value }))}
+                    />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Fines master</label>
+                    <Input
+                      value={edit.fines_master}
+                      onChange={(e) => setEdit((s) => ({ ...s, fines_master: e.target.value }))}
+                    />
+                  </div>
+                  <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-3">
+                    <Button onClick={saveEdit}>
+                      <Check className="size-4" /> Save changes
+                    </Button>
+                    <Button variant="outline" onClick={() => setEditId(null)}>
+                      <X className="size-4" /> Cancel
+                    </Button>
+                  </div>
+                </CardContent>
+              ) : (
               <CardContent className="flex flex-wrap items-center gap-4 p-4">
                 <span className="stat-num flex size-11 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">
                   {r.round_number}
@@ -293,6 +377,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   <Trash2 className="size-4" />
                 </Button>
               </CardContent>
+              )}
             </Card>
           );
         })}

@@ -205,7 +205,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
         </Card>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
         <BreakdownCard
           title="Fines master"
           rows={byMaster}

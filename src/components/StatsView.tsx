@@ -52,10 +52,14 @@ export function StatsView({ data }: { data: TeamBundle }) {
   const byResult = resultBreakdown(data.fines, data.rounds, splits);
   const byWeek = weekBreakdown(data.fines, data.rounds, splits);
 
+  const weeksPlayed = data.rounds.reduce((s, r) => s + (r.two_day ? 2 : 1), 0);
+  const avgPerWeek = weeksPlayed > 0 ? total / weeksPlayed : 0;
+
   const summaryTiles = [
     { label: "Season pot", value: money(total, currency), discount: false },
     { label: "Fines logged", value: String(data.fines.length), discount: false },
-    { label: "Rounds played", value: String(data.rounds.length), discount: false },
+    { label: "Average / week", value: money(avgPerWeek, currency), discount: false },
+    { label: "Weeks played", value: String(weeksPlayed), discount: false },
     { label: "Discounted", value: money(totalDiscounted, currency), discount: true },
   ];
 

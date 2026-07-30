@@ -282,7 +282,9 @@ function BreakdownCard({
                 <tr className="text-left uppercase text-muted-foreground">
                   <th className="py-2 pr-3">Name</th>
                   <th className="px-3 text-right">Total</th>
-                  <th className="whitespace-nowrap px-3 text-right text-destructive">Discounted</th>
+                  {showDiscount && (
+                    <th className="whitespace-nowrap px-3 text-right text-destructive">Discounted</th>
+                  )}
                   {showUnit && <th className="px-3 text-right">{unit}</th>}
                   {showAvg && <th className="pl-3 text-right">Avg</th>}
                 </tr>

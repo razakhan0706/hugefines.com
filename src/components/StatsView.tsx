@@ -299,9 +299,11 @@ function BreakdownCard({
                       </span>
                     </td>
                     <td className="stat-num px-3 text-right font-bold">{money(r.total, currency)}</td>
-                    <td className="stat-num whitespace-nowrap px-3 text-right font-bold text-destructive">
-                      {r.discounted > 0 ? money(r.discounted, currency) : "—"}
-                    </td>
+                    {showDiscount && (
+                      <td className="stat-num whitespace-nowrap px-3 text-right font-bold text-destructive">
+                        {r.discounted > 0 ? money(r.discounted, currency) : "—"}
+                      </td>
+                    )}
                     {showUnit && <td className="stat-num px-3 text-right">{r.rounds}</td>}
                     {showAvg && (
                       <td className="stat-num pl-3 text-right">{money(r.avg, currency)}</td>

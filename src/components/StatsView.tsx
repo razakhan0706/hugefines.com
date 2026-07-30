@@ -258,6 +258,7 @@ function BreakdownCard({
   empty,
   showUnit = true,
   showAvg = true,
+  showDiscount = true,
 }: {
   title: string;
   rows: Breakdown[];
@@ -266,6 +267,7 @@ function BreakdownCard({
   empty: string;
   showUnit?: boolean;
   showAvg?: boolean;
+  showDiscount?: boolean;
 }) {
   return (
     <Card>

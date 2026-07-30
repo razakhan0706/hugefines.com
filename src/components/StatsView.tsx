@@ -206,7 +206,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
           title="Fines master"
           rows={byMaster}
           currency={currency}
-          unit="Rounds run"
+          unit="Rounds"
           empty="Add a fines master to a round to see this."
         />
         <BreakdownCard
@@ -236,6 +236,8 @@ export function StatsView({ data }: { data: TeamBundle }) {
           currency={currency}
           unit="Matches"
           empty="Add rounds to see this."
+          showUnit={false}
+          showAvg={false}
         />
       </div>
     </div>
@@ -248,12 +250,16 @@ function BreakdownCard({
   currency,
   unit,
   empty,
+  showUnit = true,
+  showAvg = true,
 }: {
   title: string;
   rows: Breakdown[];
   currency: string;
   unit: string;
   empty: string;
+  showUnit?: boolean;
+  showAvg?: boolean;
 }) {
   const hasDiscounts = rows.some((r) => r.discounted > 0);
   return (
@@ -272,9 +278,8 @@ function BreakdownCard({
                   {hasDiscounts && (
                     <th className="text-right text-destructive">Discounted</th>
                   )}
-                  <th className="text-right">Fines</th>
-                  <th className="text-right">{unit}</th>
-                  <th className="text-right">Avg</th>
+                  {showUnit && <th className="text-right">{unit}</th>}
+                  {showAvg && <th className="text-right">Avg</th>}
                 </tr>
               </thead>
               <tbody>
@@ -292,9 +297,8 @@ function BreakdownCard({
                         {r.discounted > 0 ? money(r.discounted, currency) : "—"}
                       </td>
                     )}
-                    <td className="stat-num text-right">{r.count}</td>
-                    <td className="stat-num text-right">{r.rounds}</td>
-                    <td className="stat-num text-right">{money(r.avg, currency)}</td>
+                    {showUnit && <td className="stat-num text-right">{r.rounds}</td>}
+                    {showAvg && <td className="stat-num text-right">{money(r.avg, currency)}</td>}
                   </tr>
                 ))}
               </tbody>

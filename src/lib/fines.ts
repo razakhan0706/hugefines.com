@@ -30,6 +30,7 @@ export interface Round {
   opponent_logo_url?: string | null;
   two_day?: boolean | null;
   day?: number | null;
+  cap?: number | null;
 }
 
 export interface FineCategory {
@@ -137,9 +138,80 @@ export function slugify(value: string) {
     .slice(0, 40);
 }
 
+// ---------------------------------------------------------------------------
+// Cap logic — splits each fine into counted vs discounted portions
+// ---------------------------------------------------------------------------
+
+export interface FineSplit {
+  counted: number;
+  discounted: number;
+}
+
+/**
+ * For each fine, determine how much counts toward tallies and how much is
+ * "discounted" (excess over the round's per-player-per-week cap).
+ *
+ * Groups fines by player + round + week (day for 2-day rounds), sorts oldest
+ * first, and walks the running total against the round's cap. The first fines
+ * count fully; the fine that pushes the total over the cap is partially
+ * counted / partially discounted; everything after is fully discounted.
+ */
+export function applyCaps(fines: Fine[], rounds: Round[]): Map<string, FineSplit> {
+  const roundMap = new Map(rounds.map((r) => [r.id, r]));
+  const result = new Map<string, FineSplit>();
+
+  // Group by player + round + week
+  const groups = new Map<string, Fine[]>();
+  for (const f of fines) {
+    const weekKey = f.week ?? 1;
+    const key = `${f.player_id}|${f.round_id ?? ""}|${weekKey}`;
+    const arr = groups.get(key) ?? [];
+    arr.push(f);
+    groups.set(key, arr);
+  }
+
+  for (const [, groupFines] of groups) {
+    const sorted = [...groupFines].sort((a, b) =>
+      a.created_at.localeCompare(b.created_at),
+    );
+    const round = sorted[0].round_id ? roundMap.get(sorted[0].round_id) : null;
+    const capRaw = round?.cap;
+    const cap = capRaw != null ? Number(capRaw) : null;
+
+    if (cap === null || Number.isNaN(cap)) {
+      for (const f of sorted) {
+        result.set(f.id, { counted: Number(f.amount), discounted: 0 });
+      }
+      continue;
+    }
+
+    let running = 0;
+    for (const f of sorted) {
+      const amount = Number(f.amount);
+      if (running >= cap) {
+        result.set(f.id, { counted: 0, discounted: amount });
+      } else if (running + amount <= cap) {
+        result.set(f.id, { counted: amount, discounted: 0 });
+        running += amount;
+      } else {
+        const counted = cap - running;
+        result.set(f.id, { counted, discounted: amount - counted });
+        running = cap;
+      }
+    }
+  }
+
+  return result;
+}
+
+// ---------------------------------------------------------------------------
+// Player stats
+// ---------------------------------------------------------------------------
+
 export interface PlayerStat {
   player: Player;
   total: number;
+  discounted: number;
   count: number;
   unpaid: number;
   rounds: number;
@@ -160,11 +232,13 @@ export function buildPlayerStats(
 ): PlayerStat[] {
   const catLabel = new Map(categories.map((c) => [c.id, c.label]));
   const orderedRounds = [...rounds].sort((a, b) => a.round_number - b.round_number);
+  const splits = applyCaps(fines, rounds);
 
   return players
     .map((player) => {
       const mine = fines.filter((f) => f.player_id === player.id);
-      const total = mine.reduce((s, f) => s + Number(f.amount), 0);
+      const total = mine.reduce((s, f) => s + (splits.get(f.id)?.counted ?? Number(f.amount)), 0);
+      const discounted = mine.reduce((s, f) => s + (splits.get(f.id)?.discounted ?? 0), 0);
       const unpaid = mine.filter((f) => !f.paid).reduce((s, f) => s + Number(f.amount), 0);
       const roundIds = new Set(mine.map((f) => f.round_id).filter(Boolean));
 
@@ -192,6 +266,7 @@ export function buildPlayerStats(
       return {
         player,
         total,
+        discounted,
         count: mine.length,
         unpaid,
         rounds: roundIds.size,
@@ -204,6 +279,20 @@ export function buildPlayerStats(
       };
     })
     .sort((a, b) => b.total - a.total);
+}
+
+// ---------------------------------------------------------------------------
+// Breakdowns
+// ---------------------------------------------------------------------------
+
+export interface Breakdown {
+  label: string;
+  total: number;
+  discounted: number;
+  count: number;
+  rounds: number;
+  avg: number;
+  photo?: string | null;
 }
 
 export function categoryBreakdown(fines: Fine[], categories: FineCategory[]) {
@@ -219,16 +308,19 @@ export function categoryBreakdown(fines: Fine[], categories: FineCategory[]) {
   return [...map.values()].sort((a, b) => b.total - a.total);
 }
 
-export function roundTotals(fines: Fine[], rounds: Round[]) {
+export function roundTotals(fines: Fine[], rounds: Round[], splits?: Map<string, FineSplit>) {
+  const capSplits = splits ?? applyCaps(fines, rounds);
   return [...rounds]
     .sort((a, b) => a.round_number - b.round_number)
-    .map((r) => ({
-      name: roundBaseLabel(r),
-      total: fines
-        .filter((f) => f.round_id === r.id)
-        .reduce((s, f) => s + Number(f.amount), 0),
-      count: fines.filter((f) => f.round_id === r.id).length,
-    }));
+    .map((r) => {
+      const mine = fines.filter((f) => f.round_id === r.id);
+      return {
+        name: roundBaseLabel(r),
+        total: mine.reduce((s, f) => s + (capSplits.get(f.id)?.counted ?? Number(f.amount)), 0),
+        discounted: mine.reduce((s, f) => s + (capSplits.get(f.id)?.discounted ?? 0), 0),
+        count: mine.length,
+      };
+    });
 }
 
 export interface Award {
@@ -295,14 +387,6 @@ export function seasonAwards(stats: PlayerStat[], currency: string): Award[] {
 
   return awards;
 }
-export interface Breakdown {
-  label: string;
-  total: number;
-  count: number;
-  rounds: number;
-  avg: number;
-  photo?: string | null;
-}
 
 /** Groups fines by an attribute of the round they belong to. */
 export function roundAttributeBreakdown(
@@ -310,17 +394,21 @@ export function roundAttributeBreakdown(
   rounds: Round[],
   pick: (r: Round) => string | null | undefined,
   photo?: (r: Round) => string | null | undefined,
+  splits?: Map<string, FineSplit>,
 ): Breakdown[] {
-  const map = new Map<string, { total: number; count: number; rounds: Set<string>; photo?: string | null }>();
+  const capSplits = splits ?? applyCaps(fines, rounds);
+  const map = new Map<string, { total: number; discounted: number; count: number; rounds: Set<string>; photo?: string | null }>();
   for (const r of rounds) {
     const key = (pick(r) ?? "").trim();
     if (!key) continue;
-    const row = map.get(key) ?? { total: 0, count: 0, rounds: new Set<string>(), photo: photo?.(r) };
+    const row = map.get(key) ?? { total: 0, discounted: 0, count: 0, rounds: new Set<string>(), photo: photo?.(r) };
     if (!row.photo && photo?.(r)) row.photo = photo(r);
     row.rounds.add(r.id);
     for (const f of fines) {
       if (f.round_id !== r.id) continue;
-      row.total += Number(f.amount);
+      const split = capSplits.get(f.id);
+      row.total += split?.counted ?? Number(f.amount);
+      row.discounted += split?.discounted ?? 0;
       row.count += 1;
     }
     map.set(key, row);
@@ -329,6 +417,7 @@ export function roundAttributeBreakdown(
     .map(([label, v]) => ({
       label,
       total: v.total,
+      discounted: v.discounted,
       count: v.count,
       rounds: v.rounds.size,
       avg: v.rounds.size ? v.total / v.rounds.size : 0,
@@ -337,26 +426,28 @@ export function roundAttributeBreakdown(
     .sort((a, b) => b.total - a.total);
 }
 
-export function finesMasterBreakdown(fines: Fine[], rounds: Round[]) {
+export function finesMasterBreakdown(fines: Fine[], rounds: Round[], splits?: Map<string, FineSplit>) {
   return roundAttributeBreakdown(
     fines,
     rounds,
     (r) => r.fines_master,
     (r) => r.fines_master_photo_url,
+    splits,
   );
 }
 
-export function opponentBreakdown(fines: Fine[], rounds: Round[]) {
+export function opponentBreakdown(fines: Fine[], rounds: Round[], splits?: Map<string, FineSplit>) {
   return roundAttributeBreakdown(
     fines,
     rounds,
     (r) => r.opponent,
     (r) => r.opponent_logo_url,
+    splits,
   );
 }
 
-export function venueBreakdown(fines: Fine[], rounds: Round[]) {
-  return roundAttributeBreakdown(fines, rounds, (r) => r.venue);
+export function venueBreakdown(fines: Fine[], rounds: Round[], splits?: Map<string, FineSplit>) {
+  return roundAttributeBreakdown(fines, rounds, (r) => r.venue, undefined, splits);
 }
 
 /** Buckets results into Win / Loss / Draw-ish groups using the free-text result. */
@@ -369,12 +460,13 @@ export function resultBucket(result: string | null | undefined) {
   return "Other";
 }
 
-export function resultBreakdown(fines: Fine[], rounds: Round[]) {
-  return roundAttributeBreakdown(fines, rounds, (r) => resultBucket(r.result));
+export function resultBreakdown(fines: Fine[], rounds: Round[], splits?: Map<string, FineSplit>) {
+  return roundAttributeBreakdown(fines, rounds, (r) => resultBucket(r.result), undefined, splits);
 }
 
 /** Fines grouped by round, split into days for two-day rounds. */
-export function weekBreakdown(fines: Fine[], rounds: Round[]): Breakdown[] {
+export function weekBreakdown(fines: Fine[], rounds: Round[], splits?: Map<string, FineSplit>): Breakdown[] {
+  const capSplits = splits ?? applyCaps(fines, rounds);
   const ordered = [...rounds].sort((a, b) => a.round_number - b.round_number);
   const rows: Breakdown[] = [];
   for (const r of ordered) {
@@ -382,10 +474,12 @@ export function weekBreakdown(fines: Fine[], rounds: Round[]): Breakdown[] {
     const days = r.two_day ? [1, 2] : [null];
     for (const d of days) {
       const subset = d === null ? mine : mine.filter((f) => (f.week ?? 1) === d);
-      const total = subset.reduce((s, f) => s + Number(f.amount), 0);
+      const total = subset.reduce((s, f) => s + (capSplits.get(f.id)?.counted ?? Number(f.amount)), 0);
+      const discounted = subset.reduce((s, f) => s + (capSplits.get(f.id)?.discounted ?? 0), 0);
       rows.push({
         label: roundDayLabel(r, d),
         total,
+        discounted,
         count: subset.length,
         rounds: 1,
         avg: total,

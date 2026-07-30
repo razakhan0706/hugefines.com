@@ -261,7 +261,6 @@ function BreakdownCard({
   showUnit?: boolean;
   showAvg?: boolean;
 }) {
-  const hasDiscounts = rows.some((r) => r.discounted > 0);
   return (
     <Card>
       <CardContent className="p-5">
@@ -270,35 +269,33 @@ function BreakdownCard({
           <p className="mt-3 text-sm text-muted-foreground">{empty}</p>
         ) : (
           <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[22rem] text-sm">
               <thead>
                 <tr className="text-left uppercase text-muted-foreground">
-                  <th className="py-2">Name</th>
-                  <th className="text-right">Total</th>
-                  {hasDiscounts && (
-                    <th className="text-right text-destructive">Discounted</th>
-                  )}
-                  {showUnit && <th className="text-right">{unit}</th>}
-                  {showAvg && <th className="text-right">Avg</th>}
+                  <th className="py-2 pr-3">Name</th>
+                  <th className="px-3 text-right">Total</th>
+                  <th className="whitespace-nowrap px-3 text-right text-destructive">Discounted</th>
+                  {showUnit && <th className="px-3 text-right">{unit}</th>}
+                  {showAvg && <th className="pl-3 text-right">Avg</th>}
                 </tr>
               </thead>
               <tbody>
                 {rows.map((r) => (
                   <tr key={r.label} className="border-t border-border">
-                    <td className="py-2">
+                    <td className="py-2 pr-3">
                       <span className="flex items-center gap-2 font-medium uppercase">
                         <PhotoAvatar url={r.photo} name={r.label} className="size-8" />
                         {r.label}
                       </span>
                     </td>
-                    <td className="stat-num text-right font-bold">{money(r.total, currency)}</td>
-                    {hasDiscounts && (
-                      <td className="stat-num text-right font-bold text-destructive">
-                        {r.discounted > 0 ? money(r.discounted, currency) : "—"}
-                      </td>
+                    <td className="stat-num px-3 text-right font-bold">{money(r.total, currency)}</td>
+                    <td className="stat-num whitespace-nowrap px-3 text-right font-bold text-destructive">
+                      {r.discounted > 0 ? money(r.discounted, currency) : "—"}
+                    </td>
+                    {showUnit && <td className="stat-num px-3 text-right">{r.rounds}</td>}
+                    {showAvg && (
+                      <td className="stat-num pl-3 text-right">{money(r.avg, currency)}</td>
                     )}
-                    {showUnit && <td className="stat-num text-right">{r.rounds}</td>}
-                    {showAvg && <td className="stat-num text-right">{money(r.avg, currency)}</td>}
                   </tr>
                 ))}
               </tbody>

@@ -365,16 +365,6 @@ export function seasonAwards(stats: PlayerStat[], currency: string): Award[] {
     });
   }
 
-  const streaky = [...stats].sort((a, b) => b.streak - a.streak)[0];
-  if (streaky && streaky.streak > 1) {
-    awards.push({
-      title: "Repeat Offender",
-      winner: streaky.player.name,
-      photo: streaky.player.photo_url,
-      detail: `Fined in ${streaky.streak} rounds in a row`,
-    });
-  }
-
   const mostDiscounted = [...stats].sort((a, b) => b.discounted - a.discounted)[0];
   if (mostDiscounted && mostDiscounted.discounted > 0) {
     awards.push({

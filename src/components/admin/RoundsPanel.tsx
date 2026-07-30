@@ -17,6 +17,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   const [roundName, setRoundName] = useState(String(nextNumber));
   const [twoDay, setTwoDay] = useState(false);
   const [day, setDay] = useState<number>(1);
+  const [cap, setCap] = useState("");
   const [playedOn, setPlayedOn] = useState("");
   const [venue, setVenue] = useState("");
   const [result, setResult] = useState("");
@@ -30,6 +31,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     label: "",
     two_day: false,
     day: 1,
+    cap: "",
     venue: "",
     result: "",
     fines_master: "",
@@ -42,6 +44,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
       label: roundBaseLabel(r),
       two_day: Boolean(r.two_day),
       day: r.day ?? 1,
+      cap: r.cap != null ? String(r.cap) : "",
       venue: r.venue ?? "",
       result: r.result ?? "",
       fines_master: r.fines_master ?? "",
@@ -52,6 +55,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     if (!editId) return;
     const base = edit.label.trim() || "Round";
     const num = Number(base.match(/\d+/)?.[0] ?? NaN);
+    const capNum = Number(edit.cap);
     const { error } = await supabase
       .from("rounds")
       .update({
@@ -59,6 +63,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
         label: edit.two_day ? `${base} - Day ${edit.day}` : base,
         two_day: edit.two_day,
         day: edit.two_day ? edit.day : null,
+        cap: edit.cap.trim() && Number.isFinite(capNum) ? capNum : null,
         venue: edit.venue.trim() || null,
         result: edit.result.trim() || null,
         fines_master: edit.fines_master.trim() || null,
@@ -108,12 +113,14 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     const typed = roundName.trim();
     const num = Number(typed.match(/\d+/)?.[0] ?? NaN) || nextNumber;
     const base = typed || `Round ${num}`;
+    const capNum = Number(cap);
     const { error } = await supabase.from("rounds").insert({
       team_id: data.team.id,
       round_number: num,
       label: twoDay ? `${base} - Day ${day}` : base,
       two_day: twoDay,
       day: twoDay ? day : null,
+      cap: cap.trim() && Number.isFinite(capNum) ? capNum : null,
       opponent: opponent || null,
       played_on: playedOn || null,
       venue: venue || null,
@@ -127,6 +134,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     setRoundName(String(num + 1));
     setTwoDay(false);
     setDay(1);
+    setCap("");
     setPlayedOn("");
     setVenue("");
     setResult("");
@@ -204,6 +212,18 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                 ))}
               </div>
             )}
+          </div>
+          <div>
+            <label className="text-sm font-medium">Cap (per player)</label>
+            <Input
+              value={cap}
+              onChange={(e) => setCap(e.target.value)}
+              inputMode="decimal"
+              placeholder="e.g. 5"
+            />
+            <p className="mt-1 text-xs text-muted-foreground">
+              Max a player can be fined this round
+            </p>
           </div>
           <div>
             <label className="text-sm font-medium">Venue</label>
@@ -302,6 +322,15 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                     )}
                   </div>
                   <div>
+                    <label className="text-sm font-medium">Cap (per player)</label>
+                    <Input
+                      value={edit.cap}
+                      onChange={(e) => setEdit((s) => ({ ...s, cap: e.target.value }))}
+                      inputMode="decimal"
+                      placeholder="e.g. 5"
+                    />
+                  </div>
+                  <div>
                     <label className="text-sm font-medium">Venue</label>
                     <Input
                       value={edit.venue}
@@ -372,6 +401,11 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                     {money(total, data.team.currency)}
                   </p>
                   <p className="text-xs text-muted-foreground">{roundFines.length} fines</p>
+                  {r.cap != null && (
+                    <p className="text-xs text-muted-foreground">
+                      Cap: {money(Number(r.cap), data.team.currency)}/player
+                    </p>
+                  )}
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => startEdit(r)} title="Edit round">
                   <Pencil className="size-4" />

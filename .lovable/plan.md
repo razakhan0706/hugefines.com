@@ -1,24 +1,42 @@
-## What's happening
+## Weekly fine cap with discounted tracking
 
-The "Round" box only accepts a number. When you type `Trial Match 1`, the form converts it to a number, fails, and silently falls back to the next round number. It then builds the name itself as `Round 1` — your text is never stored.
+### How the cap works
+A **cap** is set per round (in the Rounds panel). It applies to **each player's cumulative fines within that round** — or per day for 2-day rounds (each day = separate week, each gets the same cap). If a player's total exceeds the cap, the **excess is discounted**: it does NOT count toward the individual or team tallies, but is tracked and shown **in red** across every stats section.
 
-Confirmed in the code: the round form runs `Number(roundNumber) || nextNumber`, saves `label: "Round N"`, and every display helper rebuilds the name from the number instead of reading the saved label.
+Example: cap is $5, player has $4 in fines, gets a $2 fine → $1 counts, $1 is discounted (shown in red).
 
-## What I'll change
+### 1. Database migration
+Add a nullable `cap` numeric column to `rounds`.
 
-**1. Let the Round box accept anything you type**
-- Type `Trial Match 1`, `Grand Final`, or just `4` — whatever you write is saved as the round's name.
-- A number is still pulled out of the text where one exists (so `Trial Match 1` sorts as round 1); if there's no number, it takes the next slot automatically for ordering only.
+### 2. Move cap from Fine form → Round form
+- **RoundsPanel.tsx**: Add a "Cap" input to both the add-round and edit-round forms. Shows "Max per player this round".
+- **FinesPanel.tsx**: Remove the per-fine "Cap (max)" toggle and "Max amount" input — the cap is now round-level.
 
-**2. Show your text everywhere the round appears**
-- Round cards, the round dropdown in Fines, Voting, AI recaps, and the Stats "FINES BY WEEK" table all show your typed name instead of `Round N`.
-- Two-dayers still append the day: `TRIAL MATCH 1 - DAY 2`.
-- The square number badge on the round card stays as the sort number.
+### 3. fines.ts — cap calculation logic
+- Add `cap` to the `Round` interface.
+- Add `applyCaps(fines, rounds)` → returns a `Map<fineId, { counted, discounted }>`. Groups fines by player + round + week, sorts by `created_at` (oldest first), walks the running total against the round's cap, and splits each fine into counted vs discounted portions.
+- Add `discounted` field to `Breakdown` and `PlayerStat` interfaces.
+- Update `buildPlayerStats` to use counted amounts for `total` and populate `discounted`.
+- Update all breakdown functions (`roundTotals`, `categoryBreakdown`, `finesMasterBreakdown`, `opponentBreakdown`, `venueBreakdown`, `resultBreakdown`, `weekBreakdown`) to also sum discounted amounts using the cap map.
 
-**3. Existing rounds** keep working — anything already saved as `Round 1` still reads `Round 1`.
+### 4. StatsView.tsx — show discounts in red, remove Outstanding
 
-## Technical notes
+**Summary tiles** (top row): remove "Outstanding". Keep Season pot (counted total), Fines logged (count), Rounds played. Add a red "Discounted" tile showing total discounted across the season.
 
-- `src/lib/fines.ts`: `roundDayLabel()` uses `round.label` as the base when present, falling back to `Round ${round_number}`; `weekBreakdown`/`roundTotals` inherit this automatically.
-- `src/components/admin/RoundsPanel.tsx`: free-text round input; parse trailing/leading digits for `round_number`, store raw text in `label`, append `- Day N` for two-dayers.
-- No database change — the `label` column already exists.
+**Fines leaderboard**: add a red "Discounted" column showing each player's season discounted total (with their photo already present).
+
+**Fines by round** (line chart): add a second red line for discounted amounts alongside the green counted line.
+
+**All breakdown cards** (Fines master, Fines by opponent, Fines by venue, Fines by result, Fines by week): add a red "Discounted" column to each table, showing the discounted total for that category.
+
+**Styling**: all discounted values use `text-red-600` (or destructive color) with the same `stat-num` font, clearly distinguishing them from counted amounts.
+
+### 5. Public board (t.$slug.tsx)
+No code change needed — it renders `<StatsView>`, so the discounts and removed Outstanding tile apply automatically.
+
+### Files changed
+- `supabase migration` (add `rounds.cap`)
+- `src/lib/fines.ts` (cap logic + interface updates)
+- `src/components/admin/RoundsPanel.tsx` (cap input)
+- `src/components/admin/FinesPanel.tsx` (remove per-fine cap)
+- `src/components/StatsView.tsx` (red discounts everywhere, remove Outstanding)

@@ -220,6 +220,7 @@ export type Database = {
       }
       rounds: {
         Row: {
+          cap: number | null
           created_at: string
           day: number | null
           fines_master: string | null
@@ -236,6 +237,7 @@ export type Database = {
           venue: string | null
         }
         Insert: {
+          cap?: number | null
           created_at?: string
           day?: number | null
           fines_master?: string | null
@@ -252,6 +254,7 @@ export type Database = {
           venue?: string | null
         }
         Update: {
+          cap?: number | null
           created_at?: string
           day?: number | null
           fines_master?: string | null

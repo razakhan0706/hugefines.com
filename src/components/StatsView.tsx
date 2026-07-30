@@ -219,6 +219,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
           currency={currency}
           unit="Matches"
           empty="Add opponents to your rounds to see this."
+          showDiscount={false}
         />
         <BreakdownCard
           title="Fines by venue"
@@ -226,6 +227,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
           currency={currency}
           unit="Matches"
           empty="Add venues to your rounds to see this."
+          showDiscount={false}
         />
         <BreakdownCard
           title="Fines by result"
@@ -256,6 +258,7 @@ function BreakdownCard({
   empty,
   showUnit = true,
   showAvg = true,
+  showDiscount = true,
 }: {
   title: string;
   rows: Breakdown[];
@@ -264,6 +267,7 @@ function BreakdownCard({
   empty: string;
   showUnit?: boolean;
   showAvg?: boolean;
+  showDiscount?: boolean;
 }) {
   return (
     <Card>
@@ -278,7 +282,9 @@ function BreakdownCard({
                 <tr className="text-left uppercase text-muted-foreground">
                   <th className="py-2 pr-3">Name</th>
                   <th className="px-3 text-right">Total</th>
-                  <th className="whitespace-nowrap px-3 text-right text-destructive">Discounted</th>
+                  {showDiscount && (
+                    <th className="whitespace-nowrap px-3 text-right text-destructive">Discounted</th>
+                  )}
                   {showUnit && <th className="px-3 text-right">{unit}</th>}
                   {showAvg && <th className="pl-3 text-right">Avg</th>}
                 </tr>
@@ -293,9 +299,11 @@ function BreakdownCard({
                       </span>
                     </td>
                     <td className="stat-num px-3 text-right font-bold">{money(r.total, currency)}</td>
-                    <td className="stat-num whitespace-nowrap px-3 text-right font-bold text-destructive">
-                      {r.discounted > 0 ? money(r.discounted, currency) : "—"}
-                    </td>
+                    {showDiscount && (
+                      <td className="stat-num whitespace-nowrap px-3 text-right font-bold text-destructive">
+                        {r.discounted > 0 ? money(r.discounted, currency) : "—"}
+                      </td>
+                    )}
                     {showUnit && <td className="stat-num px-3 text-right">{r.rounds}</td>}
                     {showAvg && (
                       <td className="stat-num pl-3 text-right">{money(r.avg, currency)}</td>

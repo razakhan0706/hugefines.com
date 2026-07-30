@@ -137,9 +137,6 @@ export function StatsView({ data }: { data: TeamBundle }) {
                     </td>
                     <td className="stat-num text-right">{s.count}</td>
                     <td className="stat-num text-right">{money(s.avgPerRound, currency)}</td>
-                    <td className="hidden text-muted-foreground sm:table-cell">
-                      {s.topCategory ?? "—"}
-                    </td>
                     <td className="stat-num text-right">{s.votePoints}</td>
                   </tr>
                 ))}

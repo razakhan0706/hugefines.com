@@ -219,6 +219,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
           currency={currency}
           unit="Matches"
           empty="Add opponents to your rounds to see this."
+          showDiscount={false}
         />
         <BreakdownCard
           title="Fines by venue"
@@ -226,6 +227,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
           currency={currency}
           unit="Matches"
           empty="Add venues to your rounds to see this."
+          showDiscount={false}
         />
         <BreakdownCard
           title="Fines by result"

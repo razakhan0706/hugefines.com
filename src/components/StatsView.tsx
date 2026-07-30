@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
 import {
+  applyCaps,
   buildPlayerStats,
   categoryBreakdown,
   weekBreakdown,
@@ -28,7 +29,10 @@ import { PhotoAvatar } from "@/components/PhotoAvatar";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { Trophy } from "lucide-react";
 
+const DISCOUNT_COLOR = "var(--color-destructive)";
+
 export function StatsView({ data }: { data: TeamBundle }) {
+  const splits = applyCaps(data.fines, data.rounds);
   const stats = buildPlayerStats(
     data.players,
     data.fines,
@@ -37,22 +41,22 @@ export function StatsView({ data }: { data: TeamBundle }) {
     data.votes,
   );
   const currency = data.team.currency;
-  const total = data.fines.reduce((s, f) => s + Number(f.amount), 0);
-  const unpaid = data.fines.filter((f) => !f.paid).reduce((s, f) => s + Number(f.amount), 0);
-  const byRound = roundTotals(data.fines, data.rounds);
+  const total = data.fines.reduce((s, f) => s + (splits.get(f.id)?.counted ?? Number(f.amount)), 0);
+  const totalDiscounted = data.fines.reduce((s, f) => s + (splits.get(f.id)?.discounted ?? 0), 0);
+  const byRound = roundTotals(data.fines, data.rounds, splits);
   const byCat = categoryBreakdown(data.fines, data.categories);
   const awards = seasonAwards(stats, currency);
-  const byMaster = finesMasterBreakdown(data.fines, data.rounds);
-  const byOpponent = opponentBreakdown(data.fines, data.rounds);
-  const byVenue = venueBreakdown(data.fines, data.rounds);
-  const byResult = resultBreakdown(data.fines, data.rounds);
-  const byWeek = weekBreakdown(data.fines, data.rounds);
+  const byMaster = finesMasterBreakdown(data.fines, data.rounds, splits);
+  const byOpponent = opponentBreakdown(data.fines, data.rounds, splits);
+  const byVenue = venueBreakdown(data.fines, data.rounds, splits);
+  const byResult = resultBreakdown(data.fines, data.rounds, splits);
+  const byWeek = weekBreakdown(data.fines, data.rounds, splits);
 
   const summaryTiles = [
-    { label: "Season pot", value: money(total, currency) },
-    { label: "Outstanding", value: money(unpaid, currency) },
-    { label: "Fines logged", value: String(data.fines.length) },
-    { label: "Rounds played", value: String(data.rounds.length) },
+    { label: "Season pot", value: money(total, currency), discount: false },
+    { label: "Fines logged", value: String(data.fines.length), discount: false },
+    { label: "Rounds played", value: String(data.rounds.length), discount: false },
+    { label: "Discounted", value: money(totalDiscounted, currency), discount: true },
   ];
 
   return (
@@ -64,7 +68,11 @@ export function StatsView({ data }: { data: TeamBundle }) {
               <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 {t.label}
               </p>
-              <p className="stat-num mt-1 text-2xl font-bold">{t.value}</p>
+              <p
+                className={`stat-num mt-1 text-2xl font-bold ${t.discount ? "text-destructive" : ""}`}
+              >
+                {t.value}
+              </p>
             </CardContent>
           </Card>
         ))}
@@ -103,6 +111,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
                   <th className="py-2">#</th>
                   <th>Player</th>
                   <th className="text-right">Total</th>
+                  <th className="text-right text-destructive">Discounted</th>
                   <th className="text-right">Fines</th>
                   <th className="text-right">Avg/round</th>
                   <th className="hidden sm:table-cell">Speciality</th>
@@ -124,6 +133,9 @@ export function StatsView({ data }: { data: TeamBundle }) {
                       </span>
                     </td>
                     <td className="stat-num text-right font-bold">{money(s.total, currency)}</td>
+                    <td className="stat-num text-right font-bold text-destructive">
+                      {s.discounted > 0 ? money(s.discounted, currency) : "—"}
+                    </td>
                     <td className="stat-num text-right">{s.count}</td>
                     <td className="stat-num text-right">{money(s.avgPerRound, currency)}</td>
                     <td className="hidden text-muted-foreground sm:table-cell">
@@ -155,9 +167,19 @@ export function StatsView({ data }: { data: TeamBundle }) {
                   <Line
                     type="monotone"
                     dataKey="total"
+                    name="Counted"
                     stroke="var(--color-accent)"
                     strokeWidth={3}
                     dot={{ r: 3 }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="discounted"
+                    name="Discounted"
+                    stroke={DISCOUNT_COLOR}
+                    strokeWidth={2}
+                    strokeDasharray="5 4"
+                    dot={{ r: 2 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -241,6 +263,7 @@ function BreakdownCard({
   unit: string;
   empty: string;
 }) {
+  const hasDiscounts = rows.some((r) => r.discounted > 0);
   return (
     <Card>
       <CardContent className="p-5">
@@ -254,6 +277,9 @@ function BreakdownCard({
                 <tr className="text-left uppercase text-muted-foreground">
                   <th className="py-2">Name</th>
                   <th className="text-right">Total</th>
+                  {hasDiscounts && (
+                    <th className="text-right text-destructive">Discounted</th>
+                  )}
                   <th className="text-right">Fines</th>
                   <th className="text-right">{unit}</th>
                   <th className="text-right">Avg</th>
@@ -269,6 +295,11 @@ function BreakdownCard({
                       </span>
                     </td>
                     <td className="stat-num text-right font-bold">{money(r.total, currency)}</td>
+                    {hasDiscounts && (
+                      <td className="stat-num text-right font-bold text-destructive">
+                        {r.discounted > 0 ? money(r.discounted, currency) : "—"}
+                      </td>
+                    )}
                     <td className="stat-num text-right">{r.count}</td>
                     <td className="stat-num text-right">{r.rounds}</td>
                     <td className="stat-num text-right">{money(r.avg, currency)}</td>

@@ -206,7 +206,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
           title="Fines master"
           rows={byMaster}
           currency={currency}
-          unit="Rounds run"
+          unit="Rounds"
           empty="Add a fines master to a round to see this."
         />
         <BreakdownCard
@@ -236,6 +236,8 @@ export function StatsView({ data }: { data: TeamBundle }) {
           currency={currency}
           unit="Matches"
           empty="Add rounds to see this."
+          showUnit={false}
+          showAvg={false}
         />
       </div>
     </div>

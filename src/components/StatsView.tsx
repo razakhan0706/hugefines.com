@@ -114,7 +114,6 @@ export function StatsView({ data }: { data: TeamBundle }) {
                   <th className="text-right text-destructive">Discounted</th>
                   <th className="text-right">Fines</th>
                   <th className="text-right">Avg/round</th>
-                  <th className="hidden sm:table-cell">Speciality</th>
                   <th className="text-right">Votes</th>
                 </tr>
               </thead>

@@ -375,13 +375,13 @@ export function seasonAwards(stats: PlayerStat[], currency: string): Award[] {
     });
   }
 
-  const bigOne = [...stats].sort((a, b) => b.biggest - a.biggest)[0];
-  if (bigOne && bigOne.biggest > 0) {
+  const mostDiscounted = [...stats].sort((a, b) => b.discounted - a.discounted)[0];
+  if (mostDiscounted && mostDiscounted.discounted > 0) {
     awards.push({
-      title: "Biggest Single Fine",
-      winner: bigOne.player.name,
-      photo: bigOne.player.photo_url,
-      detail: money(bigOne.biggest, currency),
+      title: "Most Discounted Fines",
+      winner: mostDiscounted.player.name,
+      photo: mostDiscounted.player.photo_url,
+      detail: `${money(mostDiscounted.discounted, currency)} discounted`,
     });
   }
 

@@ -10,6 +10,11 @@ import { toast } from "sonner";
 import { Trophy } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
+  validateSearch: (s: Record<string, unknown>) => ({
+    next: typeof s.next === "string" && s.next.startsWith("/") && !s.next.startsWith("//")
+      ? s.next
+      : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Sign in — Huge Fines" },
@@ -23,6 +28,7 @@ export const Route = createFileRoute("/auth")({
 
 function AuthPage() {
   const navigate = useNavigate();
+  const { next } = Route.useSearch();
   const [mode, setMode] = useState<"signin" | "signup">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,9 +37,12 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) navigate({ to: "/dashboard", replace: true });
+      if (data.session) {
+        if (next) window.location.replace(next);
+        else navigate({ to: "/dashboard", replace: true });
+      }
     });
-  }, [navigate]);
+  }, [navigate, next]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -44,21 +53,23 @@ function AuthPage() {
           email,
           password,
           options: {
-            emailRedirectTo: `${window.location.origin}/dashboard`,
+            emailRedirectTo: `${window.location.origin}${next ?? "/dashboard"}`,
             data: { display_name: name },
           },
         });
         if (error) throw error;
         const { data: session } = await supabase.auth.getSession();
         if (session.session) {
-          navigate({ to: "/dashboard" });
+          if (next) window.location.assign(next);
+          else navigate({ to: "/dashboard" });
         } else {
           toast.success("Check your email to confirm your account.");
         }
       } else {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
-        navigate({ to: "/dashboard" });
+        if (next) window.location.assign(next);
+        else navigate({ to: "/dashboard" });
       }
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
@@ -69,14 +80,15 @@ function AuthPage() {
 
   async function google() {
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: next ? `${window.location.origin}${next}` : window.location.origin,
     });
     if (result.error) {
       toast.error("Google sign-in failed. Try email instead.");
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/dashboard" });
+    if (next) window.location.assign(next);
+    else navigate({ to: "/dashboard" });
   }
 
   return (

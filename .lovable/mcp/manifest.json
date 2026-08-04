@@ -1,0 +1,242 @@
+{
+  "version": 1,
+  "sdk_version": "0.26.1",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://jcplzyyehweysydckyyi.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "pixel-perfect-capture",
+      "version": "0.1.0",
+      "title": "Pixel Perfect Capture"
+    },
+    "tools": [
+      {
+        "name": "list_teams",
+        "title": "List teams",
+        "description": "List the Huge Fines teams the signed-in user can access, with id, name, slug and season.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {}
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_players",
+        "title": "List players",
+        "description": "List the players on a team. Pass the team id from list_teams.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "team_id": {
+              "type": "string",
+              "description": "Team id from list_teams."
+            }
+          },
+          "required": [
+            "team_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_rounds",
+        "title": "List rounds",
+        "description": "List a team's rounds with opponent, venue, result, fines master and per-player cap.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "team_id": {
+              "type": "string",
+              "description": "Team id from list_teams."
+            }
+          },
+          "required": [
+            "team_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "list_fines",
+        "title": "List fines",
+        "description": "List fines logged for a team, newest first. Optionally filter by player or round, and limit the number returned.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "team_id": {
+              "type": "string",
+              "description": "Team id from list_teams."
+            },
+            "player_id": {
+              "description": "Optional player id filter.",
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "round_id": {
+              "description": "Optional round id filter.",
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "limit": {
+              "description": "Max rows to return, default 50.",
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "team_id"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "log_fine",
+        "title": "Log a fine",
+        "description": "Log a new fine for a player on a team. Provide either a category_id or a custom description.",
+        "annotations": {
+          "readOnlyHint": false,
+          "destructiveHint": false,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "team_id": {
+              "type": "string",
+              "description": "Team id from list_teams."
+            },
+            "player_id": {
+              "type": "string",
+              "description": "Player id from list_players."
+            },
+            "amount": {
+              "type": "number",
+              "description": "Fine amount in the team's currency."
+            },
+            "description": {
+              "type": "string",
+              "description": "What the fine was for (custom text or the category label)."
+            },
+            "category_id": {
+              "description": "Optional fine category id.",
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "round_id": {
+              "description": "Optional round id from list_rounds.",
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "week": {
+              "description": "Day 1 or 2 for a two-day round.",
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            }
+          },
+          "required": [
+            "team_id",
+            "player_id",
+            "amount",
+            "description"
+          ]
+        },
+        "outputSchema": null
+      },
+      {
+        "name": "team_summary",
+        "title": "Team season summary",
+        "description": "Season summary for a team: total fines pot, fines logged, rounds played and the fines leaderboard by player.",
+        "annotations": {
+          "readOnlyHint": true,
+          "idempotentHint": true,
+          "openWorldHint": false
+        },
+        "inputSchema": {
+          "$schema": "http://json-schema.org/draft-07/schema#",
+          "type": "object",
+          "properties": {
+            "team_id": {
+              "type": "string",
+              "description": "Team id from list_teams."
+            }
+          },
+          "required": [
+            "team_id"
+          ]
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

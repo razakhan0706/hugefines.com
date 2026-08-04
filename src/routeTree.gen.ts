@@ -15,6 +15,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedTeamTeamIdRouteImport } from './routes/_authenticated/team.$teamId'
+import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
@@ -45,12 +46,18 @@ const AuthenticatedTeamTeamIdRoute = AuthenticatedTeamTeamIdRouteImport.update({
   path: '/team/$teamId',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
+  id: '/.lovable/oauth/consent',
+  path: '/.lovable/oauth/consent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/t/$slug': typeof TSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/team/$teamId': typeof AuthenticatedTeamTeamIdRoute
 }
 export interface FileRoutesByTo {
@@ -58,6 +65,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/t/$slug': typeof TSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/team/$teamId': typeof AuthenticatedTeamTeamIdRoute
 }
 export interface FileRoutesById {
@@ -67,13 +75,26 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/t/$slug': typeof TSlugRoute
+  '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
   '/_authenticated/team/$teamId': typeof AuthenticatedTeamTeamIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth' | '/dashboard' | '/t/$slug' | '/team/$teamId'
+  fullPaths:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/t/$slug'
+    | '/.lovable/oauth/consent'
+    | '/team/$teamId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth' | '/dashboard' | '/t/$slug' | '/team/$teamId'
+  to:
+    | '/'
+    | '/auth'
+    | '/dashboard'
+    | '/t/$slug'
+    | '/.lovable/oauth/consent'
+    | '/team/$teamId'
   id:
     | '__root__'
     | '/'
@@ -81,6 +102,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/_authenticated/dashboard'
     | '/t/$slug'
+    | '/.lovable/oauth/consent'
     | '/_authenticated/team/$teamId'
   fileRoutesById: FileRoutesById
 }
@@ -89,6 +111,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   TSlugRoute: typeof TSlugRoute
+  DotlovableOauthConsentRoute: typeof DotlovableOauthConsentRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -135,6 +158,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeamTeamIdRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/.lovable/oauth/consent': {
+      id: '/.lovable/oauth/consent'
+      path: '/.lovable/oauth/consent'
+      fullPath: '/.lovable/oauth/consent'
+      preLoaderRoute: typeof DotlovableOauthConsentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -156,6 +186,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   TSlugRoute: TSlugRoute,
+  DotlovableOauthConsentRoute: DotlovableOauthConsentRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

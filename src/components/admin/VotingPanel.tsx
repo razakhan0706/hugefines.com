@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,6 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
+import { Trash2 } from "lucide-react";
 import { VOTE_FORMATS, roundDayLabel } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
@@ -35,6 +36,12 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   }, [roundId, data.votes]);
 
   const roundVotes = data.votes.filter((v) => v.round_id === roundId);
+
+  const playerById = useMemo(
+    () => new Map(data.players.map((p) => [p.id, p])),
+    [data.players],
+  );
+  const votedRounds = data.rounds.filter((r) => data.votes.some((v) => v.round_id === r.id));
 
   async function saveVotes() {
     if (!roundId) return toast.error("Pick a round first");
@@ -62,6 +69,13 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     toast.success("Votes saved");
   }
 
+  async function clearRound(id: string) {
+    const { error } = await supabase.from("votes").delete().eq("round_id", id);
+    if (error) return toast.error(error.message);
+    refresh();
+    toast.success("Votes removed");
+  }
+
   const tally = [...data.players]
     .map((p) => ({
       name: p.name,
@@ -72,47 +86,37 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     .sort((a, b) => b.total - a.total);
 
   return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      <Card>
-        <CardContent className="space-y-4 p-5">
-          <div>
-            <h3 className="text-lg font-bold">Cast round votes</h3>
-            <p className="text-sm text-muted-foreground">
-              Format: {data.team.vote_format}
-            </p>
+    <div className="space-y-6">
+      <Card className="border-2">
+        <CardContent className="grid gap-3 p-5 lg:grid-cols-5">
+          <div className="lg:col-span-5">
+            <label className="text-sm font-medium">Round</label>
+            <Select value={roundId} onValueChange={setRoundId}>
+              <SelectTrigger>
+                <SelectValue placeholder="Round" />
+              </SelectTrigger>
+              <SelectContent>
+                {data.rounds.map((r) => (
+                  <SelectItem key={r.id} value={r.id}>
+                    {roundDayLabel(r)}
+                    {r.opponent ? ` vs ${r.opponent}` : ""}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-          <Select value={roundId} onValueChange={setRoundId}>
-            <SelectTrigger>
-              <SelectValue placeholder="Choose a round" />
-            </SelectTrigger>
-            <SelectContent>
-              {data.rounds.map((r) => (
-                <SelectItem key={r.id} value={r.id}>
-                  {roundDayLabel(r)}
-                  {r.opponent ? ` vs ${r.opponent}` : ""}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
 
-          {points.map((p) => {
-            const picked = data.players.find((pl) => pl.id === picks[p]);
-            return (
-            <div key={p} className="flex items-center gap-3">
-              <div className="flex shrink-0 items-center gap-2 rounded-full bg-accent px-2 py-1 text-accent-foreground">
-                <span className="stat-num flex size-7 items-center justify-center rounded-full bg-accent-foreground/15 font-bold">
-                  {p}
-                </span>
-                <span className="max-w-28 truncate text-sm font-semibold">
-                  {picked ? picked.name : `${p} vote${p > 1 ? "s" : ""}`}
-                </span>
-              </div>
+          {points.map((p) => (
+            <div key={p}>
+              <label className="text-sm font-medium">
+                {p} vote{p > 1 ? "s" : ""}
+              </label>
               <Select
                 value={picks[p] ?? ""}
                 onValueChange={(v) => setPicks((s) => ({ ...s, [p]: v }))}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder={`${p} vote${p > 1 ? "s" : ""} to…`} />
+                  <SelectValue placeholder="Player" />
                 </SelectTrigger>
                 <SelectContent>
                   {data.players.map((pl) => (
@@ -123,12 +127,62 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                 </SelectContent>
               </Select>
             </div>
+          ))}
+
+          <div className="flex items-end lg:col-span-2">
+            <Button className="w-full" onClick={saveVotes} disabled={busy}>
+              {roundVotes.length ? "Update votes" : "Save votes"}
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-3 p-5">
+          <h3 className="text-lg font-bold">Votes by round</h3>
+          {votedRounds.length === 0 && (
+            <p className="text-sm text-muted-foreground">No votes saved yet.</p>
+          )}
+          {votedRounds.map((r) => {
+            const rv = data.votes
+              .filter((v) => v.round_id === r.id)
+              .sort((a, b) => b.points - a.points);
+            return (
+              <div key={r.id} className="rounded-md border border-border p-3">
+                <div className="flex items-center gap-2">
+                  <span className="font-semibold">
+                    {roundDayLabel(r)}
+                    {r.opponent ? ` vs ${r.opponent}` : ""}
+                  </span>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="ml-auto size-8"
+                    onClick={() => clearRound(r.id)}
+                  >
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {rv.map((v) => {
+                    const pl = playerById.get(v.player_id);
+                    return (
+                      <span
+                        key={v.id}
+                        className="flex items-center gap-2 rounded-full bg-accent px-2 py-1 text-accent-foreground"
+                      >
+                        <span className="stat-num flex size-6 items-center justify-center rounded-full bg-accent-foreground/15 text-xs font-bold">
+                          {v.points}
+                        </span>
+                        <PhotoAvatar url={pl?.photo_url} name={pl?.name ?? ""} className="size-6" />
+                        <span className="text-sm font-semibold">{pl?.name ?? "Unknown"}</span>
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
-
-          <Button className="w-full" onClick={saveVotes} disabled={busy}>
-            {roundVotes.length ? "Replace votes for this round" : "Save votes"}
-          </Button>
         </CardContent>
       </Card>
 

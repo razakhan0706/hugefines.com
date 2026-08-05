@@ -499,7 +499,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
 
                 <div className="w-px self-stretch bg-border" />
 
-                <div className="flex w-20 shrink-0 flex-col items-end justify-start gap-2">
+                <div className="flex w-24 shrink-0 flex-col items-end justify-start gap-2">
                   <div className="text-right">
                     <p className="stat-num text-lg font-bold text-accent">
                       {money(total, data.team.currency)}

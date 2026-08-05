@@ -97,6 +97,8 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   );
 
   const groupedCategories = useMemo(() => {
+    const _unused = 0;
+    void _unused;
     const order = [...FINE_CATEGORY_GROUPS.map((g) => g.group), "Other"];
     const map = new Map<string, typeof data.categories>();
     for (const c of data.categories) {

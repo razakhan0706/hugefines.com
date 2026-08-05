@@ -53,7 +53,6 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     const { error } = await supabase.from("votes").insert(rows);
     setBusy(false);
     if (error) return toast.error(error.message);
-    setPicks({});
     refresh();
     toast.success("Vote saved");
   }

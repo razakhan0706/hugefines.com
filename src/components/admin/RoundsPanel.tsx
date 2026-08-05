@@ -439,7 +439,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                 </CardContent>
               ) : (
               <CardContent className="grid grid-cols-[auto_1fr] items-start gap-3 p-4">
-                <div className="flex flex-col items-center justify-start gap-1">
+                <div className="flex w-16 flex-col items-center justify-start gap-1">
                   <span
                     className={`stat-num flex size-11 shrink-0 items-center justify-center rounded-md font-bold ${
                       resultBadge(r.result)?.className ?? "bg-muted text-muted-foreground"

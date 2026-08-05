@@ -488,7 +488,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                       </p>
                       <p className="text-xs text-muted-foreground">{roundFines.length} fines</p>
                       <p className="text-[10px] font-semibold leading-tight text-destructive">
-                        Discounted Fines: {money(discounted, data.team.currency)}
+                        Disc. {money(discounted, data.team.currency)}
                       </p>
                     </div>
                   </div>

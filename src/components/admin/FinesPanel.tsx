@@ -257,7 +257,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
             <Select
               value={categoryId}
               onValueChange={(v) => {
-                setCategoryId(v);
+                setCategoryId(v === "custom" ? "" : v);
                 setQuote("");
                 const c = data.categories.find((x) => x.id === v);
                 if (c) setAmount(String(c.default_amount));
@@ -267,6 +267,12 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem
+                  value="custom"
+                  className="cursor-pointer border-b border-border font-bold uppercase tracking-widest text-accent-strong"
+                >
+                  Custom
+                </SelectItem>
                 {groupedCategories.map((g) => (
                   <SelectGroup key={g.group}>
                     <SelectLabel>{g.group}</SelectLabel>

@@ -357,20 +357,34 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                       </Button>
                     </div>
                     {edit.two_day && (
-                      <div className="mt-2 flex gap-2">
+                      <div className="mt-2 grid grid-cols-2 gap-2">
                         {[1, 2].map((d) => (
                           <Button
                             key={d}
                             type="button"
                             size="sm"
                             variant={edit.day === d ? "default" : "outline"}
-                            className="flex-1"
+                            className="w-full"
                             onClick={() => setEdit((s) => ({ ...s, day: d }))}
                           >
                             Day {d}
                           </Button>
                         ))}
+                        <Input
+                          type="date"
+                          value={edit.played_on}
+                          onChange={(e) => setEdit((s) => ({ ...s, played_on: e.target.value }))}
+                          className={edit.day === 2 ? "col-start-2" : "col-start-1"}
+                        />
                       </div>
+                    )}
+                    {!edit.two_day && (
+                      <Input
+                        type="date"
+                        className="mt-2 w-full"
+                        value={edit.played_on}
+                        onChange={(e) => setEdit((s) => ({ ...s, played_on: e.target.value }))}
+                      />
                     )}
                   </div>
                   <div>

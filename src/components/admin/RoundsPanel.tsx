@@ -374,10 +374,21 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   </div>
                   <div>
                     <label className="text-sm font-medium">Result</label>
-                    <Input
+                    <Select
                       value={edit.result}
-                      onChange={(e) => setEdit((s) => ({ ...s, result: e.target.value }))}
-                    />
+                      onValueChange={(v) => setEdit((s) => ({ ...s, result: v }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select result" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {RESULT_OPTIONS.map((o) => (
+                          <SelectItem key={o} value={o}>
+                            {o}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Fines master</label>
@@ -397,8 +408,13 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                 </CardContent>
               ) : (
               <CardContent className="flex flex-wrap items-center gap-4 p-4">
-                <span className="stat-num flex size-11 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">
-                  {r.round_number}
+                <span
+                  className={`stat-num flex size-11 shrink-0 items-center justify-center rounded-md font-bold ${
+                    resultBadge(r.result)?.className ?? "bg-muted text-muted-foreground"
+                  }`}
+                  title={r.result ?? "No result"}
+                >
+                  {resultBadge(r.result)?.letter ?? r.round_number}
                 </span>
                 <PhotoAvatar
                   url={r.opponent_logo_url}

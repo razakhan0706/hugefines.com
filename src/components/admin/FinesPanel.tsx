@@ -21,7 +21,7 @@ import {
   groupForCategory,
   money,
   newestRoundsFirst,
-  roundDayLabel,
+  roundOpponentLabel,
 } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
@@ -89,7 +89,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
     [data.players],
   );
   const roundLabel = useMemo(
-    () => new Map(data.rounds.map((r) => [r.id, roundDayLabel(r)])),
+    () => new Map(data.rounds.map((r) => [r.id, roundOpponentLabel(r)])),
     [data.rounds],
   );
   const categoryLabel = useMemo(
@@ -195,7 +195,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               <SelectContent>
                 {roundOptions.map((r) => (
                   <SelectItem key={r.id} value={r.id}>
-                    {roundDayLabel(r)}
+                    {roundOpponentLabel(r)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -400,7 +400,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                     <SelectContent>
                       {roundOptions.map((r) => (
                         <SelectItem key={r.id} value={r.id}>
-                          {roundDayLabel(r)}
+                          {roundOpponentLabel(r)}
                         </SelectItem>
                       ))}
                     </SelectContent>

@@ -151,14 +151,18 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
     if (!playerId) return toast.error("Pick a player");
     const cat = data.categories.find((c) => c.id === categoryId);
     const custom = description.trim();
-    const base = custom || cat?.label || "Fine";
+    const base =
+      custom ||
+      cat?.label ||
+      (isCustomCategory ? "Custom fine" : "Fine");
     const q = quote.trim();
     const finalAmount = Number(amount) || 0;
+    const useCustom = Boolean(custom) || isCustomCategory;
     const { error } = await supabase.from("fines").insert({
       team_id: data.team.id,
       player_id: playerId,
       round_id: roundId || null,
-      category_id: custom ? null : categoryId || null,
+      category_id: useCustom ? null : categoryId || null,
       week: isTwoDay ? Number(week) || 1 : null,
       description: !custom && isQuoteCategory && q ? `${base} — "${q}"` : base,
       amount: finalAmount,

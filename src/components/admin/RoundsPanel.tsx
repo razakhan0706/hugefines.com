@@ -438,7 +438,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   </div>
                 </CardContent>
               ) : (
-              <CardContent className="flex items-stretch gap-2 p-4">
+              <CardContent className="flex items-stretch gap-1 p-4">
                 <div className="flex w-14 flex-col items-center justify-start gap-1">
                   <span
                     className={`stat-num flex size-11 shrink-0 items-center justify-center rounded-md font-bold ${

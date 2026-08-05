@@ -89,6 +89,7 @@ export interface Vote {
   player_id: string;
   round_id: string;
   points: number;
+  created_at: string;
 }
 
 export interface Team {

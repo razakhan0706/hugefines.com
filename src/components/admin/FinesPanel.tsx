@@ -36,6 +36,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const [quote, setQuote] = useState("");
   const [amount, setAmount] = useState("1");
   const [filterPlayer, setFilterPlayer] = useState("all");
+  const [filterWeek, setFilterWeek] = useState("all");
   const [newCategory, setNewCategory] = useState("");
   const [editId, setEditId] = useState<string | null>(null);
   const [edit, setEdit] = useState({
@@ -122,7 +123,28 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
     data.categories.find((c) => c.id === categoryId)?.label.trim().toLowerCase() ===
     "rubbish chat";
 
-  const visible = data.fines.filter((f) => filterPlayer === "all" || f.player_id === filterPlayer);
+  const weekOptions = useMemo(() => {
+    const out: { value: string; label: string }[] = [];
+    for (const r of roundOptions) {
+      if (r.two_day) {
+        out.push({ value: `${r.id}:1`, label: roundOpponentLabel(r, 1) });
+        out.push({ value: `${r.id}:2`, label: roundOpponentLabel(r, 2) });
+      } else {
+        out.push({ value: `${r.id}:`, label: roundOpponentLabel(r) });
+      }
+    }
+    return out;
+  }, [roundOptions]);
+
+  const visible = data.fines.filter((f) => {
+    if (filterPlayer !== "all" && f.player_id !== filterPlayer) return false;
+    if (filterWeek !== "all") {
+      const [rid, wk] = filterWeek.split(":");
+      if (f.round_id !== rid) return false;
+      if (wk && String(f.week ?? "") !== wk) return false;
+    }
+    return true;
+  });
   const total = visible.reduce((s, f) => s + Number(f.amount), 0);
 
   async function addFine() {
@@ -353,6 +375,19 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
             {data.players.map((p) => (
               <SelectItem key={p.id} value={p.id}>
                 {p.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <Select value={filterWeek} onValueChange={setFilterWeek}>
+          <SelectTrigger className="w-56">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All weeks</SelectItem>
+            {weekOptions.map((o) => (
+              <SelectItem key={o.value} value={o.value}>
+                {o.label}
               </SelectItem>
             ))}
           </SelectContent>

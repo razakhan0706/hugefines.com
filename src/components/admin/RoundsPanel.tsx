@@ -2,6 +2,13 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Trash2, Pencil, Check, X } from "lucide-react";
@@ -12,6 +19,18 @@ import { PhotoAvatar } from "@/components/PhotoAvatar";
 import { roundDayLabel, roundBaseLabel, newestRoundsFirst, applyCaps } from "@/lib/fines";
 
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
+  const RESULT_OPTIONS = ["Won", "Lost", "Drawn", "Tied"];
+
+  function resultBadge(result: string | null | undefined) {
+    const r = (result ?? "").toLowerCase();
+    if (r.startsWith("won") || r.startsWith("win"))
+      return { letter: "W", className: "bg-accent text-accent-foreground" };
+    if (r.startsWith("lost") || r.startsWith("los"))
+      return { letter: "L", className: "bg-destructive text-destructive-foreground" };
+    if (r) return { letter: "D", className: "bg-primary text-primary-foreground" };
+    return null;
+  }
+
   const capSplits = applyCaps(data.fines, data.rounds);
   const nextNumber = (data.rounds.at(-1)?.round_number ?? 0) + 1;
   const [opponent, setOpponent] = useState("");

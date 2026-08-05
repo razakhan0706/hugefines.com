@@ -21,7 +21,6 @@ import {
   groupForCategory,
   money,
   newestRoundsFirst,
-  roundDayLabel,
   roundOpponentLabel,
 } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";

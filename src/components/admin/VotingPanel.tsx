@@ -255,23 +255,6 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
               </Select>
             </div>
           </div>
-          <div className="hidden">
-            <div className="ml-auto w-full sm:w-48">
-              <Select value={weekFilter} onValueChange={setWeekFilter}>
-                <SelectTrigger>
-                  <SelectValue placeholder="All weeks" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All weeks</SelectItem>
-                  {votedRounds.map((r) => (
-                    <SelectItem key={r.id} value={r.id}>
-                      {roundOpponentLabel(r)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
           {weekFilter !== "all" && (
             <Button
               variant="outline"

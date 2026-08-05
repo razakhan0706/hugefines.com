@@ -375,27 +375,6 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="p-5">
-          <h3 className="text-lg font-bold">Player of the Season standings</h3>
-          <div className="mt-4 space-y-2">
-            {tally.length === 0 && (
-              <p className="text-sm text-muted-foreground">No votes recorded yet.</p>
-            )}
-            {tally.map((row, i) => (
-              <div
-                key={row.name}
-                className="flex items-center gap-3 rounded-md border border-border px-3 py-2"
-              >
-                <span className="stat-num w-6 text-muted-foreground">{i + 1}</span>
-                <PhotoAvatar url={row.photo} name={row.name} className="size-8" />
-                <span className="flex-1 font-medium">{row.name}</span>
-                <span className="stat-num font-bold text-accent">{row.total}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

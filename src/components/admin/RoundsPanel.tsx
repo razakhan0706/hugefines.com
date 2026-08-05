@@ -481,7 +481,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                         </div>
                       </div>
                     </div>
-                    <div className="shrink-0 text-right">
+                    <div className="w-28 shrink-0 text-right">
                       <p className="stat-num text-lg font-bold text-accent">
                         {money(total, data.team.currency)}
                       </p>

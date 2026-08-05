@@ -55,6 +55,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     venue: "",
     result: "",
     fines_master: "",
+    played_on: "",
   });
 
   function startEdit(r: TeamBundle["rounds"][number]) {
@@ -68,6 +69,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
       venue: r.venue ?? "",
       result: r.result ?? "",
       fines_master: r.fines_master ?? "",
+      played_on: r.played_on ?? "",
     });
   }
 
@@ -87,6 +89,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
         venue: edit.venue.trim() || null,
         result: edit.result.trim() || null,
         fines_master: edit.fines_master.trim() || null,
+        played_on: edit.played_on || null,
         ...(Number.isFinite(num) ? { round_number: num } : {}),
       })
       .eq("id", editId);

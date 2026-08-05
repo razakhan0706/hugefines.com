@@ -477,7 +477,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                             {r.opponent ? `vs ${r.opponent}` : roundDayLabel(r)}
                           </p>
                           <p className="text-sm text-muted-foreground leading-tight">
-                            {[roundDayLabel(r), r.venue, r.result].filter(Boolean).join(" · ")}
+                            {[roundDayLabel(r), r.venue].filter(Boolean).join(" · ")}
                           </p>
                         </div>
                       </div>

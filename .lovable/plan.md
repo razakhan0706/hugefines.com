@@ -1,5 +1,31 @@
 ## Weekly fine cap with discounted tracking
+# Voting: multiple voters per round
 
+## What changes
+
+Right now a round holds one single set of 3-2-1 picks — saving wipes whatever was there before, and the button says "Update votes". Since every player votes (11-13 ballots a week), voting becomes an "add a ballot" flow.
+
+### Save adds, never replaces
+- The button always reads **Save**.
+- Each save appends a new set of votes to the selected round; existing votes stay untouched.
+- After saving, the picks clear so the next teammate's ballot can be entered straight away.
+- A small counter shows how many ballots have been saved for the selected round.
+
+### + / - control (top right of the vote card)
+- Controls the highest vote number. Default starts at 3 (3-2-1).
+- Each **+** raises the top by one: 4-3-2-1, then 5-4-3-2-1, and so on.
+- Each **-** lowers it, with 1 as the floor (a single 1-vote slot).
+- The slot dropdowns re-render to match the chosen range.
+
+### Votes by round list
+- Still grouped by round, but shows the combined tally for that round (each player's total points across all ballots) instead of a single set.
+- The delete button per round still clears every vote for that round.
+
+## Technical notes
+
+- `src/components/admin/VotingPanel.tsx`: drop the effect that loads existing picks into the form and the delete-then-insert save; insert only. Replace the fixed `VOTE_FORMATS` lookup with local `topVote` state (seeded from the team's format, min 1) and derive slots as `[topVote..1]`. Add `Plus` / `Minus` icon buttons in the card header.
+- Duplicate points within one round are now expected (many voters give 3 points), so the round list aggregates points per player before rendering.
+- No database or schema change: the `votes` table already allows multiple rows per round/player, and season standings already sum all points.
 ### How the cap works
 A **cap** is set per round (in the Rounds panel). It applies to **each player's cumulative fines within that round** — or per day for 2-day rounds (each day = separate week, each gets the same cap). If a player's total exceeds the cap, the **excess is discounted**: it does NOT count toward the individual or team tallies, but is tracked and shown **in red** across every stats section.
 

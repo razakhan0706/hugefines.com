@@ -450,11 +450,12 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   </span>
                   <span className="text-[10px] leading-tight text-black">
                     {r.played_on
-                      ? new Date(r.played_on).toLocaleDateString("en-AU", {
-                          day: "numeric",
-                          month: "short",
-                          year: "2-digit",
-                        })
+                      ? (() => {
+                          const d = new Date(r.played_on);
+                          const m = d.toLocaleDateString("en-AU", { month: "short" });
+                          const y = d.getFullYear().toString().slice(-2);
+                          return `${d.getDate()} ${m} '${y}`;
+                        })()
                       : "\u00A0"}
                   </span>
                 </div>

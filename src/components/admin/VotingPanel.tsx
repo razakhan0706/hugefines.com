@@ -238,9 +238,9 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
       <Card>
         <CardContent className="space-y-3 p-5">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-lg font-bold">Vote cards</h3>
+            <h3 className="text-lg font-bold">Player of the Season standings</h3>
             <div className="ml-auto w-full sm:w-48">
-              <Select value={weekFilter} onValueChange={setWeekFilter}>
+              <Select value={standingsFilter} onValueChange={setStandingsFilter}>
                 <SelectTrigger>
                   <SelectValue placeholder="All weeks" />
                 </SelectTrigger>
@@ -255,7 +255,29 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
               </Select>
             </div>
           </div>
-          <div className="hidden">
+          <div className="space-y-2">
+            {tally.length === 0 && (
+              <p className="text-sm text-muted-foreground">No votes recorded yet.</p>
+            )}
+            {tally.map((row, i) => (
+              <div
+                key={row.name}
+                className="flex items-center gap-3 rounded-md border border-border px-3 py-2"
+              >
+                <span className="stat-num w-6 text-muted-foreground">{i + 1}</span>
+                <PhotoAvatar url={row.photo} name={row.name} className="size-8" />
+                <span className="flex-1 font-medium">{row.name}</span>
+                <span className="stat-num font-bold text-accent">{row.total}</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-3 p-5">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-lg font-bold">Vote cards</h3>
             <div className="ml-auto w-full sm:w-48">
               <Select value={weekFilter} onValueChange={setWeekFilter}>
                 <SelectTrigger>

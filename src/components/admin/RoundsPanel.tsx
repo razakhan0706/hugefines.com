@@ -9,9 +9,10 @@ import { money } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { uploadPhoto } from "@/lib/photos";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
-import { roundDayLabel, roundBaseLabel, newestRoundsFirst } from "@/lib/fines";
+import { roundDayLabel, roundBaseLabel, newestRoundsFirst, applyCaps } from "@/lib/fines";
 
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
+  const capSplits = applyCaps(data.fines, data.rounds);
   const nextNumber = (data.rounds.at(-1)?.round_number ?? 0) + 1;
   const [opponent, setOpponent] = useState("");
   const [roundName, setRoundName] = useState(String(nextNumber));
@@ -266,6 +267,10 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
         {newestRoundsFirst(data.rounds).map((r) => {
           const roundFines = data.fines.filter((f) => f.round_id === r.id);
           const total = roundFines.reduce((s, f) => s + Number(f.amount), 0);
+          const discounted = roundFines.reduce(
+            (s, f) => s + (capSplits.get(f.id)?.discounted ?? 0),
+            0,
+          );
           return (
             <Card key={r.id}>
               {editId === r.id ? (
@@ -401,11 +406,9 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                     {money(total, data.team.currency)}
                   </p>
                   <p className="text-xs text-muted-foreground">{roundFines.length} fines</p>
-                  {r.cap != null && (
-                    <p className="text-xs text-muted-foreground">
-                      Cap: {money(Number(r.cap), data.team.currency)}/player
-                    </p>
-                  )}
+                  <p className="text-xs font-semibold text-destructive">
+                    Discounted Fines: {money(discounted, data.team.currency)}
+                  </p>
                 </div>
                 <Button variant="ghost" size="icon" onClick={() => startEdit(r)} title="Edit round">
                   <Pencil className="size-4" />

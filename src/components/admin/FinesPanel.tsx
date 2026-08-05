@@ -20,13 +20,14 @@ import {
   FINE_CATEGORY_GROUPS,
   groupForCategory,
   money,
+  newestRoundsFirst,
   roundDayLabel,
 } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
 
 export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
-  const latestRound = data.rounds.at(-1)?.id ?? "";
+  const latestRound = newestRoundsFirst(data.rounds)[0]?.id ?? "";
   const [playerId, setPlayerId] = useState("");
   const [roundId, setRoundId] = useState(latestRound);
   const [categoryId, setCategoryId] = useState("");
@@ -114,7 +115,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   );
 
   const selectedRound = data.rounds.find((r) => r.id === roundId);
-  const roundOptions = useMemo(() => [...data.rounds].reverse(), [data.rounds]);
+  const roundOptions = useMemo(() => newestRoundsFirst(data.rounds), [data.rounds]);
   const isTwoDay = Boolean(selectedRound?.two_day);
 
   const isQuoteCategory =

@@ -11,13 +11,14 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
-import { VOTE_FORMATS, roundDayLabel } from "@/lib/fines";
+import { VOTE_FORMATS, newestRoundsFirst, roundDayLabel } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
 
 export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const points = VOTE_FORMATS[data.team.vote_format] ?? VOTE_FORMATS["3-2-1"];
-  const [roundId, setRoundId] = useState(data.rounds.at(-1)?.id ?? "");
+  const orderedRounds = useMemo(() => newestRoundsFirst(data.rounds), [data.rounds]);
+  const [roundId, setRoundId] = useState(orderedRounds[0]?.id ?? "");
   const [picks, setPicks] = useState<Record<number, string>>({});
   const [busy, setBusy] = useState(false);
 
@@ -41,7 +42,7 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     () => new Map(data.players.map((p) => [p.id, p])),
     [data.players],
   );
-  const votedRounds = data.rounds.filter((r) => data.votes.some((v) => v.round_id === r.id));
+  const votedRounds = orderedRounds.filter((r) => data.votes.some((v) => v.round_id === r.id));
 
   async function saveVotes() {
     if (!roundId) return toast.error("Pick a round first");
@@ -96,7 +97,7 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                 <SelectValue placeholder="Round" />
               </SelectTrigger>
               <SelectContent>
-                {[...data.rounds].reverse().map((r) => (
+                {orderedRounds.map((r) => (
                   <SelectItem key={r.id} value={r.id}>
                     {roundDayLabel(r)}
                     {r.opponent ? ` vs ${r.opponent}` : ""}

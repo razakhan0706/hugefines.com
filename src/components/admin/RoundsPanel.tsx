@@ -251,7 +251,18 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
           </div>
           <div>
             <label className="text-sm font-medium">Result</label>
-            <Input value={result} onChange={(e) => setResult(e.target.value)} placeholder="Won by 4 wkts" />
+            <Select value={result} onValueChange={setResult}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select result" />
+              </SelectTrigger>
+              <SelectContent>
+                {RESULT_OPTIONS.map((o) => (
+                  <SelectItem key={o} value={o}>
+                    {o}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <label className="text-sm font-medium">Fines master</label>

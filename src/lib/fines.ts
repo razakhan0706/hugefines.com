@@ -76,6 +76,13 @@ export function roundDayLabel(round: Round, day?: number | null) {
   return round.two_day && d ? `${base} - Day ${d}` : base;
 }
 
+/** "TRIAL MATCH 1 vs BEROWRA" — round label plus opponent when known. */
+export function roundOpponentLabel(round: Round, day?: number | null) {
+  const base = roundDayLabel(round, day);
+  const opp = (round.opponent ?? "").trim();
+  return opp ? `${base} vs ${opp}` : base;
+}
+
 export interface Vote {
   id: string;
   team_id: string;

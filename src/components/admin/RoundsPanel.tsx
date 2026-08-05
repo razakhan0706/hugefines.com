@@ -438,7 +438,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   </div>
                 </CardContent>
               ) : (
-              <CardContent className="flex items-center gap-3 p-4">
+              <CardContent className="grid grid-cols-[auto_1fr_auto] items-center gap-3 p-4">
                 <div className="flex flex-col items-center gap-1">
                   <span
                     className={`stat-num flex size-11 shrink-0 items-center justify-center rounded-md font-bold ${
@@ -461,37 +461,39 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
 
                 <div className="h-12 w-px bg-border" />
 
-                <div className="flex min-w-0 flex-1 items-center gap-3">
-                  <PhotoAvatar
-                    url={r.opponent_logo_url}
-                    name={r.opponent}
-                    busy={busy === r.id + "opponent_logo_url"}
-                    title="Opposition logo"
-                    label="Add logo"
-                    onPick={(f) => updateRoundPhoto(r.id, "opponent_logo_url", f)}
-                  />
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <p className="truncate font-semibold uppercase">
-                      {r.opponent ? `vs ${r.opponent}` : roundDayLabel(r)}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      {[roundDayLabel(r), r.venue, r.result].filter(Boolean).join(" · ")}
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <PhotoAvatar
-                        url={r.fines_master_photo_url}
-                        name={r.fines_master}
-                        className="size-8"
-                        busy={busy === r.id + "fines_master_photo_url"}
-                        title="Fines master photo"
-                        label="Add photo"
-                        onPick={(f) => updateRoundPhoto(r.id, "fines_master_photo_url", f)}
-                      />
-                      <p className="text-sm">
-                        <span className="text-muted-foreground">Fines master: </span>
-                        <span className="font-medium">{r.fines_master || "—"}</span>
+                <div className="min-w-0 space-y-1">
+                  <div className="flex items-start gap-2">
+                    <PhotoAvatar
+                      url={r.opponent_logo_url}
+                      name={r.opponent}
+                      busy={busy === r.id + "opponent_logo_url"}
+                      title="Opposition logo"
+                      label="Add logo"
+                      onPick={(f) => updateRoundPhoto(r.id, "opponent_logo_url", f)}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold uppercase leading-tight">
+                        {r.opponent ? `vs ${r.opponent}` : roundDayLabel(r)}
+                      </p>
+                      <p className="text-sm text-muted-foreground leading-tight">
+                        {[roundDayLabel(r), r.venue, r.result].filter(Boolean).join(" · ")}
                       </p>
                     </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <PhotoAvatar
+                      url={r.fines_master_photo_url}
+                      name={r.fines_master}
+                      className="size-8"
+                      busy={busy === r.id + "fines_master_photo_url"}
+                      title="Fines master photo"
+                      label="Add photo"
+                      onPick={(f) => updateRoundPhoto(r.id, "fines_master_photo_url", f)}
+                    />
+                    <p className="text-sm whitespace-nowrap">
+                      <span className="text-muted-foreground">Fines master: </span>
+                      <span className="font-medium">{r.fines_master || "—"}</span>
+                    </p>
                   </div>
                 </div>
 

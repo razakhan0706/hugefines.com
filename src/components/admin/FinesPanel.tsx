@@ -119,9 +119,9 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const roundOptions = useMemo(() => newestRoundsFirst(data.rounds), [data.rounds]);
   const isTwoDay = Boolean(selectedRound?.two_day);
 
-  const isQuoteCategory =
-    data.categories.find((c) => c.id === categoryId)?.label.trim().toLowerCase() ===
-    "rubbish chat";
+  const selectedCategory = data.categories.find((c) => c.id === categoryId);
+  const isCustomCategory = categoryId === "custom";
+  const isQuoteCategory = selectedCategory?.label.trim().toLowerCase() === "rubbish chat";
 
   const weekOptions = useMemo(() => {
     const out: { value: string; label: string }[] = [];
@@ -151,14 +151,18 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
     if (!playerId) return toast.error("Pick a player");
     const cat = data.categories.find((c) => c.id === categoryId);
     const custom = description.trim();
-    const base = custom || cat?.label || "Fine";
+    const base =
+      custom ||
+      cat?.label ||
+      (isCustomCategory ? "Custom fine" : "Fine");
     const q = quote.trim();
     const finalAmount = Number(amount) || 0;
+    const useCustom = Boolean(custom) || isCustomCategory;
     const { error } = await supabase.from("fines").insert({
       team_id: data.team.id,
       player_id: playerId,
       round_id: roundId || null,
-      category_id: custom ? null : categoryId || null,
+      category_id: useCustom ? null : categoryId || null,
       week: isTwoDay ? Number(week) || 1 : null,
       description: !custom && isQuoteCategory && q ? `${base} — "${q}"` : base,
       amount: finalAmount,
@@ -259,6 +263,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               onValueChange={(v) => {
                 setCategoryId(v);
                 setQuote("");
+                if (v === "custom") return;
                 const c = data.categories.find((x) => x.id === v);
                 if (c) setAmount(String(c.default_amount));
               }}
@@ -267,6 +272,12 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                 <SelectValue placeholder="Category" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem
+                  value="custom"
+                  className="cursor-pointer border-b border-border font-bold uppercase tracking-widest text-accent-strong"
+                >
+                  Custom
+                </SelectItem>
                 {groupedCategories.map((g) => (
                   <SelectGroup key={g.group}>
                     <SelectLabel>{g.group}</SelectLabel>

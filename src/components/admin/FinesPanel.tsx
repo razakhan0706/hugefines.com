@@ -257,8 +257,9 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
             <Select
               value={categoryId}
               onValueChange={(v) => {
-                setCategoryId(v === "custom" ? "" : v);
+                setCategoryId(v);
                 setQuote("");
+                if (v === "custom") return;
                 const c = data.categories.find((x) => x.id === v);
                 if (c) setAmount(String(c.default_amount));
               }}

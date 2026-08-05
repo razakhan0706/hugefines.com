@@ -27,6 +27,7 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   const [picks, setPicks] = useState<Record<number, string>>({});
   const [busy, setBusy] = useState(false);
   const [weekFilter, setWeekFilter] = useState("all");
+  const [standingsFilter, setStandingsFilter] = useState("all");
   const [editingBallot, setEditingBallot] = useState<string | null>(null);
   const [editPicks, setEditPicks] = useState<Record<number, string>>({});
 

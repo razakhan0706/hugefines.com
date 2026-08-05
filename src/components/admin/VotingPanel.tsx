@@ -27,6 +27,7 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   const [picks, setPicks] = useState<Record<number, string>>({});
   const [busy, setBusy] = useState(false);
   const [weekFilter, setWeekFilter] = useState("all");
+  const [standingsFilter, setStandingsFilter] = useState("all");
   const [editingBallot, setEditingBallot] = useState<string | null>(null);
   const [editPicks, setEditPicks] = useState<Record<number, string>>({});
 
@@ -143,11 +144,16 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     toast.success("Vote card updated");
   }
 
+  const standingsVotes =
+    standingsFilter === "all"
+      ? data.votes
+      : data.votes.filter((v) => v.round_id === standingsFilter);
+
   const tally = [...data.players]
     .map((p) => ({
       name: p.name,
       photo: p.photo_url,
-      total: data.votes.filter((v) => v.player_id === p.id).reduce((s, v) => s + v.points, 0),
+      total: standingsVotes.filter((v) => v.player_id === p.id).reduce((s, v) => s + v.points, 0),
     }))
     .filter((p) => p.total > 0)
     .sort((a, b) => b.total - a.total);
@@ -225,6 +231,45 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
             <Button className="w-full" onClick={saveVotes} disabled={busy}>
               Save
             </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardContent className="space-y-3 p-5">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-lg font-bold">Player of the Season standings</h3>
+            <div className="ml-auto w-full sm:w-48">
+              <Select value={standingsFilter} onValueChange={setStandingsFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All weeks" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All weeks</SelectItem>
+                  {votedRounds.map((r) => (
+                    <SelectItem key={r.id} value={r.id}>
+                      {roundOpponentLabel(r)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="space-y-2">
+            {tally.length === 0 && (
+              <p className="text-sm text-muted-foreground">No votes recorded yet.</p>
+            )}
+            {tally.map((row, i) => (
+              <div
+                key={row.name}
+                className="flex items-center gap-3 rounded-md border border-border px-3 py-2"
+              >
+                <span className="stat-num w-6 text-muted-foreground">{i + 1}</span>
+                <PhotoAvatar url={row.photo} name={row.name} className="size-8" />
+                <span className="flex-1 font-medium">{row.name}</span>
+                <span className="stat-num font-bold text-accent">{row.total}</span>
+              </div>
+            ))}
           </div>
         </CardContent>
       </Card>
@@ -369,27 +414,6 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="p-5">
-          <h3 className="text-lg font-bold">Player of the Season standings</h3>
-          <div className="mt-4 space-y-2">
-            {tally.length === 0 && (
-              <p className="text-sm text-muted-foreground">No votes recorded yet.</p>
-            )}
-            {tally.map((row, i) => (
-              <div
-                key={row.name}
-                className="flex items-center gap-3 rounded-md border border-border px-3 py-2"
-              >
-                <span className="stat-num w-6 text-muted-foreground">{i + 1}</span>
-                <PhotoAvatar url={row.photo} name={row.name} className="size-8" />
-                <span className="flex-1 font-medium">{row.name}</span>
-                <span className="stat-num font-bold text-accent">{row.total}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

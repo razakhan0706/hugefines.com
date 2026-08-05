@@ -438,8 +438,8 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   </div>
                 </CardContent>
               ) : (
-              <CardContent className="grid grid-cols-[auto_1fr_auto] items-center gap-3 p-4">
-                <div className="flex flex-col items-center gap-1">
+              <CardContent className="flex items-stretch gap-2 p-4">
+                <div className="flex flex-col items-center justify-center gap-1">
                   <span
                     className={`stat-num flex size-11 shrink-0 items-center justify-center rounded-md font-bold ${
                       resultBadge(r.result)?.className ?? "bg-muted text-muted-foreground"
@@ -459,9 +459,9 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   </span>
                 </div>
 
-                <div className="h-12 w-px bg-border" />
+                <div className="w-px self-stretch bg-border" />
 
-                <div className="min-w-0 space-y-1">
+                <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-start gap-2">
                     <PhotoAvatar
                       url={r.opponent_logo_url}
@@ -497,15 +497,15 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   </div>
                 </div>
 
-                <div className="h-12 w-px bg-border" />
+                <div className="w-px self-stretch bg-border" />
 
-                <div className="flex flex-col items-end gap-2">
+                <div className="flex w-20 shrink-0 flex-col items-end justify-center gap-2">
                   <div className="text-right">
                     <p className="stat-num text-lg font-bold text-accent">
                       {money(total, data.team.currency)}
                     </p>
                     <p className="text-xs text-muted-foreground">{roundFines.length} fines</p>
-                    <p className="text-xs font-semibold text-destructive">
+                    <p className="text-[10px] font-semibold leading-tight text-destructive">
                       Discounted Fines: {money(discounted, data.team.currency)}
                     </p>
                   </div>

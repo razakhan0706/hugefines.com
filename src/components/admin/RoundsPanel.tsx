@@ -2,6 +2,13 @@ import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Trash2, Pencil, Check, X } from "lucide-react";
@@ -12,6 +19,18 @@ import { PhotoAvatar } from "@/components/PhotoAvatar";
 import { roundDayLabel, roundBaseLabel, newestRoundsFirst, applyCaps } from "@/lib/fines";
 
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
+  const RESULT_OPTIONS = ["Won", "Lost", "Drawn", "Tied"];
+
+  function resultBadge(result: string | null | undefined) {
+    const r = (result ?? "").toLowerCase();
+    if (r.startsWith("won") || r.startsWith("win"))
+      return { letter: "W", className: "bg-accent text-accent-foreground" };
+    if (r.startsWith("lost") || r.startsWith("los"))
+      return { letter: "L", className: "bg-destructive text-destructive-foreground" };
+    if (r) return { letter: "D", className: "bg-primary text-primary-foreground" };
+    return null;
+  }
+
   const capSplits = applyCaps(data.fines, data.rounds);
   const nextNumber = (data.rounds.at(-1)?.round_number ?? 0) + 1;
   const [opponent, setOpponent] = useState("");
@@ -232,7 +251,18 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
           </div>
           <div>
             <label className="text-sm font-medium">Result</label>
-            <Input value={result} onChange={(e) => setResult(e.target.value)} placeholder="Won by 4 wkts" />
+            <Select value={result} onValueChange={setResult}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select result" />
+              </SelectTrigger>
+              <SelectContent>
+                {RESULT_OPTIONS.map((o) => (
+                  <SelectItem key={o} value={o}>
+                    {o}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div>
             <label className="text-sm font-medium">Fines master</label>
@@ -344,10 +374,21 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   </div>
                   <div>
                     <label className="text-sm font-medium">Result</label>
-                    <Input
+                    <Select
                       value={edit.result}
-                      onChange={(e) => setEdit((s) => ({ ...s, result: e.target.value }))}
-                    />
+                      onValueChange={(v) => setEdit((s) => ({ ...s, result: v }))}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select result" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {RESULT_OPTIONS.map((o) => (
+                          <SelectItem key={o} value={o}>
+                            {o}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div>
                     <label className="text-sm font-medium">Fines master</label>
@@ -367,8 +408,13 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                 </CardContent>
               ) : (
               <CardContent className="flex flex-wrap items-center gap-4 p-4">
-                <span className="stat-num flex size-11 shrink-0 items-center justify-center rounded-md bg-primary text-primary-foreground font-bold">
-                  {r.round_number}
+                <span
+                  className={`stat-num flex size-11 shrink-0 items-center justify-center rounded-md font-bold ${
+                    resultBadge(r.result)?.className ?? "bg-muted text-muted-foreground"
+                  }`}
+                  title={r.result ?? "No result"}
+                >
+                  {resultBadge(r.result)?.letter ?? r.round_number}
                 </span>
                 <PhotoAvatar
                   url={r.opponent_logo_url}

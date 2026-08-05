@@ -144,11 +144,16 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     toast.success("Vote card updated");
   }
 
+  const standingsVotes =
+    standingsFilter === "all"
+      ? data.votes
+      : data.votes.filter((v) => v.round_id === standingsFilter);
+
   const tally = [...data.players]
     .map((p) => ({
       name: p.name,
       photo: p.photo_url,
-      total: data.votes.filter((v) => v.player_id === p.id).reduce((s, v) => s + v.points, 0),
+      total: standingsVotes.filter((v) => v.player_id === p.id).reduce((s, v) => s + v.points, 0),
     }))
     .filter((p) => p.total > 0)
     .sort((a, b) => b.total - a.total);

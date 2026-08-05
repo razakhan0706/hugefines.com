@@ -191,8 +191,7 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
               <SelectContent>
                 {orderedRounds.map((r) => (
                   <SelectItem key={r.id} value={r.id}>
-                    {roundDayLabel(r)}
-                    {r.opponent ? ` vs ${r.opponent}` : ""}
+                    {roundOpponentLabel(r)}
                   </SelectItem>
                 ))}
               </SelectContent>
@@ -232,52 +231,138 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
 
       <Card>
         <CardContent className="space-y-3 p-5">
-          <h3 className="text-lg font-bold">Votes by round</h3>
-          {votedRounds.length === 0 && (
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-lg font-bold">Vote cards</h3>
+            <div className="ml-auto w-full sm:w-48">
+              <Select value={weekFilter} onValueChange={setWeekFilter}>
+                <SelectTrigger>
+                  <SelectValue placeholder="All weeks" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All weeks</SelectItem>
+                  {votedRounds.map((r) => (
+                    <SelectItem key={r.id} value={r.id}>
+                      {roundOpponentLabel(r)}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          {weekFilter !== "all" && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => clearRound(weekFilter)}
+            >
+              Clear all votes for this week
+            </Button>
+          )}
+          {visibleBallots.length === 0 && (
             <p className="text-sm text-muted-foreground">No votes saved yet.</p>
           )}
-          {votedRounds.map((r) => {
-            const totals = new Map<string, number>();
-            for (const v of data.votes) {
-              if (v.round_id !== r.id) continue;
-              totals.set(v.player_id, (totals.get(v.player_id) ?? 0) + v.points);
-            }
-            const rv = [...totals.entries()]
-              .map(([player_id, pts]) => ({ player_id, points: pts }))
-              .sort((a, b) => b.points - a.points);
+          {visibleBallots.map((b, i) => {
+            const r = roundById.get(b.round_id);
+            const editing = editingBallot === b.key;
+            const slots = b.votes.map((v) => v.points);
             return (
-              <div key={r.id} className="rounded-md border border-border p-3">
+              <div key={b.key} className="rounded-md border border-border p-3">
                 <div className="flex items-center gap-2">
                   <span className="font-semibold">
-                    {roundDayLabel(r)}
-                    {r.opponent ? ` vs ${r.opponent}` : ""}
+                    {r ? roundOpponentLabel(r) : "Round"}
                   </span>
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    className="ml-auto size-8"
-                    onClick={() => clearRound(r.id)}
-                  >
-                    <Trash2 className="size-4" />
-                  </Button>
-                </div>
-                <div className="mt-2 flex flex-wrap gap-2">
-                  {rv.map((v) => {
-                    const pl = playerById.get(v.player_id);
-                    return (
-                      <span
-                        key={v.player_id}
-                        className="flex items-center gap-2 rounded-full bg-accent px-2 py-1 text-accent-foreground"
+                  <span className="text-xs text-muted-foreground">
+                    Card {visibleBallots.length - i}
+                  </span>
+                  <div className="ml-auto flex items-center gap-1">
+                    {editing ? (
+                      <>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="size-8"
+                          disabled={busy}
+                          onClick={() => saveEdit(b)}
+                          aria-label="Save vote card"
+                        >
+                          <Check className="size-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          className="size-8"
+                          onClick={() => setEditingBallot(null)}
+                          aria-label="Cancel"
+                        >
+                          <X className="size-4" />
+                        </Button>
+                      </>
+                    ) : (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        className="size-8"
+                        onClick={() => startEdit(b)}
+                        aria-label="Edit vote card"
                       >
-                        <span className="stat-num flex size-6 items-center justify-center rounded-full bg-accent-foreground/15 text-xs font-bold">
-                          {v.points}
-                        </span>
-                        <PhotoAvatar url={pl?.photo_url} name={pl?.name ?? ""} className="size-6" />
-                        <span className="text-sm font-semibold">{pl?.name ?? "Unknown"}</span>
-                      </span>
-                    );
-                  })}
+                        <Pencil className="size-4" />
+                      </Button>
+                    )}
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      className="size-8"
+                      onClick={() => deleteBallot(b)}
+                      aria-label="Delete vote card"
+                    >
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
                 </div>
+                {editing ? (
+                  <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                    {slots.map((p) => (
+                      <div key={p}>
+                        <label className="text-xs font-medium text-muted-foreground">
+                          {p} vote{p > 1 ? "s" : ""}
+                        </label>
+                        <Select
+                          value={editPicks[p] ?? ""}
+                          onValueChange={(v) => setEditPicks((s) => ({ ...s, [p]: v }))}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Player" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {data.players.map((pl) => (
+                              <SelectItem key={pl.id} value={pl.id}>
+                                {pl.name}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {b.votes.map((v) => {
+                      const pl = playerById.get(v.player_id);
+                      return (
+                        <span
+                          key={v.id}
+                          className="flex items-center gap-2 rounded-full bg-accent px-2 py-1 text-accent-foreground"
+                        >
+                          <span className="stat-num flex size-6 items-center justify-center rounded-full bg-accent-foreground/15 text-xs font-bold">
+                            {v.points}
+                          </span>
+                          <PhotoAvatar url={pl?.photo_url} name={pl?.name ?? ""} className="size-6" />
+                          <span className="text-sm font-semibold">{pl?.name ?? "Unknown"}</span>
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             );
           })}

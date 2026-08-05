@@ -10,8 +10,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Minus, Plus, Trash2 } from "lucide-react";
-import { VOTE_FORMATS, newestRoundsFirst, roundDayLabel } from "@/lib/fines";
+import { Check, Minus, Pencil, Plus, Trash2, X } from "lucide-react";
+import { VOTE_FORMATS, newestRoundsFirst, roundOpponentLabel } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
 
@@ -26,6 +26,9 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   const [roundId, setRoundId] = useState(orderedRounds[0]?.id ?? "");
   const [picks, setPicks] = useState<Record<number, string>>({});
   const [busy, setBusy] = useState(false);
+  const [weekFilter, setWeekFilter] = useState("all");
+  const [editingBallot, setEditingBallot] = useState<string | null>(null);
+  const [editPicks, setEditPicks] = useState<Record<number, string>>({});
 
   const roundVotes = data.votes.filter((v) => v.round_id === roundId);
   const ballotCount = roundVotes.filter((v) => v.points === topVote).length;
@@ -35,6 +38,34 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     [data.players],
   );
   const votedRounds = orderedRounds.filter((r) => data.votes.some((v) => v.round_id === r.id));
+
+  // Votes saved together share a transaction timestamp = one ballot.
+  const ballots = useMemo(() => {
+    const groups = new Map<
+      string,
+      { key: string; round_id: string; created_at: string; votes: typeof data.votes }
+    >();
+    for (const v of data.votes) {
+      const key = `${v.round_id}|${v.created_at}`;
+      const g = groups.get(key) ?? { key, round_id: v.round_id, created_at: v.created_at, votes: [] };
+      g.votes = [...g.votes, v];
+      groups.set(key, g);
+    }
+    const order = new Map(orderedRounds.map((r, i) => [r.id, i]));
+    return [...groups.values()]
+      .map((g) => ({ ...g, votes: [...g.votes].sort((a, b) => b.points - a.points) }))
+      .sort((a, b) => {
+        const ra = order.get(a.round_id) ?? 999;
+        const rb = order.get(b.round_id) ?? 999;
+        if (ra !== rb) return ra - rb;
+        return b.created_at.localeCompare(a.created_at);
+      });
+  }, [data.votes, orderedRounds]);
+
+  const visibleBallots = ballots.filter(
+    (b) => weekFilter === "all" || b.round_id === weekFilter,
+  );
+  const roundById = useMemo(() => new Map(data.rounds.map((r) => [r.id, r])), [data.rounds]);
 
   async function saveVotes() {
     if (!roundId) return toast.error("Pick a round first");
@@ -62,6 +93,54 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     if (error) return toast.error(error.message);
     refresh();
     toast.success("Votes removed");
+  }
+
+  async function deleteBallot(b: { round_id: string; created_at: string }) {
+    const { error } = await supabase
+      .from("votes")
+      .delete()
+      .eq("round_id", b.round_id)
+      .eq("created_at", b.created_at);
+    if (error) return toast.error(error.message);
+    refresh();
+    toast.success("Vote card removed");
+  }
+
+  function startEdit(b: { key: string; votes: typeof data.votes }) {
+    setEditingBallot(b.key);
+    const next: Record<number, string> = {};
+    for (const v of b.votes) next[v.points] = v.player_id;
+    setEditPicks(next);
+  }
+
+  async function saveEdit(b: { round_id: string; created_at: string; votes: typeof data.votes }) {
+    const slots = b.votes.map((v) => v.points).sort((a, z) => z - a);
+    const rows = slots
+      .filter((p) => editPicks[p])
+      .map((p) => ({
+        team_id: data.team.id,
+        round_id: b.round_id,
+        player_id: editPicks[p]!,
+        points: p,
+        created_at: b.created_at,
+      }));
+    if (!rows.length) return toast.error("Select at least one player");
+    setBusy(true);
+    const { error: delError } = await supabase
+      .from("votes")
+      .delete()
+      .eq("round_id", b.round_id)
+      .eq("created_at", b.created_at);
+    if (delError) {
+      setBusy(false);
+      return toast.error(delError.message);
+    }
+    const { error } = await supabase.from("votes").insert(rows);
+    setBusy(false);
+    if (error) return toast.error(error.message);
+    setEditingBallot(null);
+    refresh();
+    toast.success("Vote card updated");
   }
 
   const tally = [...data.players]

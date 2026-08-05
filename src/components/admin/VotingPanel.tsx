@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -10,33 +10,25 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Trash2 } from "lucide-react";
+import { Minus, Plus, Trash2 } from "lucide-react";
 import { VOTE_FORMATS, newestRoundsFirst, roundDayLabel } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
 
 export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
-  const points = VOTE_FORMATS[data.team.vote_format] ?? VOTE_FORMATS["3-2-1"];
+  const defaultTop = (VOTE_FORMATS[data.team.vote_format] ?? VOTE_FORMATS["3-2-1"])[0] ?? 3;
+  const [topVote, setTopVote] = useState(defaultTop);
+  const points = useMemo(
+    () => Array.from({ length: topVote }, (_, i) => topVote - i),
+    [topVote],
+  );
   const orderedRounds = useMemo(() => newestRoundsFirst(data.rounds), [data.rounds]);
   const [roundId, setRoundId] = useState(orderedRounds[0]?.id ?? "");
   const [picks, setPicks] = useState<Record<number, string>>({});
   const [busy, setBusy] = useState(false);
 
-  // When the selected round changes (or votes refresh), load any existing
-  // votes for that round into the picks so the editor reflects saved state.
-  useEffect(() => {
-    if (!roundId) {
-      setPicks({});
-      return;
-    }
-    const existing: Record<number, string> = {};
-    for (const v of data.votes) {
-      if (v.round_id === roundId) existing[v.points] = v.player_id;
-    }
-    setPicks(existing);
-  }, [roundId, data.votes]);
-
   const roundVotes = data.votes.filter((v) => v.round_id === roundId);
+  const ballotCount = roundVotes.filter((v) => v.points === topVote).length;
 
   const playerById = useMemo(
     () => new Map(data.players.map((p) => [p.id, p])),
@@ -58,16 +50,12 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     if (!rows.length) return toast.error("Select at least one player");
 
     setBusy(true);
-    const { error: delError } = await supabase.from("votes").delete().eq("round_id", roundId);
-    if (delError) {
-      setBusy(false);
-      return toast.error(delError.message);
-    }
     const { error } = await supabase.from("votes").insert(rows);
     setBusy(false);
     if (error) return toast.error(error.message);
+    setPicks({});
     refresh();
-    toast.success("Votes saved");
+    toast.success("Vote saved");
   }
 
   async function clearRound(id: string) {
@@ -90,6 +78,32 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     <div className="space-y-6">
       <Card className="border-2">
         <CardContent className="grid gap-3 p-5 lg:grid-cols-5">
+          <div className="flex items-center gap-2 lg:col-span-5">
+            <span className="text-sm text-muted-foreground">
+              {ballotCount} vote{ballotCount === 1 ? "" : "s"} saved for this round
+            </span>
+            <div className="ml-auto flex items-center gap-1">
+              <Button
+                size="icon"
+                variant="outline"
+                className="size-8"
+                onClick={() => setTopVote((n) => Math.max(1, n - 1))}
+                aria-label="Lower top vote"
+              >
+                <Minus className="size-4" />
+              </Button>
+              <span className="stat-num w-6 text-center text-sm font-bold">{topVote}</span>
+              <Button
+                size="icon"
+                variant="outline"
+                className="size-8"
+                onClick={() => setTopVote((n) => n + 1)}
+                aria-label="Raise top vote"
+              >
+                <Plus className="size-4" />
+              </Button>
+            </div>
+          </div>
           <div className="lg:col-span-5">
             <label className="text-sm font-medium">Round</label>
             <Select value={roundId} onValueChange={setRoundId}>
@@ -132,7 +146,7 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
 
           <div className="flex items-end lg:col-span-2">
             <Button className="w-full" onClick={saveVotes} disabled={busy}>
-              {roundVotes.length ? "Update votes" : "Save votes"}
+              Save
             </Button>
           </div>
         </CardContent>
@@ -145,8 +159,13 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
             <p className="text-sm text-muted-foreground">No votes saved yet.</p>
           )}
           {votedRounds.map((r) => {
-            const rv = data.votes
-              .filter((v) => v.round_id === r.id)
+            const totals = new Map<string, number>();
+            for (const v of data.votes) {
+              if (v.round_id !== r.id) continue;
+              totals.set(v.player_id, (totals.get(v.player_id) ?? 0) + v.points);
+            }
+            const rv = [...totals.entries()]
+              .map(([player_id, pts]) => ({ player_id, points: pts }))
               .sort((a, b) => b.points - a.points);
             return (
               <div key={r.id} className="rounded-md border border-border p-3">
@@ -169,7 +188,7 @@ export function VotingPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                     const pl = playerById.get(v.player_id);
                     return (
                       <span
-                        key={v.id}
+                        key={v.player_id}
                         className="flex items-center gap-2 rounded-full bg-accent px-2 py-1 text-accent-foreground"
                       >
                         <span className="stat-num flex size-6 items-center justify-center rounded-full bg-accent-foreground/15 text-xs font-bold">

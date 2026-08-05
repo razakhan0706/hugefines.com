@@ -453,7 +453,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                       ? new Date(r.played_on).toLocaleDateString("en-AU", {
                           day: "numeric",
                           month: "short",
-                          year: "numeric",
+                          year: "2-digit",
                         })
                       : "\u00A0"}
                   </span>

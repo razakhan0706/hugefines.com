@@ -439,7 +439,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                 </CardContent>
               ) : (
               <CardContent className="flex items-stretch gap-2 p-4">
-                <div className="flex flex-col items-center justify-center gap-1">
+                <div className="flex w-14 flex-col items-center justify-start gap-1">
                   <span
                     className={`stat-num flex size-11 shrink-0 items-center justify-center rounded-md font-bold ${
                       resultBadge(r.result)?.className ?? "bg-muted text-muted-foreground"
@@ -499,7 +499,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
 
                 <div className="w-px self-stretch bg-border" />
 
-                <div className="flex w-20 shrink-0 flex-col items-end justify-center gap-2">
+                <div className="flex w-20 shrink-0 flex-col items-end justify-start gap-2">
                   <div className="text-right">
                     <p className="stat-num text-lg font-bold text-accent">
                       {money(total, data.team.currency)}

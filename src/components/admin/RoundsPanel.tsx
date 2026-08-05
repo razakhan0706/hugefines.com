@@ -19,7 +19,7 @@ import { PhotoAvatar } from "@/components/PhotoAvatar";
 import { roundDayLabel, roundBaseLabel, newestRoundsFirst, applyCaps } from "@/lib/fines";
 
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
-  const RESULT_OPTIONS = ["Won", "Lost", "Drawn", "Tied"];
+  const RESULT_OPTIONS = ["Won", "Lost", "Drawn"];
 
   function resultBadge(result: string | null | undefined) {
     const r = (result ?? "").toLowerCase();

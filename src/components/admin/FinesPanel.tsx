@@ -119,9 +119,9 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const roundOptions = useMemo(() => newestRoundsFirst(data.rounds), [data.rounds]);
   const isTwoDay = Boolean(selectedRound?.two_day);
 
-  const isQuoteCategory =
-    data.categories.find((c) => c.id === categoryId)?.label.trim().toLowerCase() ===
-    "rubbish chat";
+  const selectedCategory = data.categories.find((c) => c.id === categoryId);
+  const isCustomCategory = categoryId === "custom";
+  const isQuoteCategory = selectedCategory?.label.trim().toLowerCase() === "rubbish chat";
 
   const weekOptions = useMemo(() => {
     const out: { value: string; label: string }[] = [];

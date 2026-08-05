@@ -97,8 +97,6 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   );
 
   const groupedCategories = useMemo(() => {
-    const _unused = 0;
-    void _unused;
     const order = [...FINE_CATEGORY_GROUPS.map((g) => g.group), "Other"];
     const map = new Map<string, typeof data.categories>();
     for (const c of data.categories) {
@@ -116,6 +114,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   );
 
   const selectedRound = data.rounds.find((r) => r.id === roundId);
+  const roundOptions = useMemo(() => [...data.rounds].reverse(), [data.rounds]);
   const isTwoDay = Boolean(selectedRound?.two_day);
 
   const isQuoteCategory =
@@ -193,7 +192,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                 <SelectValue placeholder="Round" />
               </SelectTrigger>
               <SelectContent>
-                {data.rounds.map((r) => (
+                {roundOptions.map((r) => (
                   <SelectItem key={r.id} value={r.id}>
                     {roundDayLabel(r)}
                   </SelectItem>
@@ -398,7 +397,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                       <SelectValue placeholder="Round" />
                     </SelectTrigger>
                     <SelectContent>
-                      {data.rounds.map((r) => (
+                      {roundOptions.map((r) => (
                         <SelectItem key={r.id} value={r.id}>
                           {roundDayLabel(r)}
                         </SelectItem>

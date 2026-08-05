@@ -438,31 +438,49 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   </div>
                 </CardContent>
               ) : (
-              <CardContent className="flex flex-wrap items-center gap-4 p-4">
-                <span
-                  className={`stat-num flex size-11 shrink-0 items-center justify-center rounded-md font-bold ${
-                    resultBadge(r.result)?.className ?? "bg-muted text-muted-foreground"
-                  }`}
-                  title={r.result ?? "No result"}
-                >
-                  {resultBadge(r.result)?.letter ?? r.round_number}
-                </span>
-                <PhotoAvatar
-                  url={r.opponent_logo_url}
-                  name={r.opponent}
-                  busy={busy === r.id + "opponent_logo_url"}
-                  title="Opposition logo"
-                  label="Add logo"
-                  onPick={(f) => updateRoundPhoto(r.id, "opponent_logo_url", f)}
-                />
-                <div className="flex-1 min-w-40">
-                  <p className="font-semibold uppercase">
-                    {r.opponent ? `vs ${r.opponent}` : roundDayLabel(r)}
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    {[roundDayLabel(r), r.venue, r.result].filter(Boolean).join(" · ")}
-                  </p>
-                  <div className="mt-1 flex items-center gap-2">
+              <CardContent className="flex items-stretch gap-1 p-4">
+                <div className="flex w-14 flex-col items-center justify-start gap-1">
+                  <span
+                    className={`stat-num flex size-11 shrink-0 items-center justify-center rounded-md font-bold ${
+                      resultBadge(r.result)?.className ?? "bg-muted text-muted-foreground"
+                    }`}
+                    title={r.result ?? "No result"}
+                  >
+                    {resultBadge(r.result)?.letter ?? r.round_number}
+                  </span>
+                  <span className="text-[10px] leading-tight text-black">
+                    {r.played_on
+                      ? new Date(r.played_on).toLocaleDateString("en-AU", {
+                          day: "numeric",
+                          month: "short",
+                          year: "numeric",
+                        })
+                      : "\u00A0"}
+                  </span>
+                </div>
+
+                <div className="w-px self-stretch bg-border" />
+
+                <div className="min-w-0 flex-1 space-y-1">
+                  <div className="flex items-start gap-2">
+                    <PhotoAvatar
+                      url={r.opponent_logo_url}
+                      name={r.opponent}
+                      busy={busy === r.id + "opponent_logo_url"}
+                      title="Opposition logo"
+                      label="Add logo"
+                      onPick={(f) => updateRoundPhoto(r.id, "opponent_logo_url", f)}
+                    />
+                    <div className="min-w-0 flex-1">
+                      <p className="font-semibold uppercase leading-tight">
+                        {r.opponent ? `vs ${r.opponent}` : roundDayLabel(r)}
+                      </p>
+                      <p className="text-sm text-muted-foreground leading-tight">
+                        {[roundDayLabel(r), r.venue, r.result].filter(Boolean).join(" · ")}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
                     <PhotoAvatar
                       url={r.fines_master_photo_url}
                       name={r.fines_master}
@@ -472,27 +490,34 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                       label="Add photo"
                       onPick={(f) => updateRoundPhoto(r.id, "fines_master_photo_url", f)}
                     />
-                    <p className="text-sm">
+                    <p className="text-sm whitespace-nowrap">
                       <span className="text-muted-foreground">Fines master: </span>
                       <span className="font-medium">{r.fines_master || "—"}</span>
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="stat-num text-lg font-bold text-accent">
-                    {money(total, data.team.currency)}
-                  </p>
-                  <p className="text-xs text-muted-foreground">{roundFines.length} fines</p>
-                  <p className="text-xs font-semibold text-destructive">
-                    Discounted Fines: {money(discounted, data.team.currency)}
-                  </p>
+
+                <div className="w-px self-stretch bg-border" />
+
+                <div className="flex w-28 shrink-0 flex-col items-end justify-start gap-2">
+                  <div className="text-right">
+                    <p className="stat-num text-lg font-bold text-accent">
+                      {money(total, data.team.currency)}
+                    </p>
+                    <p className="text-xs text-muted-foreground">{roundFines.length} fines</p>
+                    <p className="text-[10px] font-semibold leading-tight text-destructive">
+                      Discounted Fines: {money(discounted, data.team.currency)}
+                    </p>
+                  </div>
+                  <div className="flex items-center">
+                    <Button variant="ghost" size="icon" onClick={() => startEdit(r)} title="Edit round">
+                      <Pencil className="size-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => removeRound(r.id)}>
+                      <Trash2 className="size-4" />
+                    </Button>
+                  </div>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => startEdit(r)} title="Edit round">
-                  <Pencil className="size-4" />
-                </Button>
-                <Button variant="ghost" size="icon" onClick={() => removeRound(r.id)}>
-                  <Trash2 className="size-4" />
-                </Button>
               </CardContent>
               )}
             </Card>

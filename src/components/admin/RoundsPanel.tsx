@@ -9,7 +9,7 @@ import { money } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { uploadPhoto } from "@/lib/photos";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
-import { roundDayLabel, roundBaseLabel } from "@/lib/fines";
+import { roundDayLabel, roundBaseLabel, newestRoundsFirst } from "@/lib/fines";
 
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const nextNumber = (data.rounds.at(-1)?.round_number ?? 0) + 1;
@@ -263,7 +263,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
         {data.rounds.length === 0 && (
           <p className="text-muted-foreground">No rounds yet — add your first match above.</p>
         )}
-        {[...data.rounds].reverse().map((r) => {
+        {newestRoundsFirst(data.rounds).map((r) => {
           const roundFines = data.fines.filter((f) => f.round_id === r.id);
           const total = roundFines.reduce((s, f) => s + Number(f.amount), 0);
           return (

@@ -127,8 +127,8 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
     const out: { value: string; label: string }[] = [];
     for (const r of roundOptions) {
       if (r.two_day) {
-        out.push({ value: `${r.id}:1`, label: roundOpponentLabel(r, 1) });
         out.push({ value: `${r.id}:2`, label: roundOpponentLabel(r, 2) });
+        out.push({ value: `${r.id}:1`, label: roundOpponentLabel(r, 1) });
       } else {
         out.push({ value: `${r.id}:`, label: roundOpponentLabel(r) });
       }

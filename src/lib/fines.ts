@@ -19,6 +19,7 @@ export interface Player {
 export interface Round {
   id: string;
   team_id: string;
+  created_at?: string | null;
   round_number: number;
   label: string | null;
   opponent: string | null;
@@ -31,6 +32,15 @@ export interface Round {
   two_day?: boolean | null;
   day?: number | null;
   cap?: number | null;
+}
+
+/** Rounds ordered by when they were added, with the newest week first. */
+export function newestRoundsFirst(rounds: Round[]) {
+  return [...rounds].sort((a, b) => {
+    const createdDifference = Date.parse(b.created_at ?? "") - Date.parse(a.created_at ?? "");
+    if (Number.isFinite(createdDifference) && createdDifference !== 0) return createdDifference;
+    return b.round_number - a.round_number;
+  });
 }
 
 export interface FineCategory {

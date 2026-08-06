@@ -448,7 +448,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   >
                     {resultBadge(r.result)?.letter ?? r.round_number}
                   </span>
-                  <span className="text-[10px] leading-tight text-black">
+                  <span className="text-[11px] leading-tight text-black">
                     {r.played_on
                       ? (() => {
                           const d = new Date(r.played_on);

@@ -116,7 +116,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
                   <th>Player</th>
                   <th className="text-right">Total</th>
                   <th className="text-right text-destructive">Discounted</th>
-                  <th className="text-right">Avg/round</th>
+                  <th className="text-right">Avg/week</th>
                 </tr>
               </thead>
               <tbody>
@@ -137,7 +137,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
                     <td className="stat-num text-right font-bold text-destructive">
                       {s.discounted > 0 ? money(s.discounted, currency) : "—"}
                     </td>
-                    <td className="stat-num text-right">{money(s.avgPerRound, currency)}</td>
+                    <td className="stat-num text-right">{money(s.avgPerWeek, currency)}</td>
                   </tr>
                 ))}
               </tbody>

@@ -462,24 +462,24 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
 
                 <div className="flex min-w-0 flex-col gap-2">
                   <div className="flex items-start justify-between gap-2">
-                    <div className="min-w-0 flex-1 space-y-1">
-                      <div className="flex items-start gap-2">
-                        <PhotoAvatar
-                          url={r.opponent_logo_url}
-                          name={r.opponent}
-                          busy={busy === r.id + "opponent_logo_url"}
-                          title="Opposition logo"
-                          label="Add logo"
-                          onPick={(f) => updateRoundPhoto(r.id, "opponent_logo_url", f)}
-                        />
-                        <div className="min-w-0 flex-1">
-                          <p className="font-semibold uppercase leading-tight">
-                            {r.opponent ? `vs ${r.opponent}` : roundDayLabel(r)}
-                          </p>
+                    <div className="flex min-w-0 flex-1 items-start gap-2">
+                      <PhotoAvatar
+                        url={r.opponent_logo_url}
+                        name={r.opponent}
+                        busy={busy === r.id + "opponent_logo_url"}
+                        title="Opposition logo"
+                        label="Add logo"
+                        onPick={(f) => updateRoundPhoto(r.id, "opponent_logo_url", f)}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold uppercase leading-tight">
+                          {r.opponent ? `vs ${r.opponent}` : roundDayLabel(r)}
+                        </p>
+                        {r.opponent && (
                           <p className="text-sm text-muted-foreground leading-tight">
-                            {[roundDayLabel(r), r.venue].filter(Boolean).join(" · ")}
+                            {roundDayLabel(r)}
                           </p>
-                        </div>
+                        )}
                       </div>
                     </div>
                     <div className="w-24 shrink-0 text-right">
@@ -492,6 +492,12 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                       </p>
                     </div>
                   </div>
+
+                  {r.venue && (
+                    <p className="text-sm text-muted-foreground leading-tight">
+                      {r.venue}
+                    </p>
+                  )}
 
                   <div className="h-px bg-border" />
 

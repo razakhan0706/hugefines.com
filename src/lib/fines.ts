@@ -233,7 +233,7 @@ export interface PlayerStat {
   count: number;
   unpaid: number;
   rounds: number;
-  avgPerRound: number;
+  avgPerWeek: number;
   topCategory: string | null;
   biggest: number;
   streak: number;
@@ -259,6 +259,16 @@ export function buildPlayerStats(
       const discounted = mine.reduce((s, f) => s + (splits.get(f.id)?.discounted ?? 0), 0);
       const unpaid = mine.filter((f) => !f.paid).reduce((s, f) => s + Number(f.amount), 0);
       const roundIds = new Set(mine.map((f) => f.round_id).filter(Boolean));
+
+      const roundMap = new Map(rounds.map((r) => [r.id, r]));
+      const weekKeys = new Set<string>();
+      for (const f of mine) {
+        if (!f.round_id) continue;
+        const round = roundMap.get(f.round_id);
+        const week = round?.two_day ? (f.week ?? 1) : null;
+        weekKeys.add(`${f.round_id}-${week ?? "single"}`);
+      }
+      const weeks = weekKeys.size;
 
       const byCat = new Map<string, number>();
       for (const f of mine) {
@@ -288,7 +298,7 @@ export function buildPlayerStats(
         count: mine.length,
         unpaid,
         rounds: roundIds.size,
-        avgPerRound: roundIds.size ? total / roundIds.size : 0,
+        avgPerWeek: weeks ? total / weeks : 0,
         topCategory,
         biggest: mine.reduce((m, f) => Math.max(m, Number(f.amount)), 0),
         streak: best,

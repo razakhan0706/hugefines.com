@@ -507,3 +507,17 @@ export function weekBreakdown(fines: Fine[], rounds: Round[], splits?: Map<strin
   }
   return rows;
 }
+
+/** Distinct previously-used text values for a field, most-used spelling first. */
+export function distinctValues<T>(rows: T[], pick: (row: T) => string | null | undefined): string[] {
+  const counts = new Map<string, { value: string; count: number }>();
+  for (const row of rows) {
+    const raw = (pick(row) ?? "").trim();
+    if (!raw) continue;
+    const key = raw.toLowerCase().replace(/\s+/g, " ");
+    const existing = counts.get(key);
+    if (existing) existing.count += 1;
+    else counts.set(key, { value: raw, count: 1 });
+  }
+  return [...counts.values()].sort((a, b) => b.count - a.count).map((c) => c.value);
+}

@@ -233,7 +233,7 @@ export interface PlayerStat {
   count: number;
   unpaid: number;
   rounds: number;
-  avgPerRound: number;
+  avgPerWeek: number;
   topCategory: string | null;
   biggest: number;
   streak: number;

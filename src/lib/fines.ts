@@ -298,7 +298,7 @@ export function buildPlayerStats(
         count: mine.length,
         unpaid,
         rounds: roundIds.size,
-        avgPerRound: roundIds.size ? total / roundIds.size : 0,
+        avgPerWeek: weeks ? total / weeks : 0,
         topCategory,
         biggest: mine.reduce((m, f) => Math.max(m, Number(f.amount)), 0),
         streak: best,

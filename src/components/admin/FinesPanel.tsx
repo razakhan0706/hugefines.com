@@ -22,9 +22,11 @@ import {
   money,
   newestRoundsFirst,
   roundOpponentLabel,
+  distinctValues,
 } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
+import { AutocompleteInput } from "@/components/ui/autocomplete-input";
 
 export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const latestRound = newestRoundsFirst(data.rounds)[0]?.id ?? "";
@@ -92,6 +94,10 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const roundLabel = useMemo(
     () => new Map(data.rounds.map((r) => [r.id, roundOpponentLabel(r)])),
     [data.rounds],
+  );
+  const descriptionOptions = useMemo(
+    () => distinctValues(data.fines, (f) => f.description),
+    [data.fines],
   );
   const categoryLabel = useMemo(
     () => new Map(data.categories.map((c) => [c.id, c.label])),
@@ -303,10 +309,11 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
           )}
           <div className="lg:col-span-6">
             <label className="text-sm font-medium">Custom</label>
-            <Input
+            <AutocompleteInput
               placeholder="Custom (optional — defaults to the category)"
               value={description}
-              onChange={(e) => setDescription(e.target.value)}
+              onValueChange={setDescription}
+              suggestions={descriptionOptions}
             />
           </div>
           <div>
@@ -494,9 +501,10 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                 </div>
                 <div className="sm:col-span-2">
                   <label className="text-sm font-medium">Description</label>
-                  <Input
+                  <AutocompleteInput
                     value={edit.description}
-                    onChange={(e) => setEdit((s) => ({ ...s, description: e.target.value }))}
+                    onValueChange={(v) => setEdit((s) => ({ ...s, description: v }))}
+                    suggestions={descriptionOptions}
                   />
                 </div>
                 <div>

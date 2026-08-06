@@ -16,7 +16,14 @@ import { money } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { uploadPhoto } from "@/lib/photos";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
-import { roundDayLabel, roundBaseLabel, newestRoundsFirst, applyCaps } from "@/lib/fines";
+import { AutocompleteInput } from "@/components/ui/autocomplete-input";
+import {
+  roundDayLabel,
+  roundBaseLabel,
+  newestRoundsFirst,
+  applyCaps,
+  distinctValues,
+} from "@/lib/fines";
 
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const RESULT_OPTIONS = ["Won", "Lost", "Drawn"];
@@ -32,6 +39,9 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   }
 
   const capSplits = applyCaps(data.fines, data.rounds);
+  const opponentOptions = distinctValues(data.rounds, (r) => r.opponent);
+  const venueOptions = distinctValues(data.rounds, (r) => r.venue);
+  const finesMasterOptions = distinctValues(data.rounds, (r) => r.fines_master);
   const nextNumber = (data.rounds.at(-1)?.round_number ?? 0) + 1;
   const [opponent, setOpponent] = useState("");
   const [roundName, setRoundName] = useState(String(nextNumber));
@@ -179,7 +189,11 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
         <CardContent className="grid gap-3 p-5 sm:grid-cols-2 lg:grid-cols-6">
           <div>
             <label className="text-sm font-medium">Opponent</label>
-            <Input value={opponent} onChange={(e) => setOpponent(e.target.value)} />
+            <AutocompleteInput
+              value={opponent}
+              onValueChange={setOpponent}
+              suggestions={opponentOptions}
+            />
             <div className="mt-2">
               <PhotoAvatar
                 url={opponentLogo}
@@ -264,7 +278,11 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
           </div>
           <div>
             <label className="text-sm font-medium">Venue</label>
-            <Input value={venue} onChange={(e) => setVenue(e.target.value)} />
+            <AutocompleteInput
+              value={venue}
+              onValueChange={setVenue}
+              suggestions={venueOptions}
+            />
           </div>
           <div>
             <label className="text-sm font-medium">Result</label>
@@ -283,9 +301,10 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
           </div>
           <div>
             <label className="text-sm font-medium">Fines master</label>
-            <Input
+            <AutocompleteInput
               value={finesMaster}
-              onChange={(e) => setFinesMaster(e.target.value)}
+              onValueChange={setFinesMaster}
+              suggestions={finesMasterOptions}
               placeholder="Who ran the fines"
             />
             <div className="mt-2">
@@ -324,9 +343,10 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                 <CardContent className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
                   <div>
                     <label className="text-sm font-medium">Opponent</label>
-                    <Input
+                    <AutocompleteInput
                       value={edit.opponent}
-                      onChange={(e) => setEdit((s) => ({ ...s, opponent: e.target.value }))}
+                      onValueChange={(v) => setEdit((s) => ({ ...s, opponent: v }))}
+                      suggestions={opponentOptions}
                     />
                   </div>
                   <div>
@@ -398,9 +418,10 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   </div>
                   <div>
                     <label className="text-sm font-medium">Venue</label>
-                    <Input
+                    <AutocompleteInput
                       value={edit.venue}
-                      onChange={(e) => setEdit((s) => ({ ...s, venue: e.target.value }))}
+                      onValueChange={(v) => setEdit((s) => ({ ...s, venue: v }))}
+                      suggestions={venueOptions}
                     />
                   </div>
                   <div>
@@ -423,9 +444,10 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                   </div>
                   <div>
                     <label className="text-sm font-medium">Fines master</label>
-                    <Input
+                    <AutocompleteInput
                       value={edit.fines_master}
-                      onChange={(e) => setEdit((s) => ({ ...s, fines_master: e.target.value }))}
+                      onValueChange={(v) => setEdit((s) => ({ ...s, fines_master: v }))}
+                      suggestions={finesMasterOptions}
                     />
                   </div>
                   <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-3">

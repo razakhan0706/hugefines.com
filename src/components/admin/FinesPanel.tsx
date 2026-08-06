@@ -95,6 +95,10 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
     () => new Map(data.rounds.map((r) => [r.id, roundOpponentLabel(r)])),
     [data.rounds],
   );
+  const descriptionOptions = useMemo(
+    () => distinctValues(data.fines, (f) => f.description),
+    [data.fines],
+  );
   const categoryLabel = useMemo(
     () => new Map(data.categories.map((c) => [c.id, c.label])),
     [data.categories],

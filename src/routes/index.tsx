@@ -150,20 +150,20 @@ function Index() {
             Create a season, add up to 20 players, and start fining. The end-of-season party funds
             itself.
           </p>
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg">
+          <div className="mx-auto mt-7 grid max-w-md grid-cols-2 gap-3">
+            <Button asChild size="lg" className="w-full text-xs sm:text-sm">
               <Link to="/auth">Create your team</Link>
             </Button>
-            <Button asChild size="lg" variant="outline">
+            <Button asChild size="lg" variant="outline" className="w-full text-xs sm:text-sm">
               <Link to="/auth">Start 7 day free trial</Link>
             </Button>
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">
+          <p className="mt-4 text-xs text-muted-foreground sm:text-sm">
             Standard team — 20 player profiles, 12 months of usage. No cut of your fines money. All for $19.99
           </p>
-          <a href="#how" className="mt-2 inline-block text-sm font-medium text-accent hover:underline">
-            See how it works
-          </a>
+          <Button asChild size="sm" variant="outline" className="mt-2 text-xs">
+            <a href="#how">See how it works</a>
+          </Button>
         </div>
       </section>
 

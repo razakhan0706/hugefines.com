@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { generateRecap } from "@/lib/recap.functions";
@@ -13,16 +13,23 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Sparkles, Trash2 } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
 import { buildPlayerStats, money, roundDayLabel } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
+import { cn } from "@/lib/utils";
 
 export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const run = useServerFn(generateRecap);
   const [scope, setScope] = useState<string>(data.rounds.at(-1)?.id ?? "season");
   const [tone, setTone] = useState("Cheeky clubhouse banter");
-  const [includeVotes, setIncludeVotes] = useState(false);
+  const [includeVotes, setIncludeVotes] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("huge-fines-include-votes") === "yes";
+  });
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    window.localStorage.setItem("huge-fines-include-votes", includeVotes ? "yes" : "no");
+  }, [includeVotes]);
 
   function buildSummary() {
     const isRound = scope !== "season";
@@ -170,16 +177,39 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               {busy ? "Writing…" : "Generate recap"}
             </Button>
           </div>
-          <div className="flex items-center justify-between gap-3 rounded-md border p-3 sm:col-span-3">
-            <div>
-              <p className="text-sm font-medium">Include votes in the recap</p>
-              <p className="text-xs text-muted-foreground">
-                {includeVotes
-                  ? "The AI will add vote commentary and name the leaders."
-                  : "Votes stay secret — the AI won't mention them."}
-              </p>
+          <div className="grid gap-2 sm:col-span-3">
+            <label className="text-sm font-medium">Include votes in the recap</label>
+            <div className="grid grid-cols-2 gap-0 overflow-hidden rounded-md border">
+              <button
+                type="button"
+                onClick={() => setIncludeVotes(true)}
+                className={cn(
+                  "px-4 py-2 text-sm font-semibold uppercase transition-colors",
+                  includeVotes
+                    ? "bg-accent text-white"
+                    : "bg-background text-foreground hover:bg-muted",
+                )}
+              >
+                Yes
+              </button>
+              <button
+                type="button"
+                onClick={() => setIncludeVotes(false)}
+                className={cn(
+                  "px-4 py-2 text-sm font-semibold uppercase transition-colors",
+                  !includeVotes
+                    ? "bg-accent text-white"
+                    : "bg-background text-foreground hover:bg-muted",
+                )}
+              >
+                No
+              </button>
             </div>
-            <Switch checked={includeVotes} onCheckedChange={setIncludeVotes} />
+            <p className="text-xs text-muted-foreground">
+              {includeVotes
+                ? "The AI will add vote commentary and name the leaders."
+                : "Votes stay secret — the AI won't mention them."}
+            </p>
           </div>
         </CardContent>
       </Card>

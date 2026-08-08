@@ -220,22 +220,30 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
             No recaps yet. Log some fines, then let the AI roast the squad.
           </p>
         )}
-        {data.recaps.map((r) => (
-          <Card key={r.id}>
-            <CardContent className="p-5">
-              <div className="flex items-start justify-between gap-3">
-                <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
-                  {r.scope === "season" ? "Season wrap" : "Round recap"} ·{" "}
-                  {new Date(r.created_at).toLocaleDateString()}
-                </p>
-                <Button variant="ghost" size="icon" onClick={() => remove(r.id)}>
-                  <Trash2 className="size-4" />
-                </Button>
-              </div>
-              <p className="mt-2 whitespace-pre-wrap leading-relaxed">{r.body}</p>
-            </CardContent>
-          </Card>
-        ))}
+        {data.recaps.map((r) => {
+          const round = r.round_id
+            ? data.rounds.find((round) => round.id === r.round_id)
+            : null;
+          const latestRound = data.rounds.at(-1);
+          const dateValue = round?.played_on ?? latestRound?.played_on ?? r.created_at;
+          const dateText = new Date(dateValue).toLocaleDateString("en-GB");
+
+          return (
+            <Card key={r.id}>
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between gap-3">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
+                    Recap · {dateText}
+                  </p>
+                  <Button variant="ghost" size="icon" onClick={() => remove(r.id)}>
+                    <Trash2 className="size-4" />
+                  </Button>
+                </div>
+                <p className="mt-2 whitespace-pre-wrap leading-relaxed">{r.body}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
       </div>
     </div>
   );

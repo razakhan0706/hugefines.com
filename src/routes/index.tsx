@@ -108,7 +108,10 @@ function Index() {
             </CardContent>
           </Card>
 
-          <div className="order-3 md:col-start-1 md:row-start-2 md:self-start">
+          <div className="order-3 flex flex-col gap-3 md:col-start-1 md:row-start-2 md:self-start">
+            <Button asChild size="sm" variant="outline" className="w-full text-xs sm:w-auto">
+              <a href="#how">See how it works</a>
+            </Button>
             <div className="grid grid-cols-2 gap-2">
               <Button asChild size="default" className="w-full text-xs sm:text-sm">
                 <Link to="/auth">Create your team</Link>
@@ -117,12 +120,9 @@ function Index() {
                 <Link to="/auth">Start 7 day free trial</Link>
               </Button>
             </div>
-            <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
+            <p className="text-xs text-muted-foreground sm:text-sm">
               Standard team — 20 player profiles, 12 months of usage. No cut of your fines money. All for $19.99
             </p>
-            <Button asChild size="sm" variant="outline" className="mt-2 w-full text-xs sm:w-auto">
-              <a href="#how">See how it works</a>
-            </Button>
           </div>
         </div>
       </section>

@@ -273,14 +273,9 @@ function FinesTab({ data }: { data: TeamBundle }) {
 
 function VotesTab({ data }: { data: TeamBundle }) {
   const playerMap = new Map(data.players.map((p) => [p.id, p]));
-  const roundMap = new Map(data.rounds.map((r) => [r.id, r]));
 
   const votePoints = new Map<string, number>();
   const voteRounds = new Map<string, Set<string>>();
-  const roundVotes = new Map<
-    string,
-    { round: (typeof data.rounds)[number]; votes: { player: typeof playerMap extends Map<string, infer V> ? V : never; points: number }[] }
-  >();
 
   for (const v of data.votes) {
     const player = playerMap.get(v.player_id);
@@ -290,14 +285,6 @@ function VotesTab({ data }: { data: TeamBundle }) {
     const rounds = voteRounds.get(v.player_id) ?? new Set<string>();
     rounds.add(v.round_id);
     voteRounds.set(v.player_id, rounds);
-
-    const entry = roundVotes.get(v.round_id);
-    if (!entry) {
-      const round = roundMap.get(v.round_id);
-      if (!round) continue;
-      roundVotes.set(v.round_id, { round, votes: [] });
-    }
-    roundVotes.get(v.round_id)!.votes.push({ player, points: v.points });
   }
 
   const leaderboard = [...votePoints.entries()]
@@ -317,10 +304,6 @@ function VotesTab({ data }: { data: TeamBundle }) {
   const roundsWithVotes = new Set(data.votes.map((v) => v.round_id)).size;
   const leader = leaderboard[0];
 
-  const roundResults = [...roundVotes.values()].sort(
-    (a, b) => a.round.round_number - b.round.round_number,
-  );
-
   const mvpAward = seasonAwards(buildPlayerStats(
     data.players,
     data.fines,
@@ -328,6 +311,7 @@ function VotesTab({ data }: { data: TeamBundle }) {
     data.categories,
     data.votes,
   ), data.team.currency).find((a) => a.title === "Player of the Season");
+
 
   const summaryTiles = [
     { label: "Total votes", value: String(totalVotes) },
@@ -412,60 +396,10 @@ function VotesTab({ data }: { data: TeamBundle }) {
         </CardContent>
       </Card>
 
-      <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
-        {roundResults.length > 0 ? (
-          roundResults.map((r) => {
-            const sorted = [...r.votes].sort((a, b) => b.points - a.points);
-            return (
-              <Card key={r.round.id}>
-                <CardContent className="p-3 sm:p-5">
-                  <h3 className="text-sm font-bold uppercase tracking-wide sm:text-lg">
-                    {roundOpponentLabel(r.round)}
-                  </h3>
-                  <div className="mt-3 overflow-x-auto">
-                    <table className="w-full text-xs sm:text-sm">
-                      <thead>
-                        <tr className="text-left uppercase text-muted-foreground">
-                          <th className="py-1.5 pr-2">Player</th>
-                          <th className="px-2 text-right">Points</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {sorted.map((v) => (
-                          <tr key={v.player.id} className="border-t border-border">
-                            <td className="py-1.5 pr-2">
-                              <span className="flex items-center gap-1.5 font-medium uppercase">
-                                <PhotoAvatar
-                                  url={v.player.photo_url}
-                                  name={v.player.name}
-                                  className="size-6 shrink-0 sm:size-8"
-                                />
-                                <span className="min-w-0 break-words leading-tight">{v.player.name}</span>
-                              </span>
-                            </td>
-                            <td className="stat-num whitespace-nowrap px-2 text-right font-bold">
-                              {v.points}
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })
-        ) : (
-          <Card>
-            <CardContent className="p-5">
-              <p className="text-muted-foreground">No rounds have votes yet.</p>
-            </CardContent>
-          </Card>
-        )}
-      </div>
     </div>
   );
 }
+
 
 function BreakdownCard({
   title,

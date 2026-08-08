@@ -96,7 +96,7 @@ function Index() {
             </Button>
           </div>
 
-          <Card className="self-center border-2">
+          <Card className="order-1 self-center border-2 md:order-2">
             <CardContent className="p-3 md:p-6">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Live fines leaderboard

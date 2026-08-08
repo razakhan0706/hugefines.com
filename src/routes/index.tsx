@@ -43,7 +43,7 @@ const FEATURES = [
   {
     icon: Vote,
     title: "Votes, done properly",
-    body: "From 5-4-3-2-1 down to a single vote — pick your points. Admin-only entry keeps it honest; reveal the leaderboard when you're ready.",
+    body: "Run your own team's voting, as if you're at the Brownlow or the Dally M. Admin-only entry keeps it honest; reveal the leaderboard when you're ready.",
   },
   {
     icon: Sparkles,

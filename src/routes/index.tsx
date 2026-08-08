@@ -68,29 +68,27 @@ function Index() {
       <SiteHeader />
 
       <section className="border-b border-border">
-        <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-10 md:py-16">
-          <div className="order-2 md:order-1">
-            <span className="inline-flex items-center rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-accent-strong">
+        <div className="mx-auto grid max-w-6xl gap-5 px-4 py-5 md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-10 md:py-16">
+          <div>
+            <span className="inline-flex items-center rounded-full bg-accent-soft px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-accent-strong">
               BUILT FOR LOCAL SPORT
             </span>
-            <h1 className="mt-3 text-4xl font-extrabold leading-[1.05] md:mt-5 md:text-6xl">
+            <h1 className="mt-2 text-3xl font-extrabold leading-[1.05] md:mt-5 md:text-6xl">
               Your team's fines book,
               <span className="text-accent"> finally worth reading.</span>
             </h1>
-            <p className="mt-3 max-w-xl text-base text-muted-foreground md:mt-5 md:text-lg">
-              Kill the spreadsheet. Log fines for bad haircuts and worse parking. Run
-              player-of-the-season voting, and let the whole team follow a live leaderboard all
-              season.
+            <p className="mt-2 max-w-xl text-sm text-muted-foreground md:mt-5 md:text-lg">
+              Kill the spreadsheet. Log fines, run voting, and follow a live leaderboard all season.
             </p>
-            <div className="mt-6 grid grid-cols-2 gap-3">
-              <Button asChild size="lg" className="w-full text-xs sm:text-sm">
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <Button asChild size="default" className="w-full text-xs sm:text-sm">
                 <Link to="/auth">Create your team</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="w-full text-xs sm:text-sm">
+              <Button asChild size="default" variant="outline" className="w-full text-xs sm:text-sm">
                 <Link to="/auth">Start 7 day free trial</Link>
               </Button>
             </div>
-            <p className="mt-3 text-xs text-muted-foreground sm:text-sm">
+            <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
               Standard team — 20 player profiles, 12 months of usage. No cut of your fines money. All for $19.99
             </p>
             <Button asChild size="sm" variant="outline" className="mt-2 w-full text-xs sm:w-auto">
@@ -98,26 +96,26 @@ function Index() {
             </Button>
           </div>
 
-          <Card className="order-1 self-center border-2 md:order-2">
-            <CardContent className="p-4 md:p-6">
-              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+          <Card className="self-center border-2">
+            <CardContent className="p-3 md:p-6">
+              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Live fines leaderboard
               </p>
-              <ul className="mt-4 space-y-3">
+              <ul className="mt-2 space-y-1 md:mt-4 md:space-y-3">
                 {[
                   ["Dev Patel", "$94", "Late to warm-up ×6", player1.url],
                   ["Josh Reid", "$88", "Pink shorts", player2.url],
                   ["Sam Okafor", "$71", "Shocking parking", player3.url],
                   ["Tom Lacey", "$62", "Dropped a sitter", player4.url],
                 ].map(([name, amount, reason, photo], i) => (
-                  <li key={name} className="flex items-center gap-3 border-b border-border pb-3 last:border-0">
-                    <span className="stat-num w-6 text-muted-foreground">{i + 1}</span>
-                    <PhotoAvatar url={photo} name={name} className="size-10" />
+                  <li key={name} className="flex items-center gap-2 border-b border-border pb-1.5 last:border-0 md:gap-3 md:pb-3">
+                    <span className="stat-num w-5 text-xs text-muted-foreground md:w-6">{i + 1}</span>
+                    <PhotoAvatar url={photo} name={name} className="size-8 md:size-10" />
                     <div className="flex-1">
-                      <p className="font-semibold">{name}</p>
-                      <p className="text-sm text-muted-foreground">{reason}</p>
+                      <p className="text-sm font-semibold md:text-base">{name}</p>
+                      <p className="text-xs text-muted-foreground">{reason}</p>
                     </div>
-                    <span className="stat-num text-xl font-bold text-accent">{amount}</span>
+                    <span className="stat-num text-base font-bold text-accent md:text-xl">{amount}</span>
                   </li>
                 ))}
               </ul>

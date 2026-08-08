@@ -177,16 +177,39 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               {busy ? "Writing…" : "Generate recap"}
             </Button>
           </div>
-          <div className="flex items-center justify-between gap-3 rounded-md border p-3 sm:col-span-3">
-            <div>
-              <p className="text-sm font-medium">Include votes in the recap</p>
-              <p className="text-xs text-muted-foreground">
-                {includeVotes
-                  ? "The AI will add vote commentary and name the leaders."
-                  : "Votes stay secret — the AI won't mention them."}
-              </p>
+          <div className="grid gap-2 sm:col-span-3">
+            <label className="text-sm font-medium">Include votes in the recap</label>
+            <div className="grid grid-cols-2 gap-0 overflow-hidden rounded-md border">
+              <button
+                type="button"
+                onClick={() => setIncludeVotes(true)}
+                className={cn(
+                  "px-4 py-2 text-sm font-semibold uppercase transition-colors",
+                  includeVotes
+                    ? "bg-accent text-white"
+                    : "bg-background text-foreground hover:bg-muted",
+                )}
+              >
+                Yes
+              </button>
+              <button
+                type="button"
+                onClick={() => setIncludeVotes(false)}
+                className={cn(
+                  "px-4 py-2 text-sm font-semibold uppercase transition-colors",
+                  !includeVotes
+                    ? "bg-accent text-white"
+                    : "bg-background text-foreground hover:bg-muted",
+                )}
+              >
+                No
+              </button>
             </div>
-            <Switch checked={includeVotes} onCheckedChange={setIncludeVotes} />
+            <p className="text-xs text-muted-foreground">
+              {includeVotes
+                ? "The AI will add vote commentary and name the leaders."
+                : "Votes stay secret — the AI won't mention them."}
+            </p>
           </div>
         </CardContent>
       </Card>

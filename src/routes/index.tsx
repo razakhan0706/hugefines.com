@@ -69,7 +69,7 @@ function Index() {
 
       <section className="border-b border-border">
         <div className="mx-auto grid max-w-6xl gap-5 px-4 py-5 md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-10 md:py-16">
-          <div>
+          <div className="order-2 md:order-1">
             <span className="inline-flex items-center rounded-full bg-accent-soft px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-accent-strong">
               BUILT FOR LOCAL SPORT
             </span>

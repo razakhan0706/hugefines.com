@@ -38,7 +38,7 @@ const FEATURES = [
   {
     icon: BarChart3,
     title: "Stats worth paying for",
-    body: "Category breakdowns, round trends, repeat-offender streaks and per-round averages your pivot table can't do.",
+    body: "Leaderboard, season awards, round trends, category breakdowns, discounted caps, and breakdowns by fines master, opponent, venue and result.",
   },
   {
     icon: Vote,

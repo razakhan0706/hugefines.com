@@ -48,7 +48,7 @@ const FEATURES = [
   {
     icon: Sparkles,
     title: "AI season commentary",
-    body: "Automatic weekly and season recaps that turn your fines and votes into a proper storyline.",
+    body: "Weekly and season recaps that turn your fines and votes into a proper storyline.",
   },
   {
     icon: Share2,

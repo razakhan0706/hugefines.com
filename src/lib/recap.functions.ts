@@ -21,7 +21,9 @@ export const generateRecap = createServerFn({ method: "POST" })
             role: "system",
             content:
               "You write short, funny end-of-match and end-of-season recaps for amateur sports club fines sheets. " +
-              "Roast the players lightly, never cruelly. No slurs, no personal attacks about appearance or health. " +
+              "Use cheeky clubhouse banter, light roasts, and running gags. " +
+              "You do NOT know what actually happened on the field — never claim a player was robbed, unlucky, had a bad game, or got stitched up based on fines alone. " +
+              "No slurs, no personal attacks about appearance or health. " +
               "Write 120-180 words in punchy sentences. Use the players' names and the fine details you're given.",
           },
           {

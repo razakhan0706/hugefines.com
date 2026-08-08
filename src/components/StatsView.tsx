@@ -389,7 +389,7 @@ function VotesTab({ data }: { data: TeamBundle }) {
                   <th className="py-2">#</th>
                   <th>Player</th>
                   <th className="text-right">Votes</th>
-                  <th className="text-right">Rounds</th>
+                  <th className="text-right">Stats</th>
                   <th className="text-right">Avg</th>
                 </tr>
               </thead>

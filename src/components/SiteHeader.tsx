@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Trophy } from "lucide-react";
+import logoAsset from "@/assets/Website_Logo.png.asset.json";
 
 export function SiteHeader() {
   const [email, setEmail] = useState<string | null>(null);

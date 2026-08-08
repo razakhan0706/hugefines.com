@@ -38,7 +38,7 @@ const FEATURES = [
   {
     icon: BarChart3,
     title: "Stats worth paying for",
-    body: "Leaderboard, season awards, round trends, category breakdowns, discounted caps, and breakdowns by fines master, opponent, venue and result.",
+    body: "Leaderboards, season awards, category breakdowns, and filters so that your team can break their fines down to the core.",
   },
   {
     icon: Vote,

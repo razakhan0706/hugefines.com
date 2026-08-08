@@ -68,8 +68,8 @@ function Index() {
       <SiteHeader />
 
       <section className="border-b border-border">
-        <div className="mx-auto grid max-w-6xl gap-5 px-4 py-5 md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-10 md:py-16">
-          <div className="order-2 md:order-1">
+        <div className="mx-auto grid max-w-6xl gap-5 px-4 py-5 md:grid-cols-[1.1fr_0.9fr] md:gap-x-10 md:gap-y-5 md:py-16">
+          <div className="order-1 md:col-start-1 md:row-start-1 md:self-end">
             <span className="inline-flex items-center rounded-full bg-accent-soft px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-widest text-accent-strong">
               BUILT FOR LOCAL SPORT
             </span>
@@ -80,23 +80,9 @@ function Index() {
             <p className="mt-2 max-w-xl text-sm text-muted-foreground md:mt-5 md:text-lg">
               Kill the spreadsheet. Log fines, run voting, and follow a live leaderboard all season.
             </p>
-            <div className="mt-4 grid grid-cols-2 gap-2">
-              <Button asChild size="default" className="w-full text-xs sm:text-sm">
-                <Link to="/auth">Create your team</Link>
-              </Button>
-              <Button asChild size="default" variant="outline" className="w-full text-xs sm:text-sm">
-                <Link to="/auth">Start 7 day free trial</Link>
-              </Button>
-            </div>
-            <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
-              Standard team — 20 player profiles, 12 months of usage. No cut of your fines money. All for $19.99
-            </p>
-            <Button asChild size="sm" variant="outline" className="mt-2 w-full text-xs sm:w-auto">
-              <a href="#how">See how it works</a>
-            </Button>
           </div>
 
-          <Card className="order-1 self-center border-2 md:order-2">
+          <Card className="order-2 self-center border-2 md:col-start-2 md:row-span-2 md:row-start-1">
             <CardContent className="p-3 md:p-6">
               <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
                 Live fines leaderboard
@@ -121,6 +107,23 @@ function Index() {
               </ul>
             </CardContent>
           </Card>
+
+          <div className="order-3 md:col-start-1 md:row-start-2 md:self-start">
+            <div className="grid grid-cols-2 gap-2">
+              <Button asChild size="default" className="w-full text-xs sm:text-sm">
+                <Link to="/auth">Create your team</Link>
+              </Button>
+              <Button asChild size="default" variant="outline" className="w-full text-xs sm:text-sm">
+                <Link to="/auth">Start 7 day free trial</Link>
+              </Button>
+            </div>
+            <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
+              Standard team — 20 player profiles, 12 months of usage. No cut of your fines money. All for $19.99
+            </p>
+            <Button asChild size="sm" variant="outline" className="mt-2 w-full text-xs sm:w-auto">
+              <a href="#how">See how it works</a>
+            </Button>
+          </div>
         </div>
       </section>
 

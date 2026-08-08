@@ -158,12 +158,9 @@ function Index() {
               <Link to="/auth">Start 7 day free trial</Link>
             </Button>
           </div>
-          <p className="mt-4 text-xs text-muted-foreground sm:text-sm">
+          <p className="mt-4 text-sm text-muted-foreground sm:text-base">
             Standard team — 20 player profiles, 12 months of usage. No cut of your fines money. All for $19.99
           </p>
-          <Button asChild size="sm" variant="outline" className="mt-2 text-xs">
-            <a href="#how">See how it works</a>
-          </Button>
         </div>
       </section>
 

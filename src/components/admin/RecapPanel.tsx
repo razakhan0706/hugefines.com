@@ -21,8 +21,15 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const run = useServerFn(generateRecap);
   const [scope, setScope] = useState<string>(data.rounds.at(-1)?.id ?? "season");
   const [tone, setTone] = useState("Cheeky clubhouse banter");
-  const [includeVotes, setIncludeVotes] = useState(false);
+  const [includeVotes, setIncludeVotes] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return window.localStorage.getItem("huge-fines-include-votes") === "yes";
+  });
   const [busy, setBusy] = useState(false);
+
+  useEffect(() => {
+    window.localStorage.setItem("huge-fines-include-votes", includeVotes ? "yes" : "no");
+  }, [includeVotes]);
 
   function buildSummary() {
     const isRound = scope !== "season";

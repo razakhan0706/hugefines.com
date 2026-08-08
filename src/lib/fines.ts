@@ -292,6 +292,18 @@ export function buildPlayerStats(
 
       const myVotes = votes.filter((v) => v.player_id === player.id);
 
+      let voteStreak = 0;
+      let bestVoteStreak = 0;
+      const votedRoundIds = new Set(myVotes.map((v) => v.round_id));
+      for (const r of orderedRounds) {
+        if (votedRoundIds.has(r.id)) {
+          voteStreak += 1;
+          bestVoteStreak = Math.max(bestVoteStreak, voteStreak);
+        } else {
+          voteStreak = 0;
+        }
+      }
+
       return {
         player,
         total,
@@ -305,6 +317,7 @@ export function buildPlayerStats(
         streak: best,
         votePoints: myVotes.reduce((s, v) => s + v.points, 0),
         voteRounds: myVotes.length,
+        voteStreak: bestVoteStreak,
       };
     })
     .sort((a, b) => b.total - a.total);

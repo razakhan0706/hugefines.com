@@ -56,19 +56,41 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
 
     if (includeVotes) {
       const votes = isRound ? data.votes.filter((v) => v.round_id === scope) : data.votes;
-      const tally = new Map<string, number>();
-      for (const v of votes) tally.set(v.player_id, (tally.get(v.player_id) ?? 0) + v.points);
-      const board = [...tally.entries()]
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 8)
-        .map(([pid, pts]) => `- ${names.get(pid) ?? "Someone"}: ${pts} votes`);
-      lines.push(
-        "",
-        votes.length
-          ? `Player votes (${data.team.vote_format}) — include vote commentary, call out the winners and the snubs:`
-          : "Player votes: none recorded for this scope.",
-        ...board,
-      );
+      const tallyOf = (list: typeof data.votes) => {
+        const t = new Map<string, number>();
+        for (const v of list) t.set(v.player_id, (t.get(v.player_id) ?? 0) + v.points);
+        return [...t.entries()].sort((a, b) => b[1] - a[1]);
+      };
+      const scoped = tallyOf(votes);
+      const season = tallyOf(data.votes);
+      const fmt = (rows: [string, number][]) =>
+        rows.slice(0, 8).map(([pid, pts]) => `- ${names.get(pid) ?? "Someone"}: ${pts} votes`);
+      const identical =
+        JSON.stringify(scoped) === JSON.stringify(season);
+
+      if (!votes.length) {
+        lines.push("", "Player votes: none recorded for this scope.");
+      } else if (isRound) {
+        lines.push(
+          "",
+          `Player votes for THIS ROUND (${data.team.vote_format}) — celebrate the vote-getters only, never mock anyone for a low tally:`,
+          ...fmt(scoped),
+        );
+        if (identical) {
+          lines.push(
+            "",
+            "NOTE: this is the first round, so the cumulative season tally is exactly the same as the round tally. Mention it once only — do not repeat the numbers as if they were two different things.",
+          );
+        } else {
+          lines.push("", "Cumulative season totals so far (keep clearly separate from the round tally above):", ...fmt(season));
+        }
+      } else {
+        lines.push(
+          "",
+          `Season vote totals (${data.team.vote_format}) — celebrate the vote-getters only, never mock anyone for a low tally:`,
+          ...fmt(season),
+        );
+      }
     } else {
       lines.push("", "IMPORTANT: Player votes are secret. Do not mention votes, voting, or best-player awards at all.");
     }

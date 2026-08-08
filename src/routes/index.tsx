@@ -32,7 +32,7 @@ export const Route = createFileRoute("/")({
 const FEATURES = [
   {
     icon: ClipboardList,
-    title: "Fines in two taps",
+    title: "Fines in a few taps",
     body: "Reusable categories and one-off fines, logged against a player and a round.",
   },
   {

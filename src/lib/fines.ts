@@ -383,7 +383,17 @@ export function seasonAwards(stats: PlayerStat[], currency: string): Award[] {
       title: "Player of the Season",
       winner: mvp.player.name,
       photo: mvp.player.photo_url,
-      detail: `${mvp.votePoints} votes across ${mvp.voteRounds} rounds`,
+      detail: `${mvp.votePoints} votes`,
+    });
+  }
+
+  const mostConsistent = [...stats].sort((a, b) => b.voteStreak - a.voteStreak)[0];
+  if (mostConsistent && mostConsistent.voteStreak > 0) {
+    awards.push({
+      title: "Most Consecutive Weeks",
+      winner: mostConsistent.player.name,
+      photo: mostConsistent.player.photo_url,
+      detail: `Votes in ${mostConsistent.voteStreak} consecutive weeks`,
     });
   }
 

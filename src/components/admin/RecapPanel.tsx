@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { generateRecap } from "@/lib/recap.functions";
@@ -13,9 +13,9 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Sparkles, Trash2 } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
 import { buildPlayerStats, money, roundDayLabel } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
+import { cn } from "@/lib/utils";
 
 export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const run = useServerFn(generateRecap);

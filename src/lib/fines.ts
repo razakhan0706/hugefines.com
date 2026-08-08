@@ -239,6 +239,7 @@ export interface PlayerStat {
   streak: number;
   votePoints: number;
   voteRounds: number;
+  voteStreak: number;
 }
 
 export function buildPlayerStats(

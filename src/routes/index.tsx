@@ -43,7 +43,7 @@ const FEATURES = [
   {
     icon: Vote,
     title: "Votes, done properly",
-    body: "5-4-3-2-1, 3-2-1 or single vote. Admin-only entry keeps it honest; reveal the leaderboard when you're ready.",
+    body: "From 5-4-3-2-1 down to a single vote — pick your points. Admin-only entry keeps it honest; reveal the leaderboard when you're ready.",
   },
   {
     icon: Sparkles,

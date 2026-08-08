@@ -11,6 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import { Card, CardContent } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   applyCaps,
   buildPlayerStats,
@@ -24,6 +25,7 @@ import {
   seasonAwards,
   venueBreakdown,
   type Breakdown,
+  roundOpponentLabel,
 } from "@/lib/fines";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
 import type { TeamBundle } from "@/lib/useTeamData";
@@ -32,6 +34,25 @@ import { Trophy } from "lucide-react";
 const DISCOUNT_COLOR = "var(--color-destructive)";
 
 export function StatsView({ data }: { data: TeamBundle }) {
+  return (
+    <Tabs defaultValue="fines">
+      <TabsList className="grid w-full grid-cols-2">
+        <TabsTrigger value="fines">Fines</TabsTrigger>
+        <TabsTrigger value="votes">Votes</TabsTrigger>
+      </TabsList>
+      <div className="mt-6">
+        <TabsContent value="fines">
+          <FinesTab data={data} />
+        </TabsContent>
+        <TabsContent value="votes">
+          <VotesTab data={data} />
+        </TabsContent>
+      </div>
+    </Tabs>
+  );
+}
+
+function FinesTab({ data }: { data: TeamBundle }) {
   const splits = applyCaps(data.fines, data.rounds);
   const stats = buildPlayerStats(
     data.players,
@@ -45,7 +66,7 @@ export function StatsView({ data }: { data: TeamBundle }) {
   const totalDiscounted = data.fines.reduce((s, f) => s + (splits.get(f.id)?.discounted ?? 0), 0);
   const byRound = roundTotals(data.fines, data.rounds, splits);
   const byCat = categoryBreakdown(data.fines, data.categories);
-  const awards = seasonAwards(stats, currency);
+  const awards = seasonAwards(stats, currency).filter((a) => a.title !== "Player of the Season");
   const byMaster = finesMasterBreakdown(data.fines, data.rounds, splits);
   const byOpponent = opponentBreakdown(data.fines, data.rounds, splits);
   const byVenue = venueBreakdown(data.fines, data.rounds, splits);
@@ -245,6 +266,202 @@ export function StatsView({ data }: { data: TeamBundle }) {
           showUnit={false}
           showAvg={false}
         />
+      </div>
+    </div>
+  );
+}
+
+function VotesTab({ data }: { data: TeamBundle }) {
+  const playerMap = new Map(data.players.map((p) => [p.id, p]));
+  const roundMap = new Map(data.rounds.map((r) => [r.id, r]));
+
+  const votePoints = new Map<string, number>();
+  const voteRounds = new Map<string, Set<string>>();
+  const roundVotes = new Map<
+    string,
+    { round: (typeof data.rounds)[number]; votes: { player: typeof playerMap extends Map<string, infer V> ? V : never; points: number }[] }
+  >();
+
+  for (const v of data.votes) {
+    const player = playerMap.get(v.player_id);
+    if (!player) continue;
+
+    votePoints.set(v.player_id, (votePoints.get(v.player_id) ?? 0) + v.points);
+    const rounds = voteRounds.get(v.player_id) ?? new Set<string>();
+    rounds.add(v.round_id);
+    voteRounds.set(v.player_id, rounds);
+
+    const entry = roundVotes.get(v.round_id);
+    if (!entry) {
+      const round = roundMap.get(v.round_id);
+      if (!round) continue;
+      roundVotes.set(v.round_id, { round, votes: [] });
+    }
+    roundVotes.get(v.round_id)!.votes.push({ player, points: v.points });
+  }
+
+  const leaderboard = [...votePoints.entries()]
+    .map(([playerId, points]) => {
+      const rounds = voteRounds.get(playerId)?.size ?? 0;
+      return {
+        player: playerMap.get(playerId)!,
+        points,
+        rounds,
+        avg: rounds > 0 ? points / rounds : 0,
+      };
+    })
+    .sort((a, b) => b.points - a.points);
+
+  const totalVotes = data.votes.length;
+  const totalPoints = data.votes.reduce((s, v) => s + v.points, 0);
+  const roundsWithVotes = new Set(data.votes.map((v) => v.round_id)).size;
+  const leader = leaderboard[0];
+
+  const roundResults = [...roundVotes.values()].sort(
+    (a, b) => a.round.round_number - b.round.round_number,
+  );
+
+  const mvpAward = seasonAwards(buildPlayerStats(
+    data.players,
+    data.fines,
+    data.rounds,
+    data.categories,
+    data.votes,
+  ), data.team.currency).find((a) => a.title === "Player of the Season");
+
+  const summaryTiles = [
+    { label: "Total votes", value: String(totalVotes) },
+    { label: "Total points", value: String(totalPoints) },
+    { label: "Rounds with votes", value: String(roundsWithVotes) },
+    { label: "Leader", value: leader ? `${leader.player.name} (${leader.points})` : "—" },
+  ];
+
+  return (
+    <div className="space-y-6">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        {summaryTiles.map((t) => (
+          <Card key={t.label}>
+            <CardContent className="p-5">
+              <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
+                {t.label}
+              </p>
+              <p className="stat-num mt-1 text-2xl font-bold">{t.value}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {mvpAward && (
+        <Card className="border-accent/40">
+          <CardContent className="flex gap-3 p-5">
+            {mvpAward.photo ? (
+              <PhotoAvatar url={mvpAward.photo} name={mvpAward.winner} className="size-11" />
+            ) : (
+              <Trophy className="size-5 shrink-0 text-accent" />
+            )}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
+                {mvpAward.title}
+              </p>
+              <p className="text-lg font-bold">{mvpAward.winner}</p>
+              <p className="text-sm text-muted-foreground">{mvpAward.detail}</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      <Card>
+        <CardContent className="p-5">
+          <h3 className="text-lg font-bold uppercase tracking-wide">Voting leaderboard</h3>
+          <div className="mt-4 overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="text-left text-muted-foreground">
+                  <th className="py-2">#</th>
+                  <th>Player</th>
+                  <th className="text-right">Votes</th>
+                  <th className="text-right">Rounds</th>
+                  <th className="text-right">Avg</th>
+                </tr>
+              </thead>
+              <tbody>
+                {leaderboard.map((row, i) => (
+                  <tr key={row.player.id} className="border-t border-border">
+                    <td className="stat-num py-2 text-muted-foreground">{i + 1}</td>
+                    <td className="font-medium">
+                      <span className="flex items-center gap-2">
+                        <PhotoAvatar
+                          url={row.player.photo_url}
+                          name={row.player.name}
+                          className="size-8"
+                        />
+                        {row.player.name}
+                      </span>
+                    </td>
+                    <td className="stat-num text-right font-bold">{row.points}</td>
+                    <td className="stat-num text-right">{row.rounds}</td>
+                    <td className="stat-num text-right">{row.avg.toFixed(1)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {leaderboard.length === 0 && (
+              <p className="py-4 text-muted-foreground">No votes recorded yet.</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
+        {roundResults.length > 0 ? (
+          roundResults.map((r) => {
+            const sorted = [...r.votes].sort((a, b) => b.points - a.points);
+            return (
+              <Card key={r.round.id}>
+                <CardContent className="p-3 sm:p-5">
+                  <h3 className="text-sm font-bold uppercase tracking-wide sm:text-lg">
+                    {roundOpponentLabel(r.round)}
+                  </h3>
+                  <div className="mt-3 overflow-x-auto">
+                    <table className="w-full text-xs sm:text-sm">
+                      <thead>
+                        <tr className="text-left uppercase text-muted-foreground">
+                          <th className="py-1.5 pr-2">Player</th>
+                          <th className="px-2 text-right">Points</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sorted.map((v) => (
+                          <tr key={v.player.id} className="border-t border-border">
+                            <td className="py-1.5 pr-2">
+                              <span className="flex items-center gap-1.5 font-medium uppercase">
+                                <PhotoAvatar
+                                  url={v.player.photo_url}
+                                  name={v.player.name}
+                                  className="size-6 shrink-0 sm:size-8"
+                                />
+                                <span className="min-w-0 break-words leading-tight">{v.player.name}</span>
+                              </span>
+                            </td>
+                            <td className="stat-num whitespace-nowrap px-2 text-right font-bold">
+                              {v.points}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })
+        ) : (
+          <Card>
+            <CardContent className="p-5">
+              <p className="text-muted-foreground">No rounds have votes yet.</p>
+            </CardContent>
+          </Card>
+        )}
       </div>
     </div>
   );

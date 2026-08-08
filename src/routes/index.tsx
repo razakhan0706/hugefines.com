@@ -102,13 +102,14 @@ function Index() {
               </p>
               <ul className="mt-4 space-y-3">
                 {[
-                  ["Dev Patel", "$94", "Late to warm-up ×6"],
-                  ["Josh Reid", "$88", "Pink shorts"],
-                  ["Sam Okafor", "$71", "Shocking parking"],
-                  ["Tom Lacey", "$62", "Dropped a sitter"],
-                ].map(([name, amount, reason], i) => (
+                  ["Dev Patel", "$94", "Late to warm-up ×6", player1.url],
+                  ["Josh Reid", "$88", "Pink shorts", player2.url],
+                  ["Sam Okafor", "$71", "Shocking parking", player3.url],
+                  ["Tom Lacey", "$62", "Dropped a sitter", player4.url],
+                ].map(([name, amount, reason, photo], i) => (
                   <li key={name} className="flex items-center gap-3 border-b border-border pb-3 last:border-0">
                     <span className="stat-num w-6 text-muted-foreground">{i + 1}</span>
+                    <PhotoAvatar url={photo} name={name} className="size-10" />
                     <div className="flex-1">
                       <p className="font-semibold">{name}</p>
                       <p className="text-sm text-muted-foreground">{reason}</p>

@@ -66,7 +66,9 @@ function FinesTab({ data }: { data: TeamBundle }) {
   const totalDiscounted = data.fines.reduce((s, f) => s + (splits.get(f.id)?.discounted ?? 0), 0);
   const byRound = roundTotals(data.fines, data.rounds, splits);
   const byCat = categoryBreakdown(data.fines, data.categories);
-  const awards = seasonAwards(stats, currency).filter((a) => a.title !== "Player of the Season");
+  const awards = seasonAwards(stats, currency).filter(
+    (a) => a.title !== "Player of the Season" && a.title !== "Most Consecutive Weeks",
+  );
   const byMaster = finesMasterBreakdown(data.fines, data.rounds, splits);
   const byOpponent = opponentBreakdown(data.fines, data.rounds, splits);
   const byVenue = venueBreakdown(data.fines, data.rounds, splits);

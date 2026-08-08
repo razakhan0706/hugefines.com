@@ -2,7 +2,12 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { PhotoAvatar } from "@/components/PhotoAvatar";
 import { BarChart3, ClipboardList, Share2, Sparkles, Vote, Users } from "lucide-react";
+import player1 from "@/assets/player-1.jpg.asset.json";
+import player2 from "@/assets/player-2.jpg.asset.json";
+import player3 from "@/assets/player-3.jpg.asset.json";
+import player4 from "@/assets/player-4.jpg.asset.json";
 
 export const Route = createFileRoute("/")({
   head: () => ({

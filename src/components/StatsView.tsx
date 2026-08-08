@@ -306,14 +306,15 @@ function VotesTab({ data }: { data: TeamBundle }) {
   const roundsWithVotes = new Set(data.votes.map((v) => v.round_id)).size;
   const leader = leaderboard[0];
 
-  const mvpAward = seasonAwards(buildPlayerStats(
-    data.players,
-    data.fines,
-    data.rounds,
-    data.categories,
-    data.votes,
-  ), data.team.currency).find((a) => a.title === "Player of the Season");
+  const mvpAward = seasonAwards(
+    buildPlayerStats(data.players, data.fines, data.rounds, data.categories, data.votes),
+    data.team.currency,
+  ).find((a) => a.title === "Player of the Season");
 
+  const streakAward = seasonAwards(
+    buildPlayerStats(data.players, data.fines, data.rounds, data.categories, data.votes),
+    data.team.currency,
+  ).find((a) => a.title === "Most Consecutive Weeks");
 
   const summaryTiles = [
     { label: "Total votes", value: String(totalVotes) },
@@ -337,23 +338,45 @@ function VotesTab({ data }: { data: TeamBundle }) {
         ))}
       </div>
 
-      {mvpAward && (
-        <Card className="border-accent/40">
-          <CardContent className="flex gap-3 p-5">
-            {mvpAward.photo ? (
-              <PhotoAvatar url={mvpAward.photo} name={mvpAward.winner} className="size-11" />
-            ) : (
-              <Trophy className="size-5 shrink-0 text-accent" />
-            )}
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
-                {mvpAward.title}
-              </p>
-              <p className="text-lg font-bold">{mvpAward.winner}</p>
-              <p className="text-sm text-muted-foreground">{mvpAward.detail}</p>
-            </div>
-          </CardContent>
-        </Card>
+      {(mvpAward || streakAward) && (
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {mvpAward && (
+            <Card className="border-accent/40">
+              <CardContent className="flex gap-3 p-5">
+                {mvpAward.photo ? (
+                  <PhotoAvatar url={mvpAward.photo} name={mvpAward.winner} className="size-11" />
+                ) : (
+                  <Trophy className="size-5 shrink-0 text-accent" />
+                )}
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
+                    {mvpAward.title}
+                  </p>
+                  <p className="text-lg font-bold">{mvpAward.winner}</p>
+                  <p className="text-sm text-muted-foreground">{mvpAward.detail}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+          {streakAward && (
+            <Card className="border-accent/40">
+              <CardContent className="flex gap-3 p-5">
+                {streakAward.photo ? (
+                  <PhotoAvatar url={streakAward.photo} name={streakAward.winner} className="size-11" />
+                ) : (
+                  <Trophy className="size-5 shrink-0 text-accent" />
+                )}
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
+                    {streakAward.title}
+                  </p>
+                  <p className="text-lg font-bold">{streakAward.winner}</p>
+                  <p className="text-sm text-muted-foreground">{streakAward.detail}</p>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </div>
       )}
 
       <Card>

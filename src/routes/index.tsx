@@ -148,8 +148,11 @@ function Index() {
             itself.
           </p>
           <Button asChild size="lg" className="mt-7">
-            <Link to="/auth">Create free account</Link>
+            <Link to="/auth">Create account</Link>
           </Button>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Standard team — 20 player profiles, 12 months of usage. No cut of your fines money. All for $19.99
+          </p>
         </div>
       </section>
 

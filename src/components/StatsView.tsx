@@ -273,14 +273,9 @@ function FinesTab({ data }: { data: TeamBundle }) {
 
 function VotesTab({ data }: { data: TeamBundle }) {
   const playerMap = new Map(data.players.map((p) => [p.id, p]));
-  const roundMap = new Map(data.rounds.map((r) => [r.id, r]));
 
   const votePoints = new Map<string, number>();
   const voteRounds = new Map<string, Set<string>>();
-  const roundVotes = new Map<
-    string,
-    { round: (typeof data.rounds)[number]; votes: { player: typeof playerMap extends Map<string, infer V> ? V : never; points: number }[] }
-  >();
 
   for (const v of data.votes) {
     const player = playerMap.get(v.player_id);
@@ -290,14 +285,6 @@ function VotesTab({ data }: { data: TeamBundle }) {
     const rounds = voteRounds.get(v.player_id) ?? new Set<string>();
     rounds.add(v.round_id);
     voteRounds.set(v.player_id, rounds);
-
-    const entry = roundVotes.get(v.round_id);
-    if (!entry) {
-      const round = roundMap.get(v.round_id);
-      if (!round) continue;
-      roundVotes.set(v.round_id, { round, votes: [] });
-    }
-    roundVotes.get(v.round_id)!.votes.push({ player, points: v.points });
   }
 
   const leaderboard = [...votePoints.entries()]
@@ -317,10 +304,6 @@ function VotesTab({ data }: { data: TeamBundle }) {
   const roundsWithVotes = new Set(data.votes.map((v) => v.round_id)).size;
   const leader = leaderboard[0];
 
-  const roundResults = [...roundVotes.values()].sort(
-    (a, b) => a.round.round_number - b.round.round_number,
-  );
-
   const mvpAward = seasonAwards(buildPlayerStats(
     data.players,
     data.fines,
@@ -328,6 +311,7 @@ function VotesTab({ data }: { data: TeamBundle }) {
     data.categories,
     data.votes,
   ), data.team.currency).find((a) => a.title === "Player of the Season");
+
 
   const summaryTiles = [
     { label: "Total votes", value: String(totalVotes) },

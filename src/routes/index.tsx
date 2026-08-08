@@ -84,15 +84,18 @@ function Index() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild size="lg">
-                <Link to="/auth">Start your team</Link>
+                <Link to="/auth">Create your team</Link>
               </Button>
               <Button asChild size="lg" variant="outline">
-                <a href="#how">See how it works</a>
+                <Link to="/auth">Start 7 day free trial</Link>
               </Button>
             </div>
             <p className="mt-4 text-sm text-muted-foreground">
               Standard team — 20 player profiles, 12 months of usage. No cut of your fines money. All for $19.99
             </p>
+            <a href="#how" className="mt-2 inline-block text-sm font-medium text-accent hover:underline">
+              See how it works
+            </a>
           </div>
 
           <Card className="self-center border-2">
@@ -147,12 +150,20 @@ function Index() {
             Create a season, add up to 20 players, and start fining. The end-of-season party funds
             itself.
           </p>
-          <Button asChild size="lg" className="mt-7">
-            <Link to="/auth">Create account</Link>
-          </Button>
+          <div className="mt-7 flex flex-wrap justify-center gap-3">
+            <Button asChild size="lg">
+              <Link to="/auth">Create your team</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline">
+              <Link to="/auth">Start 7 day free trial</Link>
+            </Button>
+          </div>
           <p className="mt-4 text-sm text-muted-foreground">
             Standard team — 20 player profiles, 12 months of usage. No cut of your fines money. All for $19.99
           </p>
+          <a href="#how" className="mt-2 inline-block text-sm font-medium text-accent hover:underline">
+            See how it works
+          </a>
         </div>
       </section>
 

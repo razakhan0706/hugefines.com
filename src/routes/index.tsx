@@ -142,7 +142,7 @@ function Index() {
 
       <section className="border-t border-border bg-secondary">
         <div className="mx-auto max-w-6xl px-4 py-14 text-center">
-          <h2 className="text-3xl font-bold">Set your team up in five minutes</h2>
+          <h2 className="text-3xl font-bold">Set your team up in a few minutes</h2>
           <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
             Create a season, add up to 20 players, and start fining. The end-of-season party funds
             itself.

@@ -239,6 +239,7 @@ export interface PlayerStat {
   streak: number;
   votePoints: number;
   voteRounds: number;
+  voteStreak: number;
 }
 
 export function buildPlayerStats(
@@ -291,6 +292,18 @@ export function buildPlayerStats(
 
       const myVotes = votes.filter((v) => v.player_id === player.id);
 
+      let voteStreak = 0;
+      let bestVoteStreak = 0;
+      const votedRoundIds = new Set(myVotes.map((v) => v.round_id));
+      for (const r of orderedRounds) {
+        if (votedRoundIds.has(r.id)) {
+          voteStreak += 1;
+          bestVoteStreak = Math.max(bestVoteStreak, voteStreak);
+        } else {
+          voteStreak = 0;
+        }
+      }
+
       return {
         player,
         total,
@@ -304,6 +317,7 @@ export function buildPlayerStats(
         streak: best,
         votePoints: myVotes.reduce((s, v) => s + v.points, 0),
         voteRounds: myVotes.length,
+        voteStreak: bestVoteStreak,
       };
     })
     .sort((a, b) => b.total - a.total);
@@ -369,7 +383,18 @@ export function seasonAwards(stats: PlayerStat[], currency: string): Award[] {
       title: "Player of the Season",
       winner: mvp.player.name,
       photo: mvp.player.photo_url,
-      detail: `${mvp.votePoints} votes across ${mvp.voteRounds} rounds`,
+      detail: `${mvp.votePoints} votes`,
+    });
+  }
+
+  const mostConsistent = [...stats].sort((a, b) => b.voteStreak - a.voteStreak)[0];
+  if (mostConsistent && mostConsistent.voteStreak > 0) {
+    const weeks = mostConsistent.voteStreak;
+    awards.push({
+      title: "Most Consecutive Weeks",
+      winner: mostConsistent.player.name,
+      photo: mostConsistent.player.photo_url,
+      detail: `Votes in ${weeks} consecutive week${weeks === 1 ? "" : "s"}`,
     });
   }
 

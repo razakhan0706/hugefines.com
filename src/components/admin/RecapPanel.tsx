@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Sparkles, Trash2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { buildPlayerStats, money, roundDayLabel } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 
@@ -20,6 +21,7 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const run = useServerFn(generateRecap);
   const [scope, setScope] = useState<string>(data.rounds.at(-1)?.id ?? "season");
   const [tone, setTone] = useState("Cheeky clubhouse banter");
+  const [includeVotes, setIncludeVotes] = useState(false);
   const [busy, setBusy] = useState(false);
 
   function buildSummary() {
@@ -51,6 +53,26 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
         .slice(0, 5)
         .map((s) => `- ${s.player.name}: ${money(s.total, data.team.currency)} from ${s.count} fines`),
     ];
+
+    if (includeVotes) {
+      const votes = isRound ? data.votes.filter((v) => v.round_id === scope) : data.votes;
+      const tally = new Map<string, number>();
+      for (const v of votes) tally.set(v.player_id, (tally.get(v.player_id) ?? 0) + v.points);
+      const board = [...tally.entries()]
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 8)
+        .map(([pid, pts]) => `- ${names.get(pid) ?? "Someone"}: ${pts} votes`);
+      lines.push(
+        "",
+        votes.length
+          ? `Player votes (${data.team.vote_format}) — include vote commentary, call out the winners and the snubs:`
+          : "Player votes: none recorded for this scope.",
+        ...board,
+      );
+    } else {
+      lines.push("", "IMPORTANT: Player votes are secret. Do not mention votes, voting, or best-player awards at all.");
+    }
+
     return lines.join("\n");
   }
 
@@ -125,6 +147,17 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               <Sparkles className="size-4" />
               {busy ? "Writing…" : "Generate recap"}
             </Button>
+          </div>
+          <div className="flex items-center justify-between gap-3 rounded-md border p-3 sm:col-span-3">
+            <div>
+              <p className="text-sm font-medium">Include votes in the recap</p>
+              <p className="text-xs text-muted-foreground">
+                {includeVotes
+                  ? "The AI will add vote commentary and name the leaders."
+                  : "Votes stay secret — the AI won't mention them."}
+              </p>
+            </div>
+            <Switch checked={includeVotes} onCheckedChange={setIncludeVotes} />
           </div>
         </CardContent>
       </Card>

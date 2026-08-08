@@ -389,11 +389,12 @@ export function seasonAwards(stats: PlayerStat[], currency: string): Award[] {
 
   const mostConsistent = [...stats].sort((a, b) => b.voteStreak - a.voteStreak)[0];
   if (mostConsistent && mostConsistent.voteStreak > 0) {
+    const weeks = mostConsistent.voteStreak;
     awards.push({
       title: "Most Consecutive Weeks",
       winner: mostConsistent.player.name,
       photo: mostConsistent.player.photo_url,
-      detail: `Votes in ${mostConsistent.voteStreak} consecutive weeks`,
+      detail: `Votes in ${weeks} consecutive week${weeks === 1 ? "" : "s"}`,
     });
   }
 

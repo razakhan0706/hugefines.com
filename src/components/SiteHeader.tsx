@@ -34,11 +34,12 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="flex size-8 items-center justify-center rounded-md bg-accent text-accent-foreground">
-            <Trophy className="size-4" />
-          </span>
-          <span className="font-display text-lg font-extrabold tracking-tight">Huge Fines</span>
+        <Link to="/" className="flex items-center">
+          <img
+            src={logoAsset.url}
+            alt="Huge Fines"
+            className="h-8 w-auto md:h-10"
+          />
         </Link>
         <nav className="flex items-center gap-2">
           {email ? (

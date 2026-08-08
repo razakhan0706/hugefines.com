@@ -68,38 +68,38 @@ function Index() {
       <SiteHeader />
 
       <section className="border-b border-border">
-        <div className="mx-auto grid max-w-6xl gap-10 px-4 py-16 md:grid-cols-[1.1fr_0.9fr] md:py-24">
-          <div>
+        <div className="mx-auto grid max-w-6xl gap-6 px-4 py-8 md:grid-cols-[1.1fr_0.9fr] md:items-center md:gap-10 md:py-16">
+          <div className="order-2 md:order-1">
             <span className="inline-flex items-center rounded-full bg-accent-soft px-3 py-1 text-xs font-semibold uppercase tracking-widest text-accent-strong">
               BUILT FOR LOCAL SPORT
             </span>
-            <h1 className="mt-5 text-5xl font-extrabold leading-[1.05] md:text-6xl">
+            <h1 className="mt-3 text-4xl font-extrabold leading-[1.05] md:mt-5 md:text-6xl">
               Your team's fines book,
               <span className="text-accent"> finally worth reading.</span>
             </h1>
-            <p className="mt-5 max-w-xl text-lg text-muted-foreground">
+            <p className="mt-3 max-w-xl text-base text-muted-foreground md:mt-5 md:text-lg">
               Kill the spreadsheet. Log fines for bad haircuts and worse parking. Run
               player-of-the-season voting, and let the whole team follow a live leaderboard all
               season.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button asChild size="lg">
+            <div className="mt-6 grid grid-cols-2 gap-3">
+              <Button asChild size="lg" className="w-full text-xs sm:text-sm">
                 <Link to="/auth">Create your team</Link>
               </Button>
-              <Button asChild size="lg" variant="outline">
+              <Button asChild size="lg" variant="outline" className="w-full text-xs sm:text-sm">
                 <Link to="/auth">Start 7 day free trial</Link>
               </Button>
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">
+            <p className="mt-3 text-xs text-muted-foreground sm:text-sm">
               Standard team — 20 player profiles, 12 months of usage. No cut of your fines money. All for $19.99
             </p>
-            <a href="#how" className="mt-2 inline-block text-sm font-medium text-accent hover:underline">
-              See how it works
-            </a>
+            <Button asChild size="sm" variant="outline" className="mt-2 w-full text-xs sm:w-auto">
+              <a href="#how">See how it works</a>
+            </Button>
           </div>
 
-          <Card className="self-center border-2">
-            <CardContent className="p-6">
+          <Card className="order-1 self-center border-2 md:order-2">
+            <CardContent className="p-4 md:p-6">
               <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
                 Live fines leaderboard
               </p>
@@ -150,20 +150,20 @@ function Index() {
             Create a season, add up to 20 players, and start fining. The end-of-season party funds
             itself.
           </p>
-          <div className="mt-7 flex flex-wrap justify-center gap-3">
-            <Button asChild size="lg">
+          <div className="mx-auto mt-7 grid max-w-md grid-cols-2 gap-3">
+            <Button asChild size="lg" className="w-full text-xs sm:text-sm">
               <Link to="/auth">Create your team</Link>
             </Button>
-            <Button asChild size="lg" variant="outline">
+            <Button asChild size="lg" variant="outline" className="w-full text-xs sm:text-sm">
               <Link to="/auth">Start 7 day free trial</Link>
             </Button>
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">
+          <p className="mt-4 text-xs text-muted-foreground sm:text-sm">
             Standard team — 20 player profiles, 12 months of usage. No cut of your fines money. All for $19.99
           </p>
-          <a href="#how" className="mt-2 inline-block text-sm font-medium text-accent hover:underline">
-            See how it works
-          </a>
+          <Button asChild size="sm" variant="outline" className="mt-2 text-xs">
+            <a href="#how">See how it works</a>
+          </Button>
         </div>
       </section>
 

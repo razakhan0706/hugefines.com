@@ -235,6 +235,14 @@ function Dashboard() {
             </Link>
           ))}
         </div>
+
+        <div className="mt-16 flex flex-col items-center justify-center md:mt-24">
+          <img
+            src={logoAsset.url}
+            alt="Huge Fines"
+            className="h-40 w-auto opacity-60 md:h-56"
+          />
+        </div>
       </main>
     </div>
   );

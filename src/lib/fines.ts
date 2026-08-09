@@ -541,7 +541,7 @@ export function distinctValues<T>(rows: T[], pick: (row: T) => string | null | u
 export interface VoteBreakdown {
   label: string;
   points: number;
-  matches: number;
+  weeks: number;
   avg: number;
   photo?: string | null;
 }
@@ -570,7 +570,7 @@ export function voteRoundAttributeBreakdown(
     .map(([label, v]) => ({
       label,
       points: v.points,
-      matches: v.rounds.size,
+      weeks: v.rounds.size,
       avg: v.rounds.size ? v.points / v.rounds.size : 0,
       photo: v.photo,
     }))

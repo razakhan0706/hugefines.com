@@ -12,7 +12,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Trash2, Pencil, Check, X } from "lucide-react";
-import { money } from "@/lib/fines";
+import { money, resultBadge } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { uploadPhoto } from "@/lib/photos";
 import { PhotoAvatar } from "@/components/PhotoAvatar";

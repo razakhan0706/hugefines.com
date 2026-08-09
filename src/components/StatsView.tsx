@@ -21,6 +21,7 @@ import {
   money,
   opponentBreakdown,
   resultBreakdown,
+  resultBadge,
   roundTotals,
   seasonAwards,
   venueBreakdown,

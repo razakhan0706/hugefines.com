@@ -425,6 +425,23 @@ function VotesTab({ data }: { data: TeamBundle }) {
         </CardContent>
       </Card>
 
+      <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
+        <VoteBreakdownCard
+          title="Votes by opponent"
+          rows={votesByOpponent(data.votes, data.rounds)}
+          empty="Add opponents to your rounds to see this."
+        />
+        <VoteBreakdownCard
+          title="Votes by venue"
+          rows={votesByVenue(data.votes, data.rounds)}
+          empty="Add venues to your rounds to see this."
+        />
+        <VoteBreakdownCard
+          title="Votes by result"
+          rows={votesByResult(data.votes, data.rounds)}
+          empty="Add results to your rounds to see this."
+        />
+      </div>
     </div>
   );
 }

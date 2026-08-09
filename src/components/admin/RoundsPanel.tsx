@@ -485,7 +485,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                       />
                       <div className="min-w-0 flex-1">
                         <p className="font-semibold uppercase leading-tight">
-                          {r.opponent ? `vs ${r.opponent}` : roundDayLabel(r)}
+                          {r.opponent ? `vs ${r.opponent}` : `Round: ${roundDayLabel(r)}`}
                         </p>
                         {r.opponent && (
                           <p className="text-sm text-muted-foreground leading-tight">

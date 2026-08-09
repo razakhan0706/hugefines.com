@@ -9,6 +9,7 @@ import { VotingPanel } from "@/components/admin/VotingPanel";
 import { RecapPanel } from "@/components/admin/RecapPanel";
 import { SettingsPanel } from "@/components/admin/SettingsPanel";
 import { StatsView } from "@/components/StatsView";
+import logoAsset from "@/assets/Website_Logo.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/team/$teamId")({
   head: () => ({

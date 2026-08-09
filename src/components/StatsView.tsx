@@ -507,6 +507,7 @@ function BreakdownCard({
   showUnit = true,
   showAvg = true,
   showDiscount = true,
+  resultMode = false,
 }: {
   title: string;
   rows: Breakdown[];
@@ -516,6 +517,7 @@ function BreakdownCard({
   showUnit?: boolean;
   showAvg?: boolean;
   showDiscount?: boolean;
+  resultMode?: boolean;
 }) {
   return (
     <Card>
@@ -542,7 +544,17 @@ function BreakdownCard({
                   <tr key={r.label} className="border-t border-border">
                     <td className="py-1.5 pr-2">
                       <span className="flex items-center gap-1.5 font-medium uppercase">
-                        <PhotoAvatar url={r.photo} name={r.label} className="size-6 shrink-0 sm:size-8" />
+                        {resultMode ? (
+                          <span
+                            className={`inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-[10px] font-bold sm:size-8 sm:text-xs ${
+                              resultBadge(r.label)?.className ?? "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {resultBadge(r.label)?.letter ?? r.label[0]}
+                          </span>
+                        ) : (
+                          <PhotoAvatar url={r.photo} name={r.label} className="size-6 shrink-0 sm:size-8" />
+                        )}
                         <span className="min-w-0 break-words leading-tight">{r.label}</span>
                       </span>
                     </td>

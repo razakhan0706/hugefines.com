@@ -133,7 +133,7 @@ function Carousel() {
           </p>
           <div className="h-px bg-border" />
           <p className="text-sm leading-relaxed text-muted-foreground">
-            <span className="font-semibold text-foreground">Votes:</span> Liam picked up all three votes in a tight round, while the hard workers around the stumps kept collecting the two-vote cards.
+            <span className="font-semibold text-foreground">Votes:</span> Liam picked up all three votes in a dominant round, while the minor votes were spread evenly amongst other team members.
           </p>
         </div>
       ),

@@ -82,7 +82,7 @@ const VOTES_BOARD = [
   ["Liam", "34", "4 × 3-vote weeks", player4.url],
   ["Marcus", "28", "2 × 3-vote weeks", player1.url],
   ["Tom Lacey", "22", "1 × 3-vote week", player2.url],
-  ["Dev Patel", "18", "Consistent mentions", player3.url],
+  ["Dev Patel", "18", "Consistently polled", player3.url],
 ];
 
 function Carousel() {

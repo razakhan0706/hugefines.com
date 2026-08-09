@@ -129,11 +129,11 @@ function Carousel() {
       content: (
         <div className="mt-2 space-y-3 md:mt-4">
           <p className="text-sm leading-relaxed text-muted-foreground">
-            <span className="font-semibold text-foreground">Week 6:</span> Ahmed cleaned up with a 3-2-1 haul after a tight finish, while Dev Patel's pre-game warm-up routine continues to fund the team party.
+            <span className="font-semibold text-foreground">Fines:</span> Rubbish chat and dropped catches topped the week, with the usual suspects keeping the party fund ticking over.
           </p>
           <div className="h-px bg-border" />
           <p className="text-sm leading-relaxed text-muted-foreground">
-            <span className="font-semibold text-foreground">Season so far:</span> Berowra has cost the squad $53 in fines across two venues. The most expensive habit? Rubbish chat — mostly at afternoon tea.
+            <span className="font-semibold text-foreground">Votes:</span> Liam picked up a 3-2-1 haul after a tight finish, while the midfield workhorse keeps racking up the 2s.
           </p>
         </div>
       ),

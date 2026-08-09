@@ -494,6 +494,15 @@ export function venueBreakdown(fines: Fine[], rounds: Round[], splits?: Map<stri
 }
 
 /** Buckets results into Win / Loss / Draw-ish groups using the free-text result. */
+export function resultBadge(result: string | null | undefined) {
+  const v = (result ?? "").toLowerCase();
+  if (!v.trim()) return null;
+  if (/\bwon|\bwin/.test(v)) return { letter: "W", className: "bg-accent text-accent-foreground" };
+  if (/\blost|\bloss|\bdefeat/.test(v)) return { letter: "L", className: "bg-destructive text-destructive-foreground" };
+  if (/draw|tie|abandon|wash/.test(v)) return { letter: "D", className: "bg-primary text-primary-foreground" };
+  return null;
+}
+
 export function resultBucket(result: string | null | undefined) {
   const v = (result ?? "").toLowerCase();
   if (!v.trim()) return null;

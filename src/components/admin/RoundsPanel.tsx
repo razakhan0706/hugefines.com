@@ -12,7 +12,7 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Trash2, Pencil, Check, X } from "lucide-react";
-import { money } from "@/lib/fines";
+import { money, resultBadge } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { uploadPhoto } from "@/lib/photos";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
@@ -27,16 +27,6 @@ import {
 
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const RESULT_OPTIONS = ["Won", "Lost", "Drawn"];
-
-  function resultBadge(result: string | null | undefined) {
-    const r = (result ?? "").toLowerCase();
-    if (r.startsWith("won") || r.startsWith("win"))
-      return { letter: "W", className: "bg-accent text-accent-foreground" };
-    if (r.startsWith("lost") || r.startsWith("los"))
-      return { letter: "L", className: "bg-destructive text-destructive-foreground" };
-    if (r) return { letter: "D", className: "bg-primary text-primary-foreground" };
-    return null;
-  }
 
   const capSplits = applyCaps(data.fines, data.rounds);
   const opponentOptions = distinctValues(data.rounds, (r) => r.opponent);

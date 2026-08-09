@@ -21,6 +21,7 @@ import {
   money,
   opponentBreakdown,
   resultBreakdown,
+  resultBadge,
   roundTotals,
   seasonAwards,
   venueBreakdown,
@@ -262,6 +263,7 @@ function FinesTab({ data }: { data: TeamBundle }) {
           currency={currency}
           unit="Weeks"
           empty="Add results to your rounds to see this."
+          resultMode
         />
         <BreakdownCard
           title="Fines by week"
@@ -440,6 +442,7 @@ function VotesTab({ data }: { data: TeamBundle }) {
           title="Votes by result"
           rows={votesByResult(data.votes, data.rounds)}
           empty="Add results to your rounds to see this."
+          resultMode
         />
       </div>
     </div>
@@ -450,10 +453,12 @@ function VoteBreakdownCard({
   title,
   rows,
   empty,
+  resultMode = false,
 }: {
   title: string;
   rows: VoteBreakdown[];
   empty: string;
+  resultMode?: boolean;
 }) {
   return (
     <Card>
@@ -477,7 +482,17 @@ function VoteBreakdownCard({
                   <tr key={r.label} className="border-t border-border">
                     <td className="py-1.5 pr-2">
                       <span className="flex items-center gap-1.5 font-medium uppercase">
-                        <PhotoAvatar url={r.photo} name={r.label} className="size-6 shrink-0 sm:size-8" />
+                        {resultMode ? (
+                          <span
+                            className={`inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-[10px] font-bold sm:size-8 sm:text-xs ${
+                              resultBadge(r.label)?.className ?? "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {resultBadge(r.label)?.letter ?? r.label[0]}
+                          </span>
+                        ) : (
+                          <PhotoAvatar url={r.photo} name={r.label} className="size-6 shrink-0 sm:size-8" />
+                        )}
                         <span className="min-w-0 break-words leading-tight">{r.label}</span>
                       </span>
                     </td>
@@ -505,6 +520,7 @@ function BreakdownCard({
   showUnit = true,
   showAvg = true,
   showDiscount = true,
+  resultMode = false,
 }: {
   title: string;
   rows: Breakdown[];
@@ -514,6 +530,7 @@ function BreakdownCard({
   showUnit?: boolean;
   showAvg?: boolean;
   showDiscount?: boolean;
+  resultMode?: boolean;
 }) {
   return (
     <Card>
@@ -540,7 +557,17 @@ function BreakdownCard({
                   <tr key={r.label} className="border-t border-border">
                     <td className="py-1.5 pr-2">
                       <span className="flex items-center gap-1.5 font-medium uppercase">
-                        <PhotoAvatar url={r.photo} name={r.label} className="size-6 shrink-0 sm:size-8" />
+                        {resultMode ? (
+                          <span
+                            className={`inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-[10px] font-bold sm:size-8 sm:text-xs ${
+                              resultBadge(r.label)?.className ?? "bg-muted text-muted-foreground"
+                            }`}
+                          >
+                            {resultBadge(r.label)?.letter ?? r.label[0]}
+                          </span>
+                        ) : (
+                          <PhotoAvatar url={r.photo} name={r.label} className="size-6 shrink-0 sm:size-8" />
+                        )}
                         <span className="min-w-0 break-words leading-tight">{r.label}</span>
                       </span>
                     </td>

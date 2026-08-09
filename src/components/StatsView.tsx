@@ -26,6 +26,10 @@ import {
   venueBreakdown,
   type Breakdown,
   roundOpponentLabel,
+  votesByOpponent,
+  votesByVenue,
+  votesByResult,
+  type VoteBreakdown,
 } from "@/lib/fines";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
 import type { TeamBundle } from "@/lib/useTeamData";

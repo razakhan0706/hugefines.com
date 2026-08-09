@@ -468,7 +468,7 @@ function VoteBreakdownCard({
                 <tr className="text-left uppercase text-muted-foreground">
                   <th className="py-1.5 pr-2">Name</th>
                   <th className="px-2 text-right">Votes</th>
-                  <th className="px-2 text-right">Matches</th>
+                  <th className="px-2 text-right">Weeks</th>
                   <th className="pl-2 text-right">Avg</th>
                 </tr>
               </thead>
@@ -482,7 +482,7 @@ function VoteBreakdownCard({
                       </span>
                     </td>
                     <td className="stat-num whitespace-nowrap px-2 text-right font-bold">{r.points}</td>
-                    <td className="stat-num whitespace-nowrap px-2 text-right">{r.matches}</td>
+                    <td className="stat-num whitespace-nowrap px-2 text-right">{r.weeks}</td>
                     <td className="stat-num whitespace-nowrap pl-2 text-right">{r.avg.toFixed(1)}</td>
                   </tr>
                 ))}

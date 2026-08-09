@@ -94,7 +94,7 @@ function AuthPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-secondary px-4 py-12">
       <Link to="/" className="mb-8 flex items-center justify-center">
-        <img src={logoAsset.url} alt="Huge Fines" className="h-20 w-auto md:h-24" />
+        <img src={logoAsset.url} alt="Huge Fines" className="h-32 w-auto md:h-40" />
       </Link>
 
       <Card className="w-full max-w-sm">

@@ -175,7 +175,7 @@ function Index() {
 
       <footer className="border-t border-border py-10">
         <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-4 text-center">
-          <img src={logoAsset.url} alt="Huge Fines" className="h-12 w-auto" />
+          <img src={logoAsset.url} alt="Huge Fines" className="h-20 w-auto md:h-24" />
           <p className="text-sm text-muted-foreground">
             Fines, votes and season stats for sports teams.
           </p>

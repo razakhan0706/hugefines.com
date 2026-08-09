@@ -179,9 +179,6 @@ function Index() {
           <p className="text-sm text-muted-foreground">
             Fines, votes and season stats for sports teams.
           </p>
-          <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} Huge Fines
-          </p>
         </div>
       </footer>
     </div>

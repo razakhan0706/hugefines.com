@@ -442,6 +442,7 @@ function VotesTab({ data }: { data: TeamBundle }) {
           title="Votes by result"
           rows={votesByResult(data.votes, data.rounds)}
           empty="Add results to your rounds to see this."
+          resultMode
         />
       </div>
     </div>

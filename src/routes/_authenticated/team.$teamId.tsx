@@ -49,7 +49,7 @@ function TeamWorkspace() {
               <img
                 src={logoAsset.url}
                 alt="Huge Fines"
-                className="h-16 w-auto opacity-60 md:h-20"
+                className="h-16 w-auto md:h-20"
               />
             </div>
 

@@ -8,6 +8,10 @@ import player1 from "@/assets/player-1.jpg.asset.json";
 import player2 from "@/assets/player-2.jpg.asset.json";
 import player3 from "@/assets/player-3.jpg.asset.json";
 import player4 from "@/assets/player-4.jpg.asset.json";
+import logoAsset from "@/assets/Website_Logo.png.asset.json";
+
+const SHARE_IMAGE =
+  "https://pixel-perfect-showcase-912.lovable.app/__l5e/assets-v1/47e3b408-fe2a-4307-be43-222ac817809d/huge-fines-share.png";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -24,6 +28,10 @@ export const Route = createFileRoute("/")({
         content:
           "Replace the fines spreadsheet. Log fines in seconds, run 5-4-3-2-1 voting and share a live team link.",
       },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: SHARE_IMAGE },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: SHARE_IMAGE },
     ],
   }),
   component: Index,
@@ -165,8 +173,16 @@ function Index() {
         </div>
       </section>
 
-      <footer className="border-t border-border py-8 text-center text-sm text-muted-foreground">
-        Huge Fines — fines, votes and stats for sports teams.
+      <footer className="border-t border-border py-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-4 text-center">
+          <img src={logoAsset.url} alt="Huge Fines" className="h-12 w-auto" />
+          <p className="text-sm text-muted-foreground">
+            Fines, votes and season stats for sports teams.
+          </p>
+          <p className="text-xs text-muted-foreground">
+            © {new Date().getFullYear()} Huge Fines
+          </p>
+        </div>
       </footer>
     </div>
   );

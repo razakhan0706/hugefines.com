@@ -4,6 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { fetchTeamBundle } from "@/lib/useTeamData";
 import { StatsView } from "@/components/StatsView";
 import { Card, CardContent } from "@/components/ui/card";
+import logoAsset from "@/assets/Website_Logo.png.asset.json";
+
+const SHARE_IMAGE =
+  "https://pixel-perfect-showcase-912.lovable.app/__l5e/assets-v1/47e3b408-fe2a-4307-be43-222ac817809d/huge-fines-share.png";
 
 export const Route = createFileRoute("/t/$slug")({
   head: () => ({
@@ -12,6 +16,10 @@ export const Route = createFileRoute("/t/$slug")({
       { name: "description", content: "Live team fines, stats and season awards." },
       { property: "og:title", content: "Live fines board — Huge Fines" },
       { property: "og:description", content: "Live team fines, stats and season awards." },
+      { property: "og:type", content: "website" },
+      { property: "og:image", content: SHARE_IMAGE },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:image", content: SHARE_IMAGE },
     ],
   }),
   component: PublicBoard,
@@ -39,8 +47,8 @@ function PublicBoard() {
     <div className="min-h-screen">
       <header className="border-b border-border">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-          <Link to="/" className="text-lg font-bold">
-            Huge<span className="text-accent">Fines</span>
+          <Link to="/" className="flex items-center">
+            <img src={logoAsset.url} alt="Huge Fines" className="h-8 w-auto md:h-10" />
           </Link>
           <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
             Live board
@@ -81,6 +89,14 @@ function PublicBoard() {
           </>
         )}
       </main>
+      <footer className="mt-10 border-t border-border py-10">
+        <div className="mx-auto flex max-w-6xl flex-col items-center gap-3 px-4 text-center">
+          <img src={logoAsset.url} alt="Huge Fines" className="h-12 w-auto" />
+          <p className="text-sm text-muted-foreground">
+            Fines, votes and season stats for sports teams.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 }

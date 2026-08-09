@@ -237,14 +237,14 @@ function FinesTab({ data }: { data: TeamBundle }) {
           title="Fines master"
           rows={byMaster}
           currency={currency}
-          unit="Rounds"
+          unit="Weeks"
           empty="Add a fines master to a round to see this."
         />
         <BreakdownCard
           title="Fines by opponent"
           rows={byOpponent}
           currency={currency}
-          unit="Matches"
+          unit="Weeks"
           empty="Add opponents to your rounds to see this."
           showDiscount={false}
         />
@@ -252,7 +252,7 @@ function FinesTab({ data }: { data: TeamBundle }) {
           title="Fines by venue"
           rows={byVenue}
           currency={currency}
-          unit="Matches"
+          unit="Weeks"
           empty="Add venues to your rounds to see this."
           showDiscount={false}
         />
@@ -260,14 +260,14 @@ function FinesTab({ data }: { data: TeamBundle }) {
           title="Fines by result"
           rows={byResult}
           currency={currency}
-          unit="Matches"
+          unit="Weeks"
           empty="Add results to your rounds to see this."
         />
         <BreakdownCard
           title="Fines by week"
           rows={byWeek}
           currency={currency}
-          unit="Matches"
+          unit="Weeks"
           empty="Add rounds to see this."
           showUnit={false}
           showAvg={false}

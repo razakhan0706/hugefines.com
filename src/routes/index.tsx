@@ -91,31 +91,11 @@ function Index() {
             </p>
           </div>
 
-          <Card className="order-2 self-center border-2 md:col-start-2 md:row-span-2 md:row-start-1">
-            <CardContent className="p-3 md:p-6">
-              <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
-                Live fines leaderboard
-              </p>
-              <ul className="mt-2 space-y-1 md:mt-4 md:space-y-3">
-                {[
-                  ["Dev Patel", "$94", "Late to warm-up ×6", player1.url],
-                  ["Josh Reid", "$88", "Pink shorts", player2.url],
-                  ["Sam Okafor", "$71", "Shocking parking", player3.url],
-                  ["Tom Lacey", "$62", "Dropped a sitter", player4.url],
-                ].map(([name, amount, reason, photo], i) => (
-                  <li key={name} className="flex items-center gap-2 border-b border-border pb-1.5 last:border-0 md:gap-3 md:pb-3">
-                    <span className="stat-num w-5 text-xs text-muted-foreground md:w-6">{i + 1}</span>
-                    <PhotoAvatar url={photo} name={name} className="size-8 md:size-10" />
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold md:text-base">{name}</p>
-                      <p className="text-xs text-muted-foreground">{reason}</p>
-                    </div>
-                    <span className="stat-num text-base font-bold text-accent md:text-xl">{amount}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+          <div className="order-2 self-center md:col-start-2 md:row-span-2 md:row-start-1">
+            <div className="relative">
+              <Carousel />
+            </div>
+          </div>
 
           <div className="order-3 flex flex-col gap-3 md:col-start-1 md:row-start-2 md:self-start">
             <Button asChild size="sm" variant="outline" className="w-full text-xs sm:w-auto">

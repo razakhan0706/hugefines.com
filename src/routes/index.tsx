@@ -71,6 +71,116 @@ const FEATURES = [
   },
 ];
 
+const FINES_BOARD = [
+  ["Dev Patel", "$94", "Late to warm-up ×6", player1.url],
+  ["Josh Reid", "$88", "Pink shorts", player2.url],
+  ["Sam Okafor", "$71", "Shocking parking", player3.url],
+  ["Tom Lacey", "$62", "Dropped a sitter", player4.url],
+];
+
+const VOTES_BOARD = [
+  ["Ahmed", "34", "4 × 3-vote weeks", player4.url],
+  ["Marcus", "28", "2 × 3-vote weeks", player1.url],
+  ["Tom Lacey", "22", "1 × 3-vote week", player2.url],
+  ["Dev Patel", "18", "Consistent mentions", player3.url],
+];
+
+function Carousel() {
+  const [index, setIndex] = useState(0);
+  const slides = [
+    {
+      label: "Live fines leaderboard",
+      content: (
+        <ul className="mt-2 space-y-1 md:mt-4 md:space-y-3">
+          {FINES_BOARD.map(([name, amount, reason, photo], i) => (
+            <li key={name} className="flex items-center gap-2 border-b border-border pb-1.5 last:border-0 md:gap-3 md:pb-3">
+              <span className="stat-num w-5 text-xs text-muted-foreground md:w-6">{i + 1}</span>
+              <PhotoAvatar url={photo} name={name} className="size-8 md:size-10" />
+              <div className="flex-1">
+                <p className="text-sm font-semibold md:text-base">{name}</p>
+                <p className="text-xs text-muted-foreground">{reason}</p>
+              </div>
+              <span className="stat-num text-base font-bold text-accent md:text-xl">{amount}</span>
+            </li>
+          ))}
+        </ul>
+      ),
+    },
+    {
+      label: "Live voting leaderboard",
+      content: (
+        <ul className="mt-2 space-y-1 md:mt-4 md:space-y-3">
+          {VOTES_BOARD.map(([name, points, reason, photo], i) => (
+            <li key={name} className="flex items-center gap-2 border-b border-border pb-1.5 last:border-0 md:gap-3 md:pb-3">
+              <span className="stat-num w-5 text-xs text-muted-foreground md:w-6">{i + 1}</span>
+              <PhotoAvatar url={photo} name={name} className="size-8 md:size-10" />
+              <div className="flex-1">
+                <p className="text-sm font-semibold md:text-base">{name}</p>
+                <p className="text-xs text-muted-foreground">{reason}</p>
+              </div>
+              <span className="stat-num text-base font-bold text-accent md:text-xl">{points}</span>
+            </li>
+          ))}
+        </ul>
+      ),
+    },
+    {
+      label: "AI season recap",
+      content: (
+        <div className="mt-2 space-y-3 md:mt-4">
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            <span className="font-semibold text-foreground">Week 6:</span> Ahmed cleaned up with a 3-2-1 haul after a tight finish, while Dev Patel's pre-game warm-up routine continues to fund the team party.
+          </p>
+          <div className="h-px bg-border" />
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            <span className="font-semibold text-foreground">Season so far:</span> Berowra has cost the squad $53 in fines across two venues. The most expensive habit? Rubbish chat — mostly at afternoon tea.
+          </p>
+        </div>
+      ),
+    },
+  ];
+
+  const prev = () => setIndex((i) => (i === 0 ? slides.length - 1 : i - 1));
+  const next = () => setIndex((i) => (i === slides.length - 1 ? 0 : i + 1));
+
+  return (
+    <div className="relative">
+      <Card className="border-2">
+        <CardContent className="p-3 md:p-6">
+          <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+            {slides[index].label}
+          </p>
+          {slides[index].content}
+        </CardContent>
+      </Card>
+      <div className="mt-3 flex items-center justify-center gap-3">
+        <button
+          onClick={prev}
+          className="flex size-9 items-center justify-center rounded-full border border-border bg-background text-foreground transition hover:bg-muted"
+          aria-label="Previous"
+        >
+          <ChevronLeft className="size-5" />
+        </button>
+        <div className="flex gap-1.5">
+          {slides.map((_, i) => (
+            <span
+              key={i}
+              className={`block size-2 rounded-full ${i === index ? "bg-accent" : "bg-muted"}`}
+            />
+          ))}
+        </div>
+        <button
+          onClick={next}
+          className="flex size-9 items-center justify-center rounded-full border border-border bg-background text-foreground transition hover:bg-muted"
+          aria-label="Next"
+        >
+          <ChevronRight className="size-5" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function Index() {
   return (
     <div className="min-h-screen">

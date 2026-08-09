@@ -39,11 +39,18 @@ function TeamWorkspace() {
         {bundle.error && <p className="text-destructive">Could not load this team.</p>}
         {bundle.data && (
           <>
-            <div className="mb-8">
-              <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
-                {bundle.data.team.sport} · {bundle.data.team.season_name}
-              </p>
-              <h1 className="text-3xl font-bold">{bundle.data.team.name}</h1>
+            <div className="mb-8 flex items-center justify-between gap-4">
+              <div>
+                <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
+                  {bundle.data.team.sport} · {bundle.data.team.season_name}
+                </p>
+                <h1 className="text-3xl font-bold">{bundle.data.team.name}</h1>
+              </div>
+              <img
+                src={logoAsset.url}
+                alt="Huge Fines"
+                className="h-16 w-auto opacity-60 md:h-20"
+              />
             </div>
 
             <Tabs defaultValue="rounds">

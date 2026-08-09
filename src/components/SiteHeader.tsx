@@ -38,7 +38,7 @@ export function SiteHeader() {
           <img
             src={logoAsset.url}
             alt="Huge Fines"
-            className="h-8 w-auto md:h-10"
+            className="h-12 w-auto md:h-14"
           />
         </Link>
         <nav className="flex items-center gap-2">

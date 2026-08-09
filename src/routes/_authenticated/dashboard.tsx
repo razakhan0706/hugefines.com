@@ -208,7 +208,7 @@ function Dashboard() {
                   src={logoAsset.url}
                   alt=""
                   aria-hidden="true"
-                  className="h-24 w-auto opacity-25 md:h-28"
+                  className="h-40 w-auto opacity-25 md:h-48"
                 />
                 <p className="font-semibold">No teams yet</p>
                 <p className="text-sm text-muted-foreground">

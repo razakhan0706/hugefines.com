@@ -535,6 +535,61 @@ export function weekBreakdown(fines: Fine[], rounds: Round[], splits?: Map<strin
 
 /** Distinct previously-used text values for a field, most-used spelling first. */
 export function distinctValues<T>(rows: T[], pick: (row: T) => string | null | undefined): string[] {
+  return distinctValuesImpl(rows, pick);
+}
+
+export interface VoteBreakdown {
+  label: string;
+  points: number;
+  matches: number;
+  avg: number;
+  photo?: string | null;
+}
+
+/** Groups vote points by an attribute of the round they belong to. */
+export function voteRoundAttributeBreakdown(
+  votes: Vote[],
+  rounds: Round[],
+  pick: (r: Round) => string | null | undefined,
+  photo?: (r: Round) => string | null | undefined,
+): VoteBreakdown[] {
+  const map = new Map<string, { points: number; rounds: Set<string>; photo?: string | null }>();
+  for (const r of rounds) {
+    const key = (pick(r) ?? "").trim();
+    if (!key) continue;
+    const row = map.get(key) ?? { points: 0, rounds: new Set<string>(), photo: photo?.(r) };
+    if (!row.photo && photo?.(r)) row.photo = photo(r);
+    row.rounds.add(r.id);
+    for (const v of votes) {
+      if (v.round_id !== r.id) continue;
+      row.points += v.points;
+    }
+    map.set(key, row);
+  }
+  return [...map.entries()]
+    .map(([label, v]) => ({
+      label,
+      points: v.points,
+      matches: v.rounds.size,
+      avg: v.rounds.size ? v.points / v.rounds.size : 0,
+      photo: v.photo,
+    }))
+    .sort((a, b) => b.points - a.points);
+}
+
+export function votesByOpponent(votes: Vote[], rounds: Round[]) {
+  return voteRoundAttributeBreakdown(votes, rounds, (r) => r.opponent, (r) => r.opponent_logo_url);
+}
+
+export function votesByVenue(votes: Vote[], rounds: Round[]) {
+  return voteRoundAttributeBreakdown(votes, rounds, (r) => r.venue);
+}
+
+export function votesByResult(votes: Vote[], rounds: Round[]) {
+  return voteRoundAttributeBreakdown(votes, rounds, (r) => resultBucket(r.result));
+}
+
+function distinctValuesImpl<T>(rows: T[], pick: (row: T) => string | null | undefined): string[] {
   const counts = new Map<string, { value: string; count: number }>();
   for (const row of rows) {
     const raw = (pick(row) ?? "").trim();

@@ -263,6 +263,7 @@ function FinesTab({ data }: { data: TeamBundle }) {
           currency={currency}
           unit="Weeks"
           empty="Add results to your rounds to see this."
+          resultMode
         />
         <BreakdownCard
           title="Fines by week"

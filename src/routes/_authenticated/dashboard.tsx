@@ -18,9 +18,10 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { slugify, type Team } from "@/lib/fines";
-import { Plus, Users } from "lucide-react";
+import { Plus } from "lucide-react";
 import { uploadPhoto } from "@/lib/photos";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
+import logoAsset from "@/assets/Website_Logo.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
   head: () => ({
@@ -203,7 +204,12 @@ function Dashboard() {
           {teams.data?.length === 0 && (
             <Card className="sm:col-span-2 border-dashed">
               <CardContent className="flex flex-col items-center gap-3 p-10 text-center">
-                <Users className="size-8 text-muted-foreground" />
+                <img
+                  src={logoAsset.url}
+                  alt=""
+                  aria-hidden="true"
+                  className="h-24 w-auto opacity-25 md:h-28"
+                />
                 <p className="font-semibold">No teams yet</p>
                 <p className="text-sm text-muted-foreground">
                   Create your first team to start logging fines.

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Trophy } from "lucide-react";
+import logoAsset from "@/assets/Website_Logo.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
   validateSearch: (s: Record<string, unknown>): { next?: string } => ({
@@ -93,11 +93,8 @@ function AuthPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-secondary px-4 py-12">
-      <Link to="/" className="mb-6 flex items-center gap-2">
-        <span className="flex size-8 items-center justify-center rounded-md bg-accent text-accent-foreground">
-          <Trophy className="size-4" />
-        </span>
-        <span className="font-display text-lg font-extrabold">Huge Fines</span>
+      <Link to="/" className="mb-8 flex items-center justify-center">
+        <img src={logoAsset.url} alt="Huge Fines" className="h-20 w-auto md:h-24" />
       </Link>
 
       <Card className="w-full max-w-sm">

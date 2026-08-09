@@ -133,7 +133,7 @@ function Carousel() {
           </p>
           <div className="h-px bg-border" />
           <p className="text-sm leading-relaxed text-muted-foreground">
-            <span className="font-semibold text-foreground">Votes:</span> Liam picked up a 3-2-1 haul after a tight finish, while the midfield workhorse keeps racking up the 2s.
+            <span className="font-semibold text-foreground">Votes:</span> Liam picked up all three votes in a tight round, while the hard workers around the stumps kept collecting the two-vote cards.
           </p>
         </div>
       ),
@@ -144,7 +144,7 @@ function Carousel() {
   const next = () => setIndex((i) => (i === slides.length - 1 ? 0 : i + 1));
 
   return (
-    <div className="relative">
+    <div className="relative px-8 md:px-12">
       <Card className="border-2">
         <CardContent className="p-3 md:p-6">
           <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
@@ -153,29 +153,27 @@ function Carousel() {
           {slides[index].content}
         </CardContent>
       </Card>
-      <div className="mt-3 flex items-center justify-center gap-3">
-        <button
-          onClick={prev}
-          className="flex size-9 items-center justify-center rounded-full border border-border bg-background text-foreground transition hover:bg-muted"
-          aria-label="Previous"
-        >
-          <ChevronLeft className="size-5" />
-        </button>
-        <div className="flex gap-1.5">
-          {slides.map((_, i) => (
-            <span
-              key={i}
-              className={`block size-2 rounded-full ${i === index ? "bg-accent" : "bg-muted"}`}
-            />
-          ))}
-        </div>
-        <button
-          onClick={next}
-          className="flex size-9 items-center justify-center rounded-full border border-border bg-background text-foreground transition hover:bg-muted"
-          aria-label="Next"
-        >
-          <ChevronRight className="size-5" />
-        </button>
+      <button
+        onClick={prev}
+        className="absolute left-0 top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-foreground transition hover:bg-muted md:size-10"
+        aria-label="Previous"
+      >
+        <ChevronLeft className="size-5" />
+      </button>
+      <button
+        onClick={next}
+        className="absolute right-0 top-1/2 z-10 flex size-9 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-background text-foreground transition hover:bg-muted md:size-10"
+        aria-label="Next"
+      >
+        <ChevronRight className="size-5" />
+      </button>
+      <div className="mt-3 flex items-center justify-center gap-1.5">
+        {slides.map((_, i) => (
+          <span
+            key={i}
+            className={`block size-2 rounded-full ${i === index ? "bg-accent" : "bg-muted"}`}
+          />
+        ))}
       </div>
     </div>
   );

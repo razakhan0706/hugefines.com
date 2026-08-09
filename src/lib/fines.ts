@@ -574,6 +574,7 @@ export function voteRoundAttributeBreakdown(
       avg: v.rounds.size ? v.points / v.rounds.size : 0,
       photo: v.photo,
     }))
+    .filter((row) => row.points > 0)
     .sort((a, b) => b.points - a.points);
 }
 

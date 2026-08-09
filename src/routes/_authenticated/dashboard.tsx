@@ -130,7 +130,7 @@ function Dashboard() {
           <div>
             <h1 className="text-3xl font-bold">My teams</h1>
             <p className="mt-1 text-muted-foreground">
-              Each team gets its own season, players, fines and voting.
+              Each team gets its own season, players, fines, voting and AI summary.
             </p>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>

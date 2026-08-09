@@ -240,7 +240,7 @@ function Dashboard() {
           <img
             src={logoAsset.url}
             alt="Huge Fines"
-            className="h-40 w-auto opacity-60 md:h-56"
+            className="h-40 w-auto md:h-56"
           />
         </div>
       </main>

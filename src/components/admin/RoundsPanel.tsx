@@ -28,16 +28,6 @@ import {
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const RESULT_OPTIONS = ["Won", "Lost", "Drawn"];
 
-  function resultBadge(result: string | null | undefined) {
-    const r = (result ?? "").toLowerCase();
-    if (r.startsWith("won") || r.startsWith("win"))
-      return { letter: "W", className: "bg-accent text-accent-foreground" };
-    if (r.startsWith("lost") || r.startsWith("los"))
-      return { letter: "L", className: "bg-destructive text-destructive-foreground" };
-    if (r) return { letter: "D", className: "bg-primary text-primary-foreground" };
-    return null;
-  }
-
   const capSplits = applyCaps(data.fines, data.rounds);
   const opponentOptions = distinctValues(data.rounds, (r) => r.opponent);
   const venueOptions = distinctValues(data.rounds, (r) => r.venue);

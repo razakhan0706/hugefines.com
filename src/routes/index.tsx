@@ -125,7 +125,7 @@ function Carousel() {
       ),
     },
     {
-      label: "AI season recap",
+      label: "AI weekly recap",
       content: (
         <div className="mt-2 space-y-3 md:mt-4">
           <p className="text-sm leading-relaxed text-muted-foreground">

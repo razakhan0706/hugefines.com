@@ -457,8 +457,7 @@ export function roundAttributeBreakdown(
       avg: v.rounds.size ? v.total / v.rounds.size : 0,
       photo: v.photo,
     }))
-    .sort((a, b) => b.avg - a.avg);
-
+    .sort((a, b) => b.total - a.total);
 }
 
 export function finesMasterBreakdown(fines: Fine[], rounds: Round[], splits?: Map<string, FineSplit>) {
@@ -531,9 +530,8 @@ export function weekBreakdown(fines: Fine[], rounds: Round[], splits?: Map<strin
       });
     }
   }
-  return rows.sort((a, b) => b.avg - a.avg);
+  return rows;
 }
-
 
 /** Distinct previously-used text values for a field, most-used spelling first. */
 export function distinctValues<T>(rows: T[], pick: (row: T) => string | null | undefined): string[] {

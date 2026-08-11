@@ -457,7 +457,12 @@ export function roundAttributeBreakdown(
       avg: v.rounds.size ? v.total / v.rounds.size : 0,
       photo: v.photo,
     }))
-    .sort((a, b) => b.total - a.total);
+    .sort((a, b) => {
+      if (b.total !== a.total) return b.total - a.total;
+      if (b.discounted !== a.discounted) return b.discounted - a.discounted;
+      if (b.avg !== a.avg) return b.avg - a.avg;
+      return b.rounds - a.rounds;
+    });
 }
 
 export function finesMasterBreakdown(fines: Fine[], rounds: Round[], splits?: Map<string, FineSplit>) {
@@ -530,6 +535,12 @@ export function weekBreakdown(fines: Fine[], rounds: Round[], splits?: Map<strin
       });
     }
   }
+  rows.sort((a, b) => {
+    if (b.total !== a.total) return b.total - a.total;
+    if (b.discounted !== a.discounted) return b.discounted - a.discounted;
+    if (b.avg !== a.avg) return b.avg - a.avg;
+    return b.rounds - a.rounds;
+  });
   return rows;
 }
 

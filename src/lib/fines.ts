@@ -457,7 +457,8 @@ export function roundAttributeBreakdown(
       avg: v.rounds.size ? v.total / v.rounds.size : 0,
       photo: v.photo,
     }))
-    .sort((a, b) => b.total - a.total);
+    .sort((a, b) => b.avg - a.avg);
+
 }
 
 export function finesMasterBreakdown(fines: Fine[], rounds: Round[], splits?: Map<string, FineSplit>) {

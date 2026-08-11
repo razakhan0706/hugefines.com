@@ -533,8 +533,12 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               <div className="flex-1 min-w-45">
                 <p className="font-semibold">{playerName.get(f.player_id) ?? "Unknown"}</p>
                 <p className="text-sm text-muted-foreground">
-                  {f.description}
-                  {f.category_id ? ` · ${categoryLabel.get(f.category_id) ?? ""}` : ""}
+                  {(() => {
+                    const cat = f.category_id ? categoryLabel.get(f.category_id) ?? "" : "";
+                    const same =
+                      cat.trim().toLowerCase() === f.description.trim().toLowerCase();
+                    return `${f.description}${cat && !same ? ` · ${cat}` : ""}`;
+                  })()}
                   {f.round_id ? ` · ${roundLabel.get(f.round_id) ?? ""}` : ""}
                 </p>
               </div>

@@ -531,8 +531,9 @@ export function weekBreakdown(fines: Fine[], rounds: Round[], splits?: Map<strin
       });
     }
   }
-  return rows;
+  return rows.sort((a, b) => b.avg - a.avg);
 }
+
 
 /** Distinct previously-used text values for a field, most-used spelling first. */
 export function distinctValues<T>(rows: T[], pick: (row: T) => string | null | undefined): string[] {

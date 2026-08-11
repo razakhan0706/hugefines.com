@@ -408,17 +408,8 @@ export function seasonAwards(stats: PlayerStat[], currency: string): Award[] {
     });
   }
 
-  const cleanest = [...stats].sort((a, b) => a.total - b.total)[0];
-  if (cleanest) {
-    awards.push({
-      title: "Best Behaviour",
-      winner: cleanest.player.name,
-      photo: cleanest.player.photo_url,
-      detail: `Only ${money(cleanest.total, currency)} all season`,
-    });
-  }
-
   const mostDiscounted = [...stats].sort((a, b) => b.discounted - a.discounted)[0];
+
   if (mostDiscounted && mostDiscounted.discounted > 0) {
     awards.push({
       title: "Most Discounted Fines",

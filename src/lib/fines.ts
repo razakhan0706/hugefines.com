@@ -341,7 +341,9 @@ export function categoryBreakdown(fines: Fine[], categories: FineCategory[]) {
   const catLabel = new Map(categories.map((c) => [c.id, c.label]));
   const map = new Map<string, { label: string; total: number; count: number }>();
   for (const f of fines) {
-    const label = f.category_id ? (catLabel.get(f.category_id) ?? "Custom") : "Custom";
+    const label = f.category_id
+      ? (catLabel.get(f.category_id) ?? f.description.trim() ?? "Custom")
+      : (f.description.trim() || "Custom");
     const row = map.get(label) ?? { label, total: 0, count: 0 };
     row.total += Number(f.amount);
     row.count += 1;

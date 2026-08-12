@@ -67,6 +67,99 @@ export function StatsView({ data }: { data: TeamBundle }) {
 }
 
 function FinesTab({ data }: { data: TeamBundle }) {
+  return <FinesTabInner data={data} />;
+}
+
+function TopCategoriesCard({ data }: { data: TeamBundle }) {
+  const [player, setPlayer] = useState("all");
+  const [week, setWeek] = useState("all");
+
+  const weekOptions = useMemo(() => {
+    const out: { value: string; label: string }[] = [];
+    for (const r of newestRoundsFirst(data.rounds)) {
+      if (r.two_day) {
+        out.push({ value: `${r.id}:2`, label: roundOpponentLabel(r, 2) });
+        out.push({ value: `${r.id}:1`, label: roundOpponentLabel(r, 1) });
+      } else {
+        out.push({ value: `${r.id}:`, label: roundOpponentLabel(r) });
+      }
+    }
+    return out;
+  }, [data.rounds]);
+
+  const filtered = data.fines.filter((f) => {
+    if (player !== "all" && f.player_id !== player) return false;
+    if (week !== "all") {
+      const [rid, wk] = week.split(":");
+      if (f.round_id !== rid) return false;
+      if (wk && String(f.week ?? "") !== wk) return false;
+    }
+    return true;
+  });
+
+  const rows = categoryBreakdown(filtered, data.categories).slice(0, 5);
+
+  return (
+    <Card>
+      <CardContent className="p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-lg font-bold uppercase tracking-wide">Top offence categories</h3>
+          <div className="flex flex-wrap gap-2">
+            <Select value={player} onValueChange={setPlayer}>
+              <SelectTrigger className="h-8 w-36 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All players</SelectItem>
+                {data.players.map((p) => (
+                  <SelectItem key={p.id} value={p.id}>
+                    {p.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={week} onValueChange={setWeek}>
+              <SelectTrigger className="h-8 w-40 text-xs">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All weeks</SelectItem>
+                {weekOptions.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>
+                    {o.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+        <div className="mt-4 h-64">
+          {rows.length === 0 ? (
+            <p className="pt-16 text-center text-sm text-muted-foreground">
+              No fines for this filter.
+            </p>
+          ) : (
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={rows}>
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                <XAxis dataKey="label" stroke="var(--color-muted-foreground)" fontSize={11} />
+                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
+                <Tooltip />
+                <Bar dataKey="total" radius={[6, 6, 0, 0]}>
+                  {rows.map((c) => (
+                    <Cell key={c.label} fill="var(--color-accent)" />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function FinesTabInner({ data }: { data: TeamBundle }) {
   const splits = applyCaps(data.fines, data.rounds);
   const stats = buildPlayerStats(
     data.players,

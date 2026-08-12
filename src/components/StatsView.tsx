@@ -98,15 +98,16 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
   });
 
   const rows = categoryBreakdown(filtered, data.categories).slice(0, 5);
+  const hasDecimals = rows.some((r) => !Number.isInteger(r.total));
 
   return (
     <Card>
       <CardContent className="p-5">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-lg font-bold uppercase tracking-wide">Top offence categories</h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-nowrap gap-2">
             <Select value={player} onValueChange={setPlayer}>
-              <SelectTrigger className="h-8 w-36 text-xs">
+              <SelectTrigger className="h-8 w-32 text-xs sm:w-36">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -119,7 +120,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
               </SelectContent>
             </Select>
             <Select value={week} onValueChange={setWeek}>
-              <SelectTrigger className="h-8 w-40 text-xs">
+              <SelectTrigger className="h-8 w-32 text-xs sm:w-40">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -143,8 +144,18 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
               <BarChart data={rows}>
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                 <XAxis dataKey="label" stroke="var(--color-muted-foreground)" fontSize={11} />
-                <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
-                <Tooltip />
+                <YAxis
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickFormatter={(v) =>
+                    hasDecimals ? Number(v).toFixed(2) : String(Math.round(v))
+                  }
+                />
+                <Tooltip
+                  formatter={(value: number) =>
+                    hasDecimals ? Number(value).toFixed(2) : String(Math.round(value))
+                  }
+                />
                 <Bar dataKey="total" radius={[6, 6, 0, 0]}>
                   {rows.map((c) => (
                     <Cell key={c.label} fill="var(--color-accent)" />

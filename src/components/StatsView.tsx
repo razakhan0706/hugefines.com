@@ -220,26 +220,7 @@ function FinesTab({ data }: { data: TeamBundle }) {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-5">
-            <h3 className="text-lg font-bold uppercase tracking-wide">Top offence categories</h3>
-            <div className="mt-4 h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={byCat.slice(0, 5)}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                  <XAxis dataKey="label" stroke="var(--color-muted-foreground)" fontSize={11} />
-                  <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
-                  <Tooltip />
-                  <Bar dataKey="total" radius={[6, 6, 0, 0]}>
-                    {byCat.slice(0, 5).map((c) => (
-                      <Cell key={c.label} fill="var(--color-accent)" />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+        <TopCategoriesCard data={data} />
       </div>
 
       <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">

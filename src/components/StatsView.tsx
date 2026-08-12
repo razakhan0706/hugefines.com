@@ -79,7 +79,6 @@ function FinesTab({ data }: { data: TeamBundle }) {
   const total = data.fines.reduce((s, f) => s + (splits.get(f.id)?.counted ?? Number(f.amount)), 0);
   const totalDiscounted = data.fines.reduce((s, f) => s + (splits.get(f.id)?.discounted ?? 0), 0);
   const byRound = roundTotals(data.fines, data.rounds, splits);
-  const byCat = categoryBreakdown(data.fines, data.categories);
   const awards = seasonAwards(stats, currency).filter(
     (a) => a.title !== "Player of the Season" && a.title !== "Most Consecutive Weeks",
   );

@@ -1,0 +1,1 @@
+UPDATE public.fine_categories SET label = 'Hungover' WHERE id = 'bb95acc5-ccbd-46e2-ae01-f6dbaa47e012';

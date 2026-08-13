@@ -118,7 +118,7 @@ export const FINE_CATEGORY_GROUPS: { group: string; labels: string[] }[] = [
     labels: [
       "Dummy spit",
       "Rubbish chat",
-      "Getting into a fight",
+      "Hungover",
       "Late arrival",
       "Lost/forgetting equipment",
       "Wrong Uniform",

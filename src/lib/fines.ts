@@ -495,6 +495,7 @@ export function venueBreakdown(fines: Fine[], rounds: Round[], splits?: Map<stri
 export function resultBadge(result: string | null | undefined) {
   const v = (result ?? "").toLowerCase();
   if (!v.trim()) return null;
+  if (/in progress/.test(v)) return { letter: "IP", className: "bg-muted text-muted-foreground" };
   if (/\bwon|\bwin/.test(v)) return { letter: "W", className: "bg-accent text-accent-foreground" };
   if (/\blost|\bloss|\bdefeat/.test(v)) return { letter: "L", className: "bg-destructive text-destructive-foreground" };
   if (/draw|tie|abandon|wash/.test(v)) return { letter: "D", className: "bg-primary text-primary-foreground" };
@@ -504,6 +505,7 @@ export function resultBadge(result: string | null | undefined) {
 export function resultBucket(result: string | null | undefined) {
   const v = (result ?? "").toLowerCase();
   if (!v.trim()) return null;
+  if (/in progress/.test(v)) return null;
   if (/\bwon|\bwin/.test(v)) return "Wins";
   if (/\blost|\bloss|\bdefeat/.test(v)) return "Losses";
   if (/draw|tie|abandon|wash/.test(v)) return "Draws";

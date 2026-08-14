@@ -26,7 +26,9 @@ import {
 } from "@/lib/fines";
 
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
-  const RESULT_OPTIONS = ["Won", "Lost", "Drawn", "In progress"];
+  const RESULT_OPTIONS = ["Won", "Lost", "Drawn"];
+  const resultOptionsFor = (twoDayer: boolean, dayNum: number) =>
+    twoDayer && dayNum === 1 ? [...RESULT_OPTIONS, "In progress"] : RESULT_OPTIONS;
 
   const isInProgress = (v: string | null | undefined) => /in progress/i.test(v ?? "");
 
@@ -301,7 +303,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                 <SelectValue placeholder="Select result" />
               </SelectTrigger>
               <SelectContent>
-                {RESULT_OPTIONS.map((o) => (
+                {resultOptionsFor(twoDay, day).map((o) => (
                   <SelectItem key={o} value={o}>
                     {o}
                   </SelectItem>
@@ -444,7 +446,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                         <SelectValue placeholder="Select result" />
                       </SelectTrigger>
                       <SelectContent>
-                        {RESULT_OPTIONS.map((o) => (
+                        {resultOptionsFor(edit.two_day, edit.day).map((o) => (
                           <SelectItem key={o} value={o}>
                             {o}
                           </SelectItem>

@@ -139,6 +139,17 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
 
   const rows = categoryBreakdown(filtered, data.categories).slice(0, 5);
   const hasDecimals = rows.some((r) => !Number.isInteger(r.total));
+  const catMax = Math.max(0, ...rows.map((r) => r.total));
+  const catChartMin = catMax > 0 ? 1 : 0;
+  const catChartStep = Math.max(1, Math.ceil(catMax / 4));
+  const catChartTop = Math.max(catChartStep, catChartStep * 4);
+  const catChartTicks = [
+    catChartMin,
+    catChartStep,
+    catChartStep * 2,
+    catChartStep * 3,
+    catChartTop,
+  ].filter((v, i, a) => a.indexOf(v) === i);
 
   return (
     <Card className="overflow-hidden">
@@ -201,6 +212,8 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
                   width={40}
                   tickLine={false}
                   axisLine={{ stroke: "var(--color-muted-foreground)" }}
+                  domain={[catChartMin, catChartTop]}
+                  ticks={catChartTicks}
                   tickFormatter={(v) =>
                     hasDecimals ? Number(v).toFixed(2) : String(Math.round(v))
                   }

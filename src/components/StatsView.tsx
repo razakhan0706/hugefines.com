@@ -372,7 +372,7 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
             <h3 className="text-lg font-bold uppercase tracking-wide">Fines by round</h3>
             <div className="mt-4 h-80 sm:h-96">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={byRound} margin={{ top: 8, right: 8, bottom: 12, left: 0 }}>
+                <LineChart data={byRound} margin={{ top: 8, right: 8, bottom: 12, left: -40 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                   <YAxis
                     stroke="var(--color-muted-foreground)"
@@ -380,9 +380,11 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
                     width={40}
                     tickLine={false}
                     axisLine={{ stroke: "var(--color-muted-foreground)" }}
-                    domain={[-roundChartStep * 0.08, roundChartTop]}
+                    domain={[roundChartMin, roundChartTop]}
                     ticks={roundChartTicks}
+                    tick={<YAxisInsideTick />}
                   />
+
                   <Tooltip />
                   <Line
                     type="monotone"

@@ -103,8 +103,8 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
   const hasDecimals = rows.some((r) => !Number.isInteger(r.total));
 
   return (
-    <Card>
-      <CardContent className="p-5">
+    <Card className="overflow-hidden">
+      <CardContent className="p-3 sm:p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h3 className="text-lg font-bold uppercase tracking-wide">Top offence categories</h3>
           <div className="flex flex-nowrap gap-2">
@@ -136,43 +136,49 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
             </Select>
           </div>
         </div>
-        <div className="mt-4 h-80 sm:h-96">
+        <div className="mt-2 h-96 overflow-x-auto sm:h-[28rem]">
           {rows.length === 0 ? (
             <p className="pt-16 text-center text-sm text-muted-foreground">
               No fines for this filter.
             </p>
           ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={rows} margin={{ top: 8, right: 8, left: -8, bottom: 24 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                <XAxis
-                  dataKey="label"
-                  stroke="var(--color-muted-foreground)"
-                  fontSize={11}
-                  interval={0}
-                  angle={-20}
-                  textAnchor="end"
-                  height={40}
-                />
-                <YAxis
-                  stroke="var(--color-muted-foreground)"
-                  fontSize={12}
-                  tickFormatter={(v) =>
-                    hasDecimals ? Number(v).toFixed(2) : String(Math.round(v))
-                  }
-                />
-                <Tooltip
-                  formatter={(value: number) =>
-                    hasDecimals ? Number(value).toFixed(2) : String(Math.round(value))
-                  }
-                />
-                <Bar dataKey="total" radius={[6, 6, 0, 0]}>
-                  {rows.map((c) => (
-                    <Cell key={c.label} fill="var(--color-accent)" />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="min-w-[520px] sm:min-w-0 h-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={rows}
+                  margin={{ top: 8, right: 0, bottom: 0, left: -12 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                  <XAxis
+                    dataKey="label"
+                    stroke="var(--color-muted-foreground)"
+                    fontSize={10}
+                    interval={0}
+                    tickLine={false}
+                    axisLine={{ stroke: "var(--color-muted-foreground)" }}
+                  />
+                  <YAxis
+                    stroke="var(--color-muted-foreground)"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) =>
+                      hasDecimals ? Number(v).toFixed(2) : String(Math.round(v))
+                    }
+                  />
+                  <Tooltip
+                    formatter={(value: number) =>
+                      hasDecimals ? Number(value).toFixed(2) : String(Math.round(value))
+                    }
+                  />
+                  <Bar dataKey="total" radius={[6, 6, 0, 0]}>
+                    {rows.map((c) => (
+                      <Cell key={c.label} fill="var(--color-accent)" />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           )}
         </div>
       </CardContent>

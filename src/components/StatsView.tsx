@@ -145,7 +145,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={rows}
-                margin={{ top: 8, right: 5, bottom: 0, left: 5 }}
+                margin={{ top: 8, right: 0, bottom: 0, left: -44 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                 <XAxis
@@ -160,6 +160,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
                 <YAxis
                   stroke="var(--color-muted-foreground)"
                   fontSize={12}
+                  width={28}
                   tickLine={false}
                   axisLine={false}
                   tickFormatter={(v) =>
@@ -206,6 +207,13 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
   const byVenue = venueBreakdown(data.fines, data.rounds, splits);
   const byResult = resultBreakdown(data.fines, data.rounds, splits);
   const byWeek = weekBreakdown(data.fines, data.rounds, splits);
+  const roundChartMax = Math.max(
+    0,
+    ...byRound.flatMap((round) => [round.total, round.discounted]),
+  );
+  const roundChartStep = Math.max(1, Math.ceil(roundChartMax / 4));
+  const roundChartTop = Math.max(roundChartStep, roundChartStep * 4);
+  const roundChartTicks = Array.from({ length: 5 }, (_, index) => index * roundChartStep);
 
   const weeksPlayed = data.rounds.reduce((s, r) => s + (r.two_day && !r.day ? 2 : 1), 0);
   const avgPerWeek = weeksPlayed > 0 ? total / weeksPlayed : 0;
@@ -310,9 +318,17 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
             <h3 className="text-lg font-bold uppercase tracking-wide">Fines by round</h3>
             <div className="mt-4 h-80 sm:h-96">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={byRound} margin={{ top: 8, right: 5, bottom: 0, left: 5 }}>
+                <LineChart data={byRound} margin={{ top: 8, right: 0, bottom: 12, left: -44 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                  <YAxis stroke="var(--color-muted-foreground)" fontSize={12} domain={[0, "auto"]} />
+                  <YAxis
+                    stroke="var(--color-muted-foreground)"
+                    fontSize={12}
+                    width={28}
+                    tickLine={false}
+                    axisLine={false}
+                    domain={[-roundChartStep * 0.08, roundChartTop]}
+                    ticks={roundChartTicks}
+                  />
                   <Tooltip />
                   <Line
                     type="monotone"

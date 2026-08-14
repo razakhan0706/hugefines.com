@@ -173,7 +173,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
             </Select>
           </div>
         </div>
-        <div className="mt-2 h-96 sm:h-[28rem]">
+        <div className="-ml-5 mt-2 h-[26rem] sm:h-[30rem]">
           {rows.length === 0 ? (
             <p className="pt-16 text-center text-sm text-muted-foreground">
               No fines for this filter.
@@ -182,7 +182,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={rows}
-                margin={{ top: 8, right: 8, bottom: 40, left: 0 }}
+                margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                 <XAxis

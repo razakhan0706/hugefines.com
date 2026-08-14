@@ -26,7 +26,21 @@ import {
 } from "@/lib/fines";
 
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
-  const RESULT_OPTIONS = ["Won", "Lost", "Drawn"];
+  const RESULT_OPTIONS = ["Won", "Lost", "Drawn", "In progress"];
+
+  const isInProgress = (v: string | null | undefined) => /in progress/i.test(v ?? "");
+
+  /** When a Day 2 result is set, copy it back onto the matching Day 1 round. */
+  async function syncDayOneResult(roundNumber: number, day: number | null, res: string | null) {
+    if (day !== 2 || !res || isInProgress(res)) return;
+    const dayOne = data.rounds.filter(
+      (r) => r.two_day && r.round_number === roundNumber && (r.day ?? 1) === 1,
+    );
+    for (const r of dayOne) {
+      if (r.result === res) continue;
+      await supabase.from("rounds").update({ result: res }).eq("id", r.id);
+    }
+  }
 
   const capSplits = applyCaps(data.fines, data.rounds);
   const opponentOptions = distinctValues(data.rounds, (r) => r.opponent);
@@ -94,6 +108,11 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
       })
       .eq("id", editId);
     if (error) return toast.error(error.message);
+    await syncDayOneResult(
+      Number.isFinite(num) ? num : (data.rounds.find((r) => r.id === editId)?.round_number ?? 0),
+      edit.two_day ? edit.day : null,
+      edit.result.trim() || null,
+    );
     setEditId(null);
     refresh();
     toast.success("Round updated");

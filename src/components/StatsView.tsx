@@ -145,7 +145,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={rows}
-                margin={{ top: 8, right: 0, bottom: 0, left: -8 }}
+                margin={{ top: 8, right: 0, bottom: 0, left: 10 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                 <XAxis

@@ -107,12 +107,6 @@ function MultiLineTick({ x, y, payload }: { x?: number; y?: number; payload?: { 
   );
 }
 
-function resultDot(result: string) {
-  if (result === "Won") return <span className="inline-block size-2 rounded-full bg-green-600" />;
-  if (result === "Lost") return <span className="inline-block size-2 rounded-full bg-red-600" />;
-  if (result === "Drawn") return <span className="inline-block size-2 rounded-full bg-neutral-800" />;
-  return null;
-}
 
 function TopCategoriesCard({ data }: { data: TeamBundle }) {
   const [player, setPlayer] = useState("all");

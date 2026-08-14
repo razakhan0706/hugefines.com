@@ -136,47 +136,49 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
             </Select>
           </div>
         </div>
-        <div className="mt-2 h-96 sm:h-[28rem]">
+        <div className="mt-2 h-96 overflow-x-auto sm:h-[28rem]">
           {rows.length === 0 ? (
             <p className="pt-16 text-center text-sm text-muted-foreground">
               No fines for this filter.
             </p>
           ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={rows}
-                margin={{ top: 8, right: 0, bottom: 0, left: -12 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                <XAxis
-                  dataKey="label"
-                  stroke="var(--color-muted-foreground)"
-                  fontSize={11}
-                  interval={0}
-                  tickLine={false}
-                  axisLine={{ stroke: "var(--color-muted-foreground)" }}
-                />
-                <YAxis
-                  stroke="var(--color-muted-foreground)"
-                  fontSize={12}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(v) =>
-                    hasDecimals ? Number(v).toFixed(2) : String(Math.round(v))
-                  }
-                />
-                <Tooltip
-                  formatter={(value: number) =>
-                    hasDecimals ? Number(value).toFixed(2) : String(Math.round(value))
-                  }
-                />
-                <Bar dataKey="total" radius={[6, 6, 0, 0]}>
-                  {rows.map((c) => (
-                    <Cell key={c.label} fill="var(--color-accent)" />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+            <div className="min-w-[520px] sm:min-w-0 h-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart
+                  data={rows}
+                  margin={{ top: 8, right: 0, bottom: 0, left: -12 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                  <XAxis
+                    dataKey="label"
+                    stroke="var(--color-muted-foreground)"
+                    fontSize={10}
+                    interval={0}
+                    tickLine={false}
+                    axisLine={{ stroke: "var(--color-muted-foreground)" }}
+                  />
+                  <YAxis
+                    stroke="var(--color-muted-foreground)"
+                    fontSize={12}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) =>
+                      hasDecimals ? Number(v).toFixed(2) : String(Math.round(v))
+                    }
+                  />
+                  <Tooltip
+                    formatter={(value: number) =>
+                      hasDecimals ? Number(value).toFixed(2) : String(Math.round(value))
+                    }
+                  />
+                  <Bar dataKey="total" radius={[6, 6, 0, 0]}>
+                    {rows.map((c) => (
+                      <Cell key={c.label} fill="var(--color-accent)" />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           )}
         </div>
       </CardContent>

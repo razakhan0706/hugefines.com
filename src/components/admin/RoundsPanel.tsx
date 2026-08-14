@@ -26,7 +26,9 @@ import {
 } from "@/lib/fines";
 
 export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
-  const RESULT_OPTIONS = ["Won", "Lost", "Drawn", "In progress"];
+  const RESULT_OPTIONS = ["Won", "Lost", "Drawn"];
+  const resultOptionsFor = (twoDayer: boolean, dayNum: number) =>
+    twoDayer && dayNum === 1 ? [...RESULT_OPTIONS, "In progress"] : RESULT_OPTIONS;
 
   const isInProgress = (v: string | null | undefined) => /in progress/i.test(v ?? "");
 

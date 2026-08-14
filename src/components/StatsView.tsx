@@ -307,11 +307,11 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
         <Card>
           <CardContent className="p-5">
             <h3 className="text-lg font-bold uppercase tracking-wide">Fines by round</h3>
-            <div className="mt-4 h-64">
+            <div className="mt-4 h-80 sm:h-96">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={byRound}>
+                <LineChart data={byRound} margin={{ top: 8, right: 0, bottom: 0, left: -12 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                  <XAxis dataKey="name" stroke="var(--color-muted-foreground)" fontSize={12} />
+                  <XAxis dataKey="name" stroke="var(--color-muted-foreground)" fontSize={12} interval={0} />
                   <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
                   <Tooltip />
                   <Line

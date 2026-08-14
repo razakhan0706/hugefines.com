@@ -174,6 +174,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     if (error) return toast.error(error.message);
     setOpponent("");
     setRoundName(String(num + 1));
+    await syncDayOneResult(num, twoDay ? day : null, result || null);
     setTwoDay(false);
     setDay(1);
     setCap("");

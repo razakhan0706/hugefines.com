@@ -107,15 +107,7 @@ function MultiLineTick({ x, y, payload }: { x?: number; y?: number; payload?: { 
   );
 }
 
-function YAxisInsideTick({ x, y, payload }: { x?: number; y?: number; payload?: { value?: number } }) {
-  const v = payload?.value ?? 0;
-  const label = Number.isInteger(v) ? String(v) : Number(v).toFixed(2);
-  return (
-    <text x={x} y={y} dx={6} dy={3} textAnchor="start" fill="var(--color-muted-foreground)" fontSize={12}>
-      {label}
-    </text>
-  );
-}
+
 function TopCategoriesCard({ data }: { data: TeamBundle }) {
   const [player, setPlayer] = useState("all");
   const [week, setWeek] = useState("all");
@@ -370,23 +362,21 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
         <Card>
           <CardContent className="p-5">
             <h3 className="text-lg font-bold uppercase tracking-wide">Fines by round</h3>
-            <div className="mt-4 h-80 sm:h-96">
+            <div className="-ml-5 mt-4 h-80 sm:h-96">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={byRound} margin={{ top: 8, right: 8, bottom: 12, left: -40 }}>
+                <LineChart data={byRound} margin={{ top: 8, right: 8, bottom: 12, left: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                   <YAxis
                     stroke="var(--color-muted-foreground)"
                     fontSize={12}
                     width={40}
-                    tickLine={false}
                     axisLine={{ stroke: "var(--color-muted-foreground)" }}
                     domain={[roundChartMin, roundChartTop]}
                     ticks={roundChartTicks}
-                    tick={<YAxisInsideTick />}
-                    mirror={true}
+                    tickFormatter={(v) =>
+                      Number.isInteger(v) ? String(v) : Number(v).toFixed(2)
+                    }
                   />
-
-
                   <Tooltip />
                   <Line
                     type="monotone"

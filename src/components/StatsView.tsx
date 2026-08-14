@@ -383,7 +383,9 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
                     domain={[roundChartMin, roundChartTop]}
                     ticks={roundChartTicks}
                     tick={<YAxisInsideTick />}
+                    mirror={true}
                   />
+
 
                   <Tooltip />
                   <Line

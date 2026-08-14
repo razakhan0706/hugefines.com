@@ -523,7 +523,7 @@ export function weekBreakdown(fines: Fine[], rounds: Round[], splits?: Map<strin
   const rows: Breakdown[] = [];
   for (const r of ordered) {
     const mine = fines.filter((f) => f.round_id === r.id);
-    const days = r.two_day ? [1, 2] : [null];
+    const days = r.two_day ? (r.day ? [r.day] : [1, 2]) : [null];
     for (const d of days) {
       const subset = d === null ? mine : mine.filter((f) => (f.week ?? 1) === d);
       const total = subset.reduce((s, f) => s + (capSplits.get(f.id)?.counted ?? Number(f.amount)), 0);

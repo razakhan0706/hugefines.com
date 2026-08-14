@@ -77,9 +77,11 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
   const weekOptions = useMemo(() => {
     const out: { value: string; label: string }[] = [];
     for (const r of newestRoundsFirst(data.rounds)) {
-      if (r.two_day) {
+      if (r.two_day && !r.day) {
         out.push({ value: `${r.id}:2`, label: roundOpponentLabel(r, 2) });
         out.push({ value: `${r.id}:1`, label: roundOpponentLabel(r, 1) });
+      } else if (r.two_day && r.day) {
+        out.push({ value: `${r.id}:${r.day}`, label: roundOpponentLabel(r, r.day) });
       } else {
         out.push({ value: `${r.id}:`, label: roundOpponentLabel(r) });
       }
@@ -192,7 +194,7 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
   const byResult = resultBreakdown(data.fines, data.rounds, splits);
   const byWeek = weekBreakdown(data.fines, data.rounds, splits);
 
-  const weeksPlayed = data.rounds.reduce((s, r) => s + (r.two_day ? 2 : 1), 0);
+  const weeksPlayed = data.rounds.reduce((s, r) => s + (r.two_day && !r.day ? 2 : 1), 0);
   const avgPerWeek = weeksPlayed > 0 ? total / weeksPlayed : 0;
 
   const summaryTiles = [

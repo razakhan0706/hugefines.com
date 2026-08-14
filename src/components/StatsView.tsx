@@ -145,16 +145,17 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={rows}
-                margin={{ top: 8, right: 0, bottom: 0, left: -16 }}
+                margin={{ top: 8, right: 0, bottom: 0, left: -8 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                 <XAxis
                   dataKey="label"
                   stroke="var(--color-muted-foreground)"
-                  fontSize={10}
+                  fontSize={8}
                   interval={0}
                   tickLine={false}
                   axisLine={{ stroke: "var(--color-muted-foreground)" }}
+                  tick={{ dx: 4 }}
                 />
                 <YAxis
                   stroke="var(--color-muted-foreground)"

@@ -194,7 +194,7 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
   const byResult = resultBreakdown(data.fines, data.rounds, splits);
   const byWeek = weekBreakdown(data.fines, data.rounds, splits);
 
-  const weeksPlayed = data.rounds.reduce((s, r) => s + (r.two_day ? 2 : 1), 0);
+  const weeksPlayed = data.rounds.reduce((s, r) => s + (r.two_day && !r.day ? 2 : 1), 0);
   const avgPerWeek = weeksPlayed > 0 ? total / weeksPlayed : 0;
 
   const summaryTiles = [

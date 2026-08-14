@@ -107,7 +107,16 @@ function MultiLineTick({ x, y, payload }: { x?: number; y?: number; payload?: { 
   );
 }
 
-function TopCategoriesCard({ data }: { data: TeamBundle }) {
+function YAxisInsideTick({ x, y, payload }: { x?: number; y?: number; payload?: { value?: number } }) {
+  const v = payload?.value ?? 0;
+  const label = Number.isInteger(v) ? String(v) : Number(v).toFixed(2);
+  return (
+    <text x={x} y={y} dx={6} dy={3} textAnchor="start" fill="var(--color-muted-foreground)" fontSize={12}>
+      {label}
+    </text>
+  );
+}
+
   const [player, setPlayer] = useState("all");
   const [week, setWeek] = useState("all");
 
@@ -248,9 +257,17 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
     0,
     ...byRound.flatMap((round) => [round.total, round.discounted]),
   );
+  const roundChartMin = roundChartMax > 0 ? 1 : 0;
   const roundChartStep = Math.max(1, Math.ceil(roundChartMax / 4));
   const roundChartTop = Math.max(roundChartStep, roundChartStep * 4);
-  const roundChartTicks = Array.from({ length: 5 }, (_, index) => index * roundChartStep);
+  const roundChartTicks = [
+    roundChartMin,
+    roundChartStep,
+    roundChartStep * 2,
+    roundChartStep * 3,
+    roundChartTop,
+  ].filter((v, i, a) => a.indexOf(v) === i);
+
 
   const weeksPlayed = data.rounds.reduce((s, r) => s + (r.two_day && !r.day ? 2 : 1), 0);
   const avgPerWeek = weeksPlayed > 0 ? total / weeksPlayed : 0;

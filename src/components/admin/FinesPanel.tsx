@@ -132,9 +132,11 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const weekOptions = useMemo(() => {
     const out: { value: string; label: string }[] = [];
     for (const r of roundOptions) {
-      if (r.two_day) {
+      if (r.two_day && !r.day) {
         out.push({ value: `${r.id}:2`, label: roundOpponentLabel(r, 2) });
         out.push({ value: `${r.id}:1`, label: roundOpponentLabel(r, 1) });
+      } else if (r.two_day && r.day) {
+        out.push({ value: `${r.id}:${r.day}`, label: roundOpponentLabel(r, r.day) });
       } else {
         out.push({ value: `${r.id}:`, label: roundOpponentLabel(r) });
       }

@@ -303,7 +303,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                 <SelectValue placeholder="Select result" />
               </SelectTrigger>
               <SelectContent>
-                {RESULT_OPTIONS.map((o) => (
+                {resultOptionsFor(twoDay, day).map((o) => (
                   <SelectItem key={o} value={o}>
                     {o}
                   </SelectItem>
@@ -446,7 +446,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                         <SelectValue placeholder="Select result" />
                       </SelectTrigger>
                       <SelectContent>
-                        {RESULT_OPTIONS.map((o) => (
+                        {resultOptionsFor(edit.two_day, edit.day).map((o) => (
                           <SelectItem key={o} value={o}>
                             {o}
                           </SelectItem>

@@ -27,10 +27,7 @@ import {
   venueBreakdown,
   type Breakdown,
   roundOpponentLabel,
-  votesByOpponent,
-  votesByVenue,
-  votesByResult,
-  type VoteBreakdown,
+  newestRoundsFirst,
 } from "@/lib/fines";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
 import type { TeamBundle } from "@/lib/useTeamData";
@@ -43,7 +40,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { newestRoundsFirst } from "@/lib/fines";
 
 const DISCOUNT_COLOR = "var(--color-destructive)";
 
@@ -616,88 +612,10 @@ function VotesTab({ data }: { data: TeamBundle }) {
         </CardContent>
       </Card>
 
-      <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
-        <VoteBreakdownCard
-          title="Votes by opponent"
-          rows={votesByOpponent(data.votes, data.rounds)}
-          empty="Add opponents to your rounds to see this."
-        />
-        <VoteBreakdownCard
-          title="Votes by venue"
-          rows={votesByVenue(data.votes, data.rounds)}
-          empty="Add venues to your rounds to see this."
-        />
-        <VoteBreakdownCard
-          title="Votes by result"
-          rows={votesByResult(data.votes, data.rounds)}
-          empty="Add results to your rounds to see this."
-          resultMode
-        />
-      </div>
     </div>
   );
 }
 
-function VoteBreakdownCard({
-  title,
-  rows,
-  empty,
-  resultMode = false,
-}: {
-  title: string;
-  rows: VoteBreakdown[];
-  empty: string;
-  resultMode?: boolean;
-}) {
-  return (
-    <Card>
-      <CardContent className="p-3 sm:p-5">
-        <h3 className="text-sm font-bold uppercase tracking-wide sm:text-lg">{title}</h3>
-        {rows.length === 0 ? (
-          <p className="mt-3 text-sm text-muted-foreground">{empty}</p>
-        ) : (
-          <div className="mt-3 overflow-x-auto">
-            <table className="w-full text-xs sm:text-sm">
-              <thead>
-                <tr className="text-left uppercase text-muted-foreground">
-                  <th className="py-1.5 pr-2">Name</th>
-                  <th className="px-2 text-right">Votes</th>
-                  <th className="px-2 text-right">Weeks</th>
-                  <th className="pl-2 text-right">Avg</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.map((r) => (
-                  <tr key={r.label} className="border-t border-border">
-                    <td className="py-1.5 pr-2">
-                      <span className="flex items-center gap-1.5 font-medium uppercase">
-                        {resultMode ? (
-                          <span
-                            className={`inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-[10px] font-bold sm:size-8 sm:text-xs ${
-                              resultBadge(r.label)?.className ?? "bg-muted text-muted-foreground"
-                            }`}
-                          >
-                            {resultBadge(r.label)?.letter ?? r.label[0]}
-                          </span>
-                        ) : (
-                          <PhotoAvatar url={r.photo} name={r.label} className="size-6 shrink-0 sm:size-8" />
-                        )}
-                        <span className="min-w-0 break-words leading-tight">{r.label}</span>
-                      </span>
-                    </td>
-                    <td className="stat-num whitespace-nowrap px-2 text-right font-bold">{r.points}</td>
-                    <td className="stat-num whitespace-nowrap px-2 text-right">{r.weeks}</td>
-                    <td className="stat-num whitespace-nowrap pl-2 text-right">{r.avg.toFixed(1)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </CardContent>
-    </Card>
-  );
-}
 
 
 function BreakdownCard({

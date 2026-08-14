@@ -351,10 +351,10 @@ export function roundTotals(fines: Fine[], rounds: Round[], splits?: Map<string,
   const capSplits = splits ?? applyCaps(fines, rounds);
   return [...rounds]
     .sort((a, b) => a.round_number - b.round_number)
-    .map((r) => {
+    .map((r, index) => {
       const mine = fines.filter((f) => f.round_id === r.id);
       return {
-        name: roundBaseLabel(r),
+        name: String(index + 1),
         total: mine.reduce((s, f) => s + (capSplits.get(f.id)?.counted ?? Number(f.amount)), 0),
         discounted: mine.reduce((s, f) => s + (capSplits.get(f.id)?.discounted ?? 0), 0),
         count: mine.length,

@@ -390,6 +390,11 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
                       Number.isInteger(v) ? String(v) : Number(v).toFixed(2)
                     }
                   />
+                  <XAxis
+                    dataKey="name"
+                    stroke="var(--color-muted-foreground)"
+                    fontSize={12}
+                  />
                   <Tooltip />
                   <Line
                     type="monotone"

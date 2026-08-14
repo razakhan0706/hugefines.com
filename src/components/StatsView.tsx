@@ -29,6 +29,17 @@ import {
   roundOpponentLabel,
   newestRoundsFirst,
 } from "@/lib/fines";
+import { PhotoAvatar } from "@/components/PhotoAvatar";
+import type { TeamBundle } from "@/lib/useTeamData";
+import { Trophy } from "lucide-react";
+import { useMemo, useState } from "react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const DISCOUNT_COLOR = "var(--color-destructive)";
 

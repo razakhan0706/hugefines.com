@@ -212,6 +212,8 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
                   width={40}
                   tickLine={false}
                   axisLine={{ stroke: "var(--color-muted-foreground)" }}
+                  domain={[catChartMin, catChartTop]}
+                  ticks={catChartTicks}
                   tickFormatter={(v) =>
                     hasDecimals ? Number(v).toFixed(2) : String(Math.round(v))
                   }

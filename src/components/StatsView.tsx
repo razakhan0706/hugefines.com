@@ -262,7 +262,7 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
     0,
     ...byRound.flatMap((round) => [round.total, round.discounted]),
   );
-  const roundChartMin = roundChartMax > 0 ? 1 : 0;
+  const roundChartMin = 0;
   const roundChartStep = Math.max(1, Math.ceil(roundChartMax / 4));
   const roundChartTop = Math.max(roundChartStep, roundChartStep * 4);
   const roundChartTicks = [

@@ -140,7 +140,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
   const rows = categoryBreakdown(filtered, data.categories).slice(0, 5);
   const hasDecimals = rows.some((r) => !Number.isInteger(r.total));
   const catMax = Math.max(0, ...rows.map((r) => r.total));
-  const catChartMin = catMax > 0 ? 1 : 0;
+  const catChartMin = 0;
   const catChartStep = Math.max(1, Math.ceil(catMax / 4));
   const catChartTop = Math.max(catChartStep, catChartStep * 4);
   const catChartTicks = [

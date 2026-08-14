@@ -107,15 +107,13 @@ function MultiLineTick({ x, y, payload }: { x?: number; y?: number; payload?: { 
   );
 }
 
-function YAxisInsideTick({ x, y, payload }: { x?: number; y?: number; payload?: { value?: number } }) {
-  const v = payload?.value ?? 0;
-  const label = Number.isInteger(v) ? String(v) : Number(v).toFixed(2);
-  return (
-    <text x={x} y={y} dx={6} dy={3} textAnchor="start" fill="var(--color-muted-foreground)" fontSize={12}>
-      {label}
-    </text>
-  );
+function resultDot(result: string) {
+  if (result === "Won") return <span className="inline-block size-2 rounded-full bg-green-600" />;
+  if (result === "Lost") return <span className="inline-block size-2 rounded-full bg-red-600" />;
+  if (result === "Drawn") return <span className="inline-block size-2 rounded-full bg-neutral-800" />;
+  return null;
 }
+
 function TopCategoriesCard({ data }: { data: TeamBundle }) {
   const [player, setPlayer] = useState("all");
   const [week, setWeek] = useState("all");

@@ -39,11 +39,24 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
     const round = data.rounds.find((r) => r.id === scope);
     const stats = buildPlayerStats(data.players, fines, data.rounds, data.categories, data.votes);
 
+    const dayOneOfTwo = Boolean(round?.two_day && (round?.day ?? 1) === 1);
+    const resultText = round?.result ?? "";
+    const resultPending = dayOneOfTwo || /in progress/i.test(resultText) || !resultText.trim();
+
     const lines = [
       `Team: ${data.team.name} (${data.team.sport}), season ${data.team.season_name}.`,
       isRound
-        ? `Round: ${round ? roundDayLabel(round) : ""} vs ${round?.opponent ?? "unknown"} — ${round?.result ?? "result unrecorded"}.`
+        ? `Round: ${round ? roundDayLabel(round) : ""} vs ${round?.opponent ?? "unknown"}${
+            resultPending ? "" : ` — ${resultText}`
+          }.`
         : `Whole season across ${data.rounds.length} rounds.`,
+      ...(isRound && resultPending
+        ? [
+            dayOneOfTwo
+              ? "IMPORTANT: this is Day 1 of a two-day match, so the result is not decided yet. Do NOT mention, guess or imply any result, win, loss or draw."
+              : "IMPORTANT: the result for this round is not recorded yet. Do NOT mention, guess or imply any result.",
+          ]
+        : []),
       "",
       "Fines:",
       ...fines

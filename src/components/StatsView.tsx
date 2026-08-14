@@ -145,7 +145,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={rows}
-                margin={{ top: 8, right: 0, bottom: 0, left: -8 }}
+                margin={{ top: 8, right: 0, bottom: 0, left: 10 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                 <XAxis
@@ -310,9 +310,8 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
             <h3 className="text-lg font-bold uppercase tracking-wide">Fines by round</h3>
             <div className="mt-4 h-80 sm:h-96">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={byRound} margin={{ top: 8, right: 0, bottom: 0, left: -12 }}>
+                <LineChart data={byRound} margin={{ top: 8, right: 0, bottom: 0, left: 10 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                  <XAxis dataKey="name" stroke="var(--color-muted-foreground)" fontSize={12} interval={0} />
                   <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
                   <Tooltip />
                   <Line

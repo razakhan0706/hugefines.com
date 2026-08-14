@@ -70,6 +70,43 @@ function FinesTab({ data }: { data: TeamBundle }) {
   return <FinesTabInner data={data} />;
 }
 
+function MultiLineTick({ x, y, payload }: { x?: number; y?: number; payload?: { value?: string } }) {
+  const text = String(payload?.value ?? "");
+  const maxChars = 9;
+  const words = text.split(" ");
+  const lines: string[] = [];
+  let current = "";
+  for (const word of words) {
+    if ((current + " " + word).trim().length > maxChars && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = (current + " " + word).trim();
+    }
+  }
+  if (current) lines.push(current);
+  if (lines.length === 0) lines.push(text);
+
+  return (
+    <g transform={`translate(${x ?? 0},${y ?? 0})`}>
+      <text
+        x={0}
+        y={0}
+        dy={12}
+        textAnchor="middle"
+        fill="var(--color-muted-foreground)"
+        fontSize={9}
+      >
+        {lines.map((line, i) => (
+          <tspan key={i} x={0} dy={i === 0 ? 0 : 12}>
+            {line}
+          </tspan>
+        ))}
+      </text>
+    </g>
+  );
+}
+
 function TopCategoriesCard({ data }: { data: TeamBundle }) {
   const [player, setPlayer] = useState("all");
   const [week, setWeek] = useState("all");
@@ -145,17 +182,17 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={rows}
-                margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
+                margin={{ top: 8, right: 8, bottom: 40, left: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                 <XAxis
                   dataKey="label"
                   stroke="var(--color-muted-foreground)"
-                  fontSize={8}
                   interval={0}
                   tickLine={false}
                   axisLine={{ stroke: "var(--color-muted-foreground)" }}
-                  tick={{ dx: 4 }}
+                  tick={<MultiLineTick />}
+                  height={55}
                 />
                 <YAxis
                   stroke="var(--color-muted-foreground)"

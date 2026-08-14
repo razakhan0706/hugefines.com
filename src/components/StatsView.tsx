@@ -145,7 +145,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
             <ResponsiveContainer width="100%" height="100%">
               <BarChart
                 data={rows}
-                margin={{ top: 8, right: 0, bottom: 0, left: -44 }}
+                margin={{ top: 8, right: 8, bottom: 0, left: 0 }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
                 <XAxis
@@ -160,9 +160,9 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
                 <YAxis
                   stroke="var(--color-muted-foreground)"
                   fontSize={12}
-                  width={28}
+                  width={40}
                   tickLine={false}
-                  axisLine={false}
+                  axisLine={{ stroke: "var(--color-muted-foreground)" }}
                   tickFormatter={(v) =>
                     hasDecimals ? Number(v).toFixed(2) : String(Math.round(v))
                   }

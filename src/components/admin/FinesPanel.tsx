@@ -73,7 +73,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
         week: (() => {
           const r = data.rounds.find((x) => x.id === edit.round_id);
           if (!r?.two_day) return null;
-          return r.day ?? Number(edit.week) || 1;
+          return r.day ?? (Number(edit.week) || 1);
         })(),
         description: edit.description.trim() || "Fine",
         amount: Number(edit.amount) || 0,
@@ -173,7 +173,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
       player_id: playerId,
       round_id: roundId || null,
       category_id: useCustom ? null : categoryId || null,
-      week: isTwoDay ? (selectedRound?.day ?? Number(week) || 1) : null,
+      week: isTwoDay ? (selectedRound?.day ?? (Number(week) || 1)) : null,
       description: !custom && isQuoteCategory && q ? `${base} — "${q}"` : base,
       amount: finalAmount,
     });

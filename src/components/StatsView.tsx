@@ -117,6 +117,7 @@ function YAxisInsideTick({ x, y, payload }: { x?: number; y?: number; payload?: 
   );
 }
 function TopCategoriesCard({ data }: { data: TeamBundle }) {
+  const [player, setPlayer] = useState("all");
   const [week, setWeek] = useState("all");
 
   const weekOptions = useMemo(() => {

@@ -42,7 +42,7 @@ function TeamWorkspace() {
             <div className="relative mb-8 flex items-start justify-between gap-4">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
-                  {bundle.data.team.sport} · {bundle.data.team.season_name}
+                  Season · {bundle.data.team.season_name}
                 </p>
                 <h1 className="text-3xl font-bold">{bundle.data.team.name}</h1>
               </div>

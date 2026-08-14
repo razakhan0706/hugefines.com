@@ -70,9 +70,11 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
         player_id: edit.player_id,
         round_id: edit.round_id || null,
         category_id: edit.category_id || null,
-        week: data.rounds.find((r) => r.id === edit.round_id)?.two_day
-          ? Number(edit.week) || 1
-          : null,
+        week: (() => {
+          const r = data.rounds.find((x) => x.id === edit.round_id);
+          if (!r?.two_day) return null;
+          return r.day ?? Number(edit.week) || 1;
+        })(),
         description: edit.description.trim() || "Fine",
         amount: Number(edit.amount) || 0,
       })
@@ -171,7 +173,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
       player_id: playerId,
       round_id: roundId || null,
       category_id: useCustom ? null : categoryId || null,
-      week: isTwoDay ? Number(week) || 1 : null,
+      week: isTwoDay ? (selectedRound?.day ?? Number(week) || 1) : null,
       description: !custom && isQuoteCategory && q ? `${base} — "${q}"` : base,
       amount: finalAmount,
     });
@@ -235,7 +237,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               </SelectContent>
             </Select>
           </div>
-          {isTwoDay && (
+          {isTwoDay && !selectedRound?.day && (
             <div>
               <label className="text-sm font-medium">Week</label>
               <Select value={week} onValueChange={setWeek}>

@@ -136,49 +136,47 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
             </Select>
           </div>
         </div>
-        <div className="mt-2 h-96 overflow-x-auto sm:h-[28rem]">
+        <div className="mt-2 h-96 sm:h-[28rem]">
           {rows.length === 0 ? (
             <p className="pt-16 text-center text-sm text-muted-foreground">
               No fines for this filter.
             </p>
           ) : (
-            <div className="min-w-[520px] sm:min-w-0 h-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart
-                  data={rows}
-                  margin={{ top: 8, right: 0, bottom: 0, left: -12 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                  <XAxis
-                    dataKey="label"
-                    stroke="var(--color-muted-foreground)"
-                    fontSize={10}
-                    interval={0}
-                    tickLine={false}
-                    axisLine={{ stroke: "var(--color-muted-foreground)" }}
-                  />
-                  <YAxis
-                    stroke="var(--color-muted-foreground)"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(v) =>
-                      hasDecimals ? Number(v).toFixed(2) : String(Math.round(v))
-                    }
-                  />
-                  <Tooltip
-                    formatter={(value: number) =>
-                      hasDecimals ? Number(value).toFixed(2) : String(Math.round(value))
-                    }
-                  />
-                  <Bar dataKey="total" radius={[6, 6, 0, 0]}>
-                    {rows.map((c) => (
-                      <Cell key={c.label} fill="var(--color-accent)" />
-                    ))}
-                  </Bar>
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={rows}
+                margin={{ top: 8, right: 0, bottom: 0, left: -16 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
+                <XAxis
+                  dataKey="label"
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={10}
+                  interval={0}
+                  tickLine={false}
+                  axisLine={{ stroke: "var(--color-muted-foreground)" }}
+                />
+                <YAxis
+                  stroke="var(--color-muted-foreground)"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(v) =>
+                    hasDecimals ? Number(v).toFixed(2) : String(Math.round(v))
+                  }
+                />
+                <Tooltip
+                  formatter={(value: number) =>
+                    hasDecimals ? Number(value).toFixed(2) : String(Math.round(value))
+                  }
+                />
+                <Bar dataKey="total" radius={[6, 6, 0, 0]}>
+                  {rows.map((c) => (
+                    <Cell key={c.label} fill="var(--color-accent)" />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           )}
         </div>
       </CardContent>
@@ -309,11 +307,11 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
         <Card>
           <CardContent className="p-5">
             <h3 className="text-lg font-bold uppercase tracking-wide">Fines by round</h3>
-            <div className="mt-4 h-64">
+            <div className="mt-4 h-80 sm:h-96">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={byRound}>
+                <LineChart data={byRound} margin={{ top: 8, right: 0, bottom: 0, left: -12 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--color-border)" />
-                  <XAxis dataKey="name" stroke="var(--color-muted-foreground)" fontSize={12} />
+                  <XAxis dataKey="name" stroke="var(--color-muted-foreground)" fontSize={12} interval={0} />
                   <YAxis stroke="var(--color-muted-foreground)" fontSize={12} />
                   <Tooltip />
                   <Line

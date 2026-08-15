@@ -499,6 +499,10 @@ function VotesTab({ data }: { data: TeamBundle }) {
   const roundsWithVotes = new Set(data.votes.map((v) => v.round_id)).size;
   const leader = leaderboard[0];
 
+  const positionsPerCard = VOTE_FORMATS[data.team.vote_format]?.length ?? 1;
+  const voterCards = Math.floor(totalVotes / positionsPerCard);
+  const totalMaxVotes = voterCards * positionsPerCard;
+
   const mvpAward = seasonAwards(
     buildPlayerStats(data.players, data.fines, data.rounds, data.categories, data.votes),
     data.team.currency,
@@ -510,15 +514,16 @@ function VotesTab({ data }: { data: TeamBundle }) {
   ).find((a) => a.title === "Most Consecutive Weeks");
 
   const summaryTiles = [
-    { label: "Total votes", value: String(totalVotes) },
+    { label: "Total votes", value: String(voterCards) },
+    { label: "Total maximum votes", value: String(totalMaxVotes) },
     { label: "Total points", value: String(totalPoints) },
-    { label: "Rounds with votes", value: String(roundsWithVotes) },
+    { label: "Weeks with votes", value: String(roundsWithVotes) },
     { label: "Leader", value: leader ? `${leader.player.name} (${leader.points})` : "—" },
   ];
 
   return (
     <div className="space-y-6">
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
         {summaryTiles.map((t) => (
           <Card key={t.label}>
             <CardContent className="p-5">

@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const run = useServerFn(generateRecap);
   const [scope, setScope] = useState<string>(data.rounds.at(-1)?.id ?? "season");
-  const [tone, setTone] = useState("Cheeky clubhouse banter");
+  const [tone, setTone] = useState("Absolutely ruthless");
   const [includeVotes, setIncludeVotes] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.localStorage.getItem("huge-fines-include-votes") === "yes";

@@ -21,7 +21,8 @@ export const generateRecap = createServerFn({ method: "POST" })
             role: "system",
             content:
               "You write short, funny end-of-match and end-of-season recaps for amateur sports club fines sheets. " +
-              "Use cheeky clubhouse banter, light roasts, running gags, and a confident rhythm. " +
+              "For 'Absolutely ruthless', be mercilessly funny — tear into repeat offenders, absurd fines, and anyone who keeps the party fund alive. No sympathy, no softening, no 'hard luck'. Go for the jugular while still sticking to the facts you are given. " +
+              "For other tones, use cheeky clubhouse banter, dramatic commentary, or dry deadpan newsreading as requested. " +
               "Stick strictly to the facts you are given. Never invent details, settings, or reactions (e.g. 'to an empty field'), and never merge two separate fines into one cause-and-effect story — each fine is its own unrelated event unless the text says otherwise. " +
               "You do NOT know what actually happened on the field — never claim a player was robbed, unlucky, had a bad game, or got stitched up based on fines or votes. " +
               "Do NOT say 'hard luck', 'tough luck', 'bad luck', or 'better luck' to anyone. " +

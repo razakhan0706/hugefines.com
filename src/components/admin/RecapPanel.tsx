@@ -177,10 +177,10 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Cheeky clubhouse banter">Cheeky clubhouse banter</SelectItem>
+                <SelectItem value="Absolutely ruthless">Absolutely ruthless</SelectItem>
                 <SelectItem value="Dramatic sports commentator">Dramatic commentator</SelectItem>
+                <SelectItem value="Cheeky clubhouse banter">Cheeky clubhouse banter</SelectItem>
                 <SelectItem value="Dry deadpan newsreader">Dry deadpan newsreader</SelectItem>
-                <SelectItem value="Wholesome and encouraging">Wholesome and encouraging</SelectItem>
               </SelectContent>
             </Select>
           </div>

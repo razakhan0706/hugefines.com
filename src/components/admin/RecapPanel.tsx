@@ -187,12 +187,6 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               </SelectContent>
             </Select>
           </div>
-          <div className="flex items-end">
-            <Button className="w-full" onClick={generate} disabled={busy || !data.fines.length}>
-              <Sparkles className="size-4" />
-              {busy ? "Writing…" : "Generate recap"}
-            </Button>
-          </div>
           <div className="grid gap-2 sm:col-span-3">
             <label className="text-sm font-medium">Scorecard link</label>
             <Input
@@ -240,6 +234,12 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                 ? "The AI will add vote commentary and name the leaders."
                 : "Votes stay secret — the AI won't mention them."}
             </p>
+          </div>
+          <div className="flex items-end sm:col-span-3">
+            <Button className="w-full" onClick={generate} disabled={busy || !data.fines.length}>
+              <Sparkles className="size-4" />
+              {busy ? "Writing…" : "Generate recap"}
+            </Button>
           </div>
         </CardContent>
       </Card>

@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { generateRecap } from "@/lib/recap.functions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -21,6 +22,7 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const run = useServerFn(generateRecap);
   const [scope, setScope] = useState<string>(data.rounds.at(-1)?.id ?? "season");
   const [tone, setTone] = useState("Absolutely ruthless");
+  const [scorecardUrl, setScorecardUrl] = useState("");
   const [includeVotes, setIncludeVotes] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.localStorage.getItem("huge-fines-include-votes") === "yes";
@@ -126,6 +128,7 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
           summary: buildSummary(),
           tone,
           scope: scope === "season" ? "Season wrap" : "Round recap",
+          scorecardUrl: scorecardUrl.trim() || undefined,
         },
       });
       const { error } = await supabase.from("recaps").insert({
@@ -189,6 +192,20 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               <Sparkles className="size-4" />
               {busy ? "Writing…" : "Generate recap"}
             </Button>
+          </div>
+          <div className="grid gap-2 sm:col-span-3">
+            <label className="text-sm font-medium">Scorecard link</label>
+            <Input
+              type="url"
+              inputMode="url"
+              placeholder="https://…"
+              value={scorecardUrl}
+              onChange={(e) => setScorecardUrl(e.target.value)}
+            />
+            <p className="text-xs text-muted-foreground">
+              Optional — paste a public scorecard URL and the AI will use the match details in the
+              recap.
+            </p>
           </div>
           <div className="grid gap-2 sm:col-span-3">
             <label className="text-sm font-medium">Include votes in the recap</label>

@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Sparkles, Trash2 } from "lucide-react";
-import { buildPlayerStats, money, roundDayLabel } from "@/lib/fines";
+import { buildPlayerStats, money, roundDayLabel, newestRoundsFirst } from "@/lib/fines";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { cn } from "@/lib/utils";
 
@@ -161,7 +161,7 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="season">Whole season</SelectItem>
-                {[...data.rounds].reverse().map((r) => (
+                {newestRoundsFirst(data.rounds).map((r) => (
                   <SelectItem key={r.id} value={r.id}>
                     {roundDayLabel(r)}
                     {r.opponent ? ` vs ${r.opponent}` : ""}

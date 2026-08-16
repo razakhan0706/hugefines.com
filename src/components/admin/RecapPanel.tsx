@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { generateRecap } from "@/lib/recap.functions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
+
 import {
   Select,
   SelectContent,
@@ -128,7 +128,6 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
           summary: buildSummary(),
           tone,
           scope: scope === "season" ? "Season wrap" : "Round recap",
-          scorecardUrl: scorecardUrl.trim() || undefined,
         },
       });
       const { error } = await supabase.from("recaps").insert({

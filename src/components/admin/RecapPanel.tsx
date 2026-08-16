@@ -22,7 +22,7 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const run = useServerFn(generateRecap);
   const [scope, setScope] = useState<string>(data.rounds.at(-1)?.id ?? "season");
   const [tone, setTone] = useState("Absolutely ruthless");
-  const [scorecardUrl, setScorecardUrl] = useState("");
+  
   const [includeVotes, setIncludeVotes] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.localStorage.getItem("huge-fines-include-votes") === "yes";
@@ -186,20 +186,6 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                 <SelectItem value="Dry deadpan newsreader">Dry deadpan newsreader</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          <div className="grid gap-2 sm:col-span-3">
-            <label className="text-sm font-medium">Scorecard link</label>
-            <Input
-              type="url"
-              inputMode="url"
-              placeholder="https://…"
-              value={scorecardUrl}
-              onChange={(e) => setScorecardUrl(e.target.value)}
-            />
-            <p className="text-xs text-muted-foreground">
-              Optional — paste a public scorecard URL and the AI will use the match details in the
-              recap.
-            </p>
           </div>
           <div className="grid gap-2 sm:col-span-3">
             <label className="text-sm font-medium">Include votes in the recap</label>

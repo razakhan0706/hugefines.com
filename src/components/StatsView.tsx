@@ -482,8 +482,6 @@ function VotesTab({ data }: { data: TeamBundle }) {
     voteRounds.set(v.player_id, rounds);
   }
 
-  const totalVoteWeeks = new Set(data.votes.map((v) => v.round_id)).size;
-
   const leaderboard = [...votePoints.entries()]
     .map(([playerId, points]) => {
       const rounds = voteRounds.get(playerId)?.size ?? 0;
@@ -491,7 +489,6 @@ function VotesTab({ data }: { data: TeamBundle }) {
         player: playerMap.get(playerId)!,
         points,
         rounds,
-        avg: totalVoteWeeks > 0 ? points / totalVoteWeeks : 0,
       };
     })
     .sort((a, b) => b.points - a.points);

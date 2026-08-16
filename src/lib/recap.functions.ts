@@ -3,34 +3,11 @@ import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 export const generateRecap = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(
-    (input: { summary: string; tone: string; scope: string; scorecardUrl?: string }) => input,
-  )
+  .inputValidator((input: { summary: string; tone: string; scope: string }) => input)
   .handler(async ({ data }) => {
     const apiKey = process.env.LOVABLE_API_KEY;
     if (!apiKey) throw new Error("AI is not configured");
 
-    let scorecard = "";
-    if (data.scorecardUrl && /^https?:\/\//i.test(data.scorecardUrl)) {
-      try {
-        const page = await fetch(data.scorecardUrl, {
-          headers: { "User-Agent": "Mozilla/5.0 (compatible; HugeFinesBot/1.0)" },
-        });
-        if (page.ok) {
-          const html = await page.text();
-          scorecard = html
-            .replace(/<script[\s\S]*?<\/script>/gi, " ")
-            .replace(/<style[\s\S]*?<\/style>/gi, " ")
-            .replace(/<[^>]+>/g, " ")
-            .replace(/&nbsp;/g, " ")
-            .replace(/\s+/g, " ")
-            .trim()
-            .slice(0, 6000);
-        }
-      } catch {
-        scorecard = "";
-      }
-    }
 
     const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -55,14 +32,12 @@ export const generateRecap = createServerFn({ method: "POST" })
               "When you run out of meaningful game commentary, pivot to something else funny: the fines tally, repeat offenders, the clubhouse wallet, the cheapest fine, or a running joke. " +
               "If you run out of material, expand the fines section rather than padding with vote commentary. " +
               "No slurs, no personal attacks about appearance or health. " +
-              "If a scorecard extract is provided, you MAY use concrete facts from it (scores, wickets, standout performances) but never invent anything beyond it. " +
               "Write 120-180 words in punchy sentences. Use the players' names and the fine details you're given.",
           },
           {
             role: "user",
             content:
-              `Tone: ${data.tone}. Scope: ${data.scope}.\n\nData:\n${data.summary}` +
-              (scorecard ? `\n\nScorecard extract (raw text from ${data.scorecardUrl}):\n${scorecard}` : ""),
+              `Tone: ${data.tone}. Scope: ${data.scope}.\n\nData:\n${data.summary}`,
           },
         ],
       }),

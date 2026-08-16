@@ -303,7 +303,7 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
           </div>
           {isQuoteCategory && (
             <div className="lg:col-span-6">
-              <label className="text-sm font-medium">Exact quote</label>
+              <label className="text-sm font-medium">Quote</label>
               <Input
                 placeholder='What did they actually say? e.g. "I could bowl faster than that"'
                 value={quote}

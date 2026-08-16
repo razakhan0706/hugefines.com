@@ -4,7 +4,6 @@ import { supabase } from "@/integrations/supabase/client";
 import { generateRecap } from "@/lib/recap.functions";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-
 import {
   Select,
   SelectContent,
@@ -22,7 +21,6 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   const run = useServerFn(generateRecap);
   const [scope, setScope] = useState<string>(data.rounds.at(-1)?.id ?? "season");
   const [tone, setTone] = useState("Absolutely ruthless");
-  
   const [includeVotes, setIncludeVotes] = useState(() => {
     if (typeof window === "undefined") return false;
     return window.localStorage.getItem("huge-fines-include-votes") === "yes";

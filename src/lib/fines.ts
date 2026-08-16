@@ -34,12 +34,13 @@ export interface Round {
   cap?: number | null;
 }
 
-/** Rounds ordered by when they were added, with the newest week first. */
+/** Rounds ordered by when they were added, with the newest week first and Day 2 before Day 1. */
 export function newestRoundsFirst(rounds: Round[]) {
   return [...rounds].sort((a, b) => {
     const createdDifference = Date.parse(b.created_at ?? "") - Date.parse(a.created_at ?? "");
     if (Number.isFinite(createdDifference) && createdDifference !== 0) return createdDifference;
-    return b.round_number - a.round_number;
+    if (a.round_number !== b.round_number) return b.round_number - a.round_number;
+    return (b.day ?? 0) - (a.day ?? 0);
   });
 }
 

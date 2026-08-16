@@ -587,7 +587,6 @@ function VotesTab({ data }: { data: TeamBundle }) {
                   <th>Player</th>
                   <th className="text-right">Votes</th>
                   <th className="text-right">Weeks</th>
-                  <th className="text-right">Avg</th>
                 </tr>
               </thead>
               <tbody>
@@ -606,7 +605,6 @@ function VotesTab({ data }: { data: TeamBundle }) {
                     </td>
                     <td className="stat-num text-right font-bold">{row.points}</td>
                     <td className="stat-num text-right">{row.rounds}</td>
-                    <td className="stat-num text-right">{row.avg.toFixed(1)}</td>
                   </tr>
                 ))}
               </tbody>

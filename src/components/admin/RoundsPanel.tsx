@@ -35,9 +35,31 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
   /** When a Day 2 result is set, copy it back onto the matching Day 1 round. */
   async function syncDayOneResult(roundNumber: number, day: number | null, res: string | null) {
     if (day !== 2 || !res || isInProgress(res)) return;
-    const dayOne = data.rounds.filter(
+    const unresolved = (v: string | null | undefined) => !v?.trim() || isInProgress(v);
+    let dayOne = data.rounds.filter(
       (r) => r.two_day && r.round_number === roundNumber && (r.day ?? 1) === 1,
     );
+    if (dayOne.length === 0) {
+      // Day 1 may have been saved under a different round number (e.g. 5 vs 6).
+      // Fall back to the closest earlier Day 1 against the same opponent that
+      // still has no confirmed result.
+      const opponent = data.rounds
+        .find((r) => r.round_number === roundNumber && (r.day ?? 1) === 2)
+        ?.opponent?.trim()
+        .toLowerCase();
+      if (opponent) {
+        dayOne = data.rounds
+          .filter(
+            (r) =>
+              (r.day ?? 1) === 1 &&
+              r.round_number <= roundNumber &&
+              unresolved(r.result) &&
+              (r.opponent ?? "").trim().toLowerCase() === opponent,
+          )
+          .sort((a, b) => b.round_number - a.round_number)
+          .slice(0, 1);
+      }
+    }
     for (const r of dayOne) {
       if (r.result === res) continue;
       await supabase.from("rounds").update({ result: res }).eq("id", r.id);

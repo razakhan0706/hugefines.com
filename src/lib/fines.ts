@@ -126,7 +126,7 @@ export const FINE_CATEGORY_GROUPS: { group: string; labels: string[] }[] = [
   },
   {
     group: "Batting",
-    labels: ["Filthy hack", "BBQ", "Getting clean bowled", "Missing a straight one"],
+    labels: ["Filthy hack", "BBQ", "Soft/ridiculous dismissal"],
   },
   {
     group: "Bowling",

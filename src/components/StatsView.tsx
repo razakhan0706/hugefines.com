@@ -43,6 +43,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { cn } from "@/lib/utils";
 
 
 const DISCOUNT_COLOR = "var(--color-destructive)";
@@ -254,14 +255,21 @@ function MasterFilterSelect({
   value,
   onChange,
   options,
+  className,
 }: {
   value: string;
   onChange: (value: string) => void;
   options: string[];
+  className?: string;
 }) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="h-8 w-28 text-xs sm:w-36">
+      <SelectTrigger
+        className={cn(
+          "h-8 text-xs [&>span]:line-clamp-none",
+          className ?? "w-28 sm:w-36",
+        )}
+      >
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
@@ -355,6 +363,7 @@ function AwardCard({
             value={master}
             onChange={setMaster}
             options={masterOptions}
+            className="w-44 sm:w-48"
           />
         </div>
       </CardContent>
@@ -383,12 +392,15 @@ function FinesLeaderboardCard({ data }: { data: TeamBundle }) {
   return (
     <Card>
       <CardContent className="p-5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-lg font-bold uppercase tracking-wide">Fines leaderboard</h3>
+        <div className="flex flex-nowrap items-center justify-between gap-2">
+          <h3 className="text-base font-bold uppercase tracking-wide sm:text-lg">
+            Fines leaderboard
+          </h3>
           <MasterFilterSelect
             value={master}
             onChange={setMaster}
             options={masterOptions}
+            className="w-44 sm:w-48 shrink-0"
           />
         </div>
         <div className="mt-4 overflow-x-auto">

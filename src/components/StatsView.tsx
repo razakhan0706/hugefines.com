@@ -255,14 +255,21 @@ function MasterFilterSelect({
   value,
   onChange,
   options,
+  className,
 }: {
   value: string;
   onChange: (value: string) => void;
   options: string[];
+  className?: string;
 }) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="h-8 w-28 text-xs sm:w-36">
+      <SelectTrigger
+        className={cn(
+          "h-8 text-xs [&>span]:line-clamp-none",
+          className ?? "w-28 sm:w-36",
+        )}
+      >
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

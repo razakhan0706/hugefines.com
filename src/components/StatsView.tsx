@@ -260,7 +260,7 @@ function MasterFilterSelect({
 }) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="h-8 w-32 text-xs sm:w-40">
+      <SelectTrigger className="h-8 w-28 text-xs sm:w-36">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
@@ -274,6 +274,7 @@ function MasterFilterSelect({
     </Select>
   );
 }
+
 
 function useMasterOptions(rounds: Round[]) {
   return useMemo(() => {

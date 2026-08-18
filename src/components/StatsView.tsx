@@ -236,13 +236,57 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
 }
 
 function FinesTabInner({ data }: { data: TeamBundle }) {
+  const [master, setMaster] = useState("all");
+
+  const masterOptions = useMemo(() => {
+    const set = new Set<string>();
+    for (const r of data.rounds) {
+      const m = (r.fines_master ?? "").trim();
+      if (m) set.add(m);
+    }
+    return [...set].sort((a, b) => a.localeCompare(b));
+  }, [data.rounds]);
+
+  const masterRoundIds = useMemo(() => {
+    if (master === "all") return null;
+    return new Set(
+      data.rounds
+        .filter((r) => (r.fines_master ?? "").trim() === master)
+        .map((r) => r.id),
+    );
+  }, [data.rounds, master]);
+
+  const finesForStats = useMemo(
+    () =>
+      masterRoundIds
+        ? data.fines.filter((f) => f.round_id && masterRoundIds.has(f.round_id))
+        : data.fines,
+    [data.fines, masterRoundIds],
+  );
+
   const splits = applyCaps(data.fines, data.rounds);
   const stats = buildPlayerStats(
     data.players,
-    data.fines,
+    finesForStats,
     data.rounds,
     data.categories,
     data.votes,
+  );
+
+  const masterFilter = (
+    <Select value={master} onValueChange={setMaster}>
+      <SelectTrigger className="h-8 w-40 text-xs">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        <SelectItem value="all">All fines masters</SelectItem>
+        {masterOptions.map((m) => (
+          <SelectItem key={m} value={m}>
+            {m}
+          </SelectItem>
+        ))}
+      </SelectContent>
+    </Select>
   );
   const currency = data.team.currency;
   const total = data.fines.reduce((s, f) => s + (splits.get(f.id)?.counted ?? Number(f.amount)), 0);
@@ -312,13 +356,14 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
                 ) : (
                   <Trophy className="size-5 shrink-0 text-accent" />
                 )}
-                <div>
+                <div className="min-w-0 flex-1">
                   <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
                     {a.title}
                   </p>
                   <p className="text-lg font-bold">{a.winner}</p>
                   <p className="text-sm text-muted-foreground">{a.detail}</p>
                 </div>
+                <div className="shrink-0">{masterFilter}</div>
               </CardContent>
             </Card>
           ))}
@@ -327,7 +372,10 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
 
       <Card>
         <CardContent className="p-5">
-          <h3 className="text-lg font-bold uppercase tracking-wide">Fines leaderboard</h3>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h3 className="text-lg font-bold uppercase tracking-wide">Fines leaderboard</h3>
+            {masterFilter}
+          </div>
           <div className="mt-4 overflow-x-auto">
             <table className="w-full text-sm">
               <thead>

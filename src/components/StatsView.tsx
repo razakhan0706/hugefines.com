@@ -288,6 +288,15 @@ function filterFinesByMaster(
   return fines.filter((f) => f.round_id && roundIds.has(f.round_id));
 }
 
+function weeksForMaster(rounds: Round[], master: string) {
+  if (master === "all") {
+    return rounds.reduce((s, r) => s + (r.two_day && !r.day ? 2 : 1), 0);
+  }
+  return rounds
+    .filter((r) => (r.fines_master ?? "").trim() === master)
+    .reduce((s, r) => s + (r.two_day && !r.day ? 2 : 1), 0);
+}
+
 function AwardCard({
   data,
   awardTitle,
@@ -343,14 +352,18 @@ function FinesLeaderboardCard({ data }: { data: TeamBundle }) {
   const [master, setMaster] = useState("all");
   const masterOptions = useMasterOptions(data.rounds);
   const filteredFines = filterFinesByMaster(data.fines, data.rounds, master);
-  const splits = applyCaps(filteredFines, data.rounds);
-  const stats = buildPlayerStats(
+  const rawStats = buildPlayerStats(
     data.players,
     filteredFines,
     data.rounds,
     data.categories,
     data.votes,
   );
+  const masterWeeks = weeksForMaster(data.rounds, master);
+  const stats = rawStats.map((s) => ({
+    ...s,
+    avgPerWeek: masterWeeks > 0 ? s.total / masterWeeks : 0,
+  }));
   const currency = data.team.currency;
 
   return (

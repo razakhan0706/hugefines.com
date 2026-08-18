@@ -345,20 +345,11 @@ function AwardCard({
 
   return (
     <Card className="border-accent/40">
-      <CardContent className="flex gap-3 p-5">
-        {award.photo ? (
-          <PhotoAvatar url={award.photo} name={award.winner} className="size-11" />
-        ) : (
-          <Trophy className="size-5 shrink-0 text-accent" />
-        )}
-        <div className="min-w-0 flex-1">
+      <CardContent className="p-5">
+        <div className="flex items-start justify-between gap-2">
           <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
             {award.title}
           </p>
-          <p className="text-lg font-bold">{award.winner}</p>
-          <p className="text-sm text-muted-foreground">{award.detail}</p>
-        </div>
-        <div className="shrink-0">
           <MasterFilterSelect
             value={master}
             onChange={setMaster}
@@ -366,10 +357,22 @@ function AwardCard({
             className="w-44 sm:w-48"
           />
         </div>
+        <div className="mt-2 flex items-center gap-3">
+          {award.photo ? (
+            <PhotoAvatar url={award.photo} name={award.winner} className="size-11" />
+          ) : (
+            <Trophy className="size-5 shrink-0 text-accent" />
+          )}
+          <div className="min-w-0">
+            <p className="text-lg font-bold">{award.winner}</p>
+            <p className="text-sm text-muted-foreground">{award.detail}</p>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
 }
+
 
 function FinesLeaderboardCard({ data }: { data: TeamBundle }) {
   const [master, setMaster] = useState("all");

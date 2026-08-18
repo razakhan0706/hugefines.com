@@ -392,12 +392,15 @@ function FinesLeaderboardCard({ data }: { data: TeamBundle }) {
   return (
     <Card>
       <CardContent className="p-5">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h3 className="text-lg font-bold uppercase tracking-wide">Fines leaderboard</h3>
+        <div className="flex flex-nowrap items-center justify-between gap-2">
+          <h3 className="text-base font-bold uppercase tracking-wide sm:text-lg">
+            Fines leaderboard
+          </h3>
           <MasterFilterSelect
             value={master}
             onChange={setMaster}
             options={masterOptions}
+            className="w-44 sm:w-48 shrink-0"
           />
         </div>
         <div className="mt-4 overflow-x-auto">

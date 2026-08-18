@@ -111,6 +111,8 @@ function MultiLineTick({ x, y, payload }: { x?: number; y?: number; payload?: { 
 function TopCategoriesCard({ data }: { data: TeamBundle }) {
   const [player, setPlayer] = useState("all");
   const [week, setWeek] = useState("all");
+  const [master, setMaster] = useState("all");
+  const masterOptions = useMasterOptions(data.rounds);
 
   const weekOptions = useMemo(() => {
     const out: { value: string; label: string }[] = [];
@@ -127,15 +129,23 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
     return out;
   }, [data.rounds]);
 
-  const filtered = data.fines.filter((f) => {
-    if (player !== "all" && f.player_id !== player) return false;
+  const filtered = useMemo(() => {
+    let out = data.fines;
+    if (player !== "all") out = out.filter((f) => f.player_id === player);
     if (week !== "all") {
       const [rid, wk] = week.split(":");
-      if (f.round_id !== rid) return false;
-      if (wk && String(f.week ?? "") !== wk) return false;
+      out = out.filter((f) => {
+        if (f.round_id !== rid) return false;
+        if (wk && String(f.week ?? "") !== wk) return false;
+        return true;
+      });
     }
-    return true;
-  });
+    if (master !== "all") {
+      out = filterFinesByMaster(out, data.rounds, master);
+    }
+    return out;
+  }, [data.fines, data.rounds, player, week, master]);
+
 
   const rows = categoryBreakdown(filtered, data.categories).slice(0, 5);
   const hasDecimals = rows.some((r) => !Number.isInteger(r.total));
@@ -158,7 +168,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
           <h3 className="text-lg font-bold uppercase tracking-wide">Top offence categories</h3>
           <div className="flex flex-nowrap gap-2">
             <Select value={player} onValueChange={setPlayer}>
-              <SelectTrigger className="h-8 w-32 text-xs sm:w-36">
+              <SelectTrigger className="h-8 w-28 text-xs sm:w-36">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -171,7 +181,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
               </SelectContent>
             </Select>
             <Select value={week} onValueChange={setWeek}>
-              <SelectTrigger className="h-8 w-32 text-xs sm:w-40">
+              <SelectTrigger className="h-8 w-28 text-xs sm:w-36">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -183,7 +193,10 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
                 ))}
               </SelectContent>
             </Select>
+            <MasterFilterSelect value={master} onChange={setMaster} options={masterOptions} />
           </div>
+
+
         </div>
         <div className="-ml-5 mt-2 h-[26rem] sm:h-[30rem]">
           {rows.length === 0 ? (
@@ -248,7 +261,7 @@ function MasterFilterSelect({
 }) {
   return (
     <Select value={value} onValueChange={onChange}>
-      <SelectTrigger className="h-8 w-32 text-xs sm:w-40">
+      <SelectTrigger className="h-8 w-28 text-xs sm:w-36">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
@@ -262,6 +275,7 @@ function MasterFilterSelect({
     </Select>
   );
 }
+
 
 function useMasterOptions(rounds: Round[]) {
   return useMemo(() => {

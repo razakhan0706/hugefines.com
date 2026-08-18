@@ -353,13 +353,18 @@ function FinesLeaderboardCard({ data }: { data: TeamBundle }) {
   const masterOptions = useMasterOptions(data.rounds);
   const filteredFines = filterFinesByMaster(data.fines, data.rounds, master);
   const splits = applyCaps(filteredFines, data.rounds);
-  const stats = buildPlayerStats(
+  const rawStats = buildPlayerStats(
     data.players,
     filteredFines,
     data.rounds,
     data.categories,
     data.votes,
   );
+  const masterWeeks = weeksForMaster(data.rounds, master);
+  const stats = rawStats.map((s) => ({
+    ...s,
+    avgPerWeek: masterWeeks > 0 ? s.total / masterWeeks : 0,
+  }));
   const currency = data.team.currency;
 
   return (

@@ -27,6 +27,8 @@ import {
   venueBreakdown,
   VOTE_FORMATS,
   type Breakdown,
+  type Round,
+  type Fine,
   roundOpponentLabel,
   newestRoundsFirst,
 } from "@/lib/fines";
@@ -235,52 +237,23 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
   );
 }
 
-function FinesTabInner({ data }: { data: TeamBundle }) {
-  const [master, setMaster] = useState("all");
-
-  const masterOptions = useMemo(() => {
-    const set = new Set<string>();
-    for (const r of data.rounds) {
-      const m = (r.fines_master ?? "").trim();
-      if (m) set.add(m);
-    }
-    return [...set].sort((a, b) => a.localeCompare(b));
-  }, [data.rounds]);
-
-  const masterRoundIds = useMemo(() => {
-    if (master === "all") return null;
-    return new Set(
-      data.rounds
-        .filter((r) => (r.fines_master ?? "").trim() === master)
-        .map((r) => r.id),
-    );
-  }, [data.rounds, master]);
-
-  const finesForStats = useMemo(
-    () =>
-      masterRoundIds
-        ? data.fines.filter((f) => f.round_id && masterRoundIds.has(f.round_id))
-        : data.fines,
-    [data.fines, masterRoundIds],
-  );
-
-  const splits = applyCaps(data.fines, data.rounds);
-  const stats = buildPlayerStats(
-    data.players,
-    finesForStats,
-    data.rounds,
-    data.categories,
-    data.votes,
-  );
-
-  const masterFilter = (
-    <Select value={master} onValueChange={setMaster}>
+function MasterFilterSelect({
+  value,
+  onChange,
+  options,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  options: string[];
+}) {
+  return (
+    <Select value={value} onValueChange={onChange}>
       <SelectTrigger className="h-8 w-32 text-xs sm:w-40">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
         <SelectItem value="all">All fines masters</SelectItem>
-        {masterOptions.map((m) => (
+        {options.map((m) => (
           <SelectItem key={m} value={m}>
             {m}
           </SelectItem>
@@ -288,13 +261,166 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
       </SelectContent>
     </Select>
   );
+}
+
+function useMasterOptions(rounds: Round[]) {
+  return useMemo(() => {
+    const set = new Set<string>();
+    for (const r of rounds) {
+      const m = (r.fines_master ?? "").trim();
+      if (m) set.add(m);
+    }
+    return [...set].sort((a, b) => a.localeCompare(b));
+  }, [rounds]);
+}
+
+function filterFinesByMaster(
+  fines: Fine[],
+  rounds: Round[],
+  master: string,
+) {
+  if (master === "all") return fines;
+  const roundIds = new Set(
+    rounds
+      .filter((r) => (r.fines_master ?? "").trim() === master)
+      .map((r) => r.id),
+  );
+  return fines.filter((f) => f.round_id && roundIds.has(f.round_id));
+}
+
+function AwardCard({
+  data,
+  awardTitle,
+}: {
+  data: TeamBundle;
+  awardTitle: "Most Fined" | "Most Discounted Fines";
+}) {
+  const [master, setMaster] = useState("all");
+  const masterOptions = useMasterOptions(data.rounds);
+  const filteredFines = filterFinesByMaster(data.fines, data.rounds, master);
+  const splits = applyCaps(filteredFines, data.rounds);
+  const stats = buildPlayerStats(
+    data.players,
+    filteredFines,
+    data.rounds,
+    data.categories,
+    data.votes,
+  );
+  const award = seasonAwards(stats, data.team.currency).find(
+    (a) => a.title === awardTitle,
+  );
+
+  if (!award) return null;
+
+  return (
+    <Card className="border-accent/40">
+      <CardContent className="flex gap-3 p-5">
+        {award.photo ? (
+          <PhotoAvatar url={award.photo} name={award.winner} className="size-11" />
+        ) : (
+          <Trophy className="size-5 shrink-0 text-accent" />
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
+            {award.title}
+          </p>
+          <p className="text-lg font-bold">{award.winner}</p>
+          <p className="text-sm text-muted-foreground">{award.detail}</p>
+        </div>
+        <div className="shrink-0">
+          <MasterFilterSelect
+            value={master}
+            onChange={setMaster}
+            options={masterOptions}
+          />
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function FinesLeaderboardCard({ data }: { data: TeamBundle }) {
+  const [master, setMaster] = useState("all");
+  const masterOptions = useMasterOptions(data.rounds);
+  const filteredFines = filterFinesByMaster(data.fines, data.rounds, master);
+  const splits = applyCaps(filteredFines, data.rounds);
+  const stats = buildPlayerStats(
+    data.players,
+    filteredFines,
+    data.rounds,
+    data.categories,
+    data.votes,
+  );
+  const currency = data.team.currency;
+
+  return (
+    <Card>
+      <CardContent className="p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-lg font-bold uppercase tracking-wide">Fines leaderboard</h3>
+          <MasterFilterSelect
+            value={master}
+            onChange={setMaster}
+            options={masterOptions}
+          />
+        </div>
+        <div className="mt-4 overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-left text-muted-foreground">
+                <th className="py-2">#</th>
+                <th>Player</th>
+                <th className="text-right">Total</th>
+                <th className="text-right text-destructive">Discounted</th>
+                <th className="text-right">Avg/week</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stats.map((s, i) => (
+                <tr key={s.player.id} className="border-t border-border">
+                  <td className="stat-num py-2 text-muted-foreground">{i + 1}</td>
+                  <td className="font-medium">
+                    <span className="flex items-center gap-2">
+                      <PhotoAvatar
+                        url={s.player.photo_url}
+                        name={s.player.name}
+                        className="size-8"
+                      />
+                      {s.player.name}
+                    </span>
+                  </td>
+                  <td className="stat-num text-right font-bold">{money(s.total, currency)}</td>
+                  <td className="stat-num text-right font-bold text-destructive">
+                    {s.discounted > 0 ? money(s.discounted, currency) : "—"}
+                  </td>
+                  <td className="stat-num text-right">{money(s.avgPerWeek, currency)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {stats.length === 0 && (
+            <p className="py-4 text-muted-foreground">Add players to see the leaderboard.</p>
+          )}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+function FinesTabInner({ data }: { data: TeamBundle }) {
+  const splits = applyCaps(data.fines, data.rounds);
+  const stats = buildPlayerStats(
+    data.players,
+    data.fines,
+    data.rounds,
+    data.categories,
+    data.votes,
+  );
+
   const currency = data.team.currency;
   const total = data.fines.reduce((s, f) => s + (splits.get(f.id)?.counted ?? Number(f.amount)), 0);
   const totalDiscounted = data.fines.reduce((s, f) => s + (splits.get(f.id)?.discounted ?? 0), 0);
   const byRound = roundTotals(data.fines, data.rounds, splits);
-  const awards = seasonAwards(stats, currency).filter(
-    (a) => a.title !== "Player of the Season" && a.title !== "Most Consecutive Weeks",
-  );
   const byMaster = finesMasterBreakdown(data.fines, data.rounds, splits);
   const byOpponent = opponentBreakdown(data.fines, data.rounds, splits);
   const byVenue = venueBreakdown(data.fines, data.rounds, splits);
@@ -314,7 +440,6 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
     roundChartStep * 3,
     roundChartTop,
   ].filter((v, i, a) => a.indexOf(v) === i);
-
 
   const weeksPlayed = data.rounds.reduce((s, r) => s + (r.two_day && !r.day ? 2 : 1), 0);
   const avgPerWeek = weeksPlayed > 0 ? total / weeksPlayed : 0;
@@ -346,76 +471,12 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
         ))}
       </div>
 
-      {awards.length > 0 && (
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-          {awards.map((a) => (
-            <Card key={a.title} className="border-accent/40">
-              <CardContent className="flex gap-3 p-5">
-                {a.photo ? (
-                  <PhotoAvatar url={a.photo} name={a.winner} className="size-11" />
-                ) : (
-                  <Trophy className="size-5 shrink-0 text-accent" />
-                )}
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
-                    {a.title}
-                  </p>
-                  <p className="text-lg font-bold">{a.winner}</p>
-                  <p className="text-sm text-muted-foreground">{a.detail}</p>
-                </div>
-                <div className="shrink-0">{masterFilter}</div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <AwardCard data={data} awardTitle="Most Fined" />
+        <AwardCard data={data} awardTitle="Most Discounted Fines" />
+      </div>
 
-      <Card>
-        <CardContent className="p-5">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-lg font-bold uppercase tracking-wide">Fines leaderboard</h3>
-            {masterFilter}
-          </div>
-          <div className="mt-4 overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-muted-foreground">
-                  <th className="py-2">#</th>
-                  <th>Player</th>
-                  <th className="text-right">Total</th>
-                  <th className="text-right text-destructive">Discounted</th>
-                  <th className="text-right">Avg/week</th>
-                </tr>
-              </thead>
-              <tbody>
-                {stats.map((s, i) => (
-                  <tr key={s.player.id} className="border-t border-border">
-                    <td className="stat-num py-2 text-muted-foreground">{i + 1}</td>
-                    <td className="font-medium">
-                      <span className="flex items-center gap-2">
-                        <PhotoAvatar
-                          url={s.player.photo_url}
-                          name={s.player.name}
-                          className="size-8"
-                        />
-                        {s.player.name}
-                      </span>
-                    </td>
-                    <td className="stat-num text-right font-bold">{money(s.total, currency)}</td>
-                    <td className="stat-num text-right font-bold text-destructive">
-                      {s.discounted > 0 ? money(s.discounted, currency) : "—"}
-                    </td>
-                    <td className="stat-num text-right">{money(s.avgPerWeek, currency)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            {stats.length === 0 && (
-              <p className="py-4 text-muted-foreground">Add players to see the leaderboard.</p>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <FinesLeaderboardCard data={data} />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>

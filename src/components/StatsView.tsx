@@ -352,7 +352,6 @@ function FinesLeaderboardCard({ data }: { data: TeamBundle }) {
   const [master, setMaster] = useState("all");
   const masterOptions = useMasterOptions(data.rounds);
   const filteredFines = filterFinesByMaster(data.fines, data.rounds, master);
-  const splits = applyCaps(filteredFines, data.rounds);
   const rawStats = buildPlayerStats(
     data.players,
     filteredFines,

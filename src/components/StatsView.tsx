@@ -363,6 +363,7 @@ function AwardCard({
             value={master}
             onChange={setMaster}
             options={masterOptions}
+            className="w-44 sm:w-48"
           />
         </div>
       </CardContent>

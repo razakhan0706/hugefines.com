@@ -275,7 +275,7 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
 
   const masterFilter = (
     <Select value={master} onValueChange={setMaster}>
-      <SelectTrigger className="h-8 w-40 text-xs">
+      <SelectTrigger className="h-8 w-32 text-xs sm:w-40">
         <SelectValue />
       </SelectTrigger>
       <SelectContent>

@@ -196,6 +196,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
             <MasterFilterSelect value={master} onChange={setMaster} options={masterOptions} />
           </div>
 
+
         </div>
         <div className="-ml-5 mt-2 h-[26rem] sm:h-[30rem]">
           {rows.length === 0 ? (

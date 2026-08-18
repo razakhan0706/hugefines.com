@@ -168,7 +168,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
           <h3 className="text-lg font-bold uppercase tracking-wide">Top offence categories</h3>
           <div className="flex flex-nowrap gap-2">
             <Select value={player} onValueChange={setPlayer}>
-              <SelectTrigger className="h-8 w-32 text-xs sm:w-36">
+              <SelectTrigger className="h-8 w-28 text-xs sm:w-36">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -181,7 +181,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
               </SelectContent>
             </Select>
             <Select value={week} onValueChange={setWeek}>
-              <SelectTrigger className="h-8 w-32 text-xs sm:w-40">
+              <SelectTrigger className="h-8 w-28 text-xs sm:w-36">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -193,7 +193,9 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
                 ))}
               </SelectContent>
             </Select>
+            <MasterFilterSelect value={master} onChange={setMaster} options={masterOptions} />
           </div>
+
         </div>
         <div className="-ml-5 mt-2 h-[26rem] sm:h-[30rem]">
           {rows.length === 0 ? (

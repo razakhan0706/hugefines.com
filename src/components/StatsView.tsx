@@ -27,6 +27,8 @@ import {
   venueBreakdown,
   VOTE_FORMATS,
   type Breakdown,
+  type Round,
+  type Fine,
   roundOpponentLabel,
   newestRoundsFirst,
 } from "@/lib/fines";

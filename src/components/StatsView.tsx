@@ -288,6 +288,15 @@ function filterFinesByMaster(
   return fines.filter((f) => f.round_id && roundIds.has(f.round_id));
 }
 
+function weeksForMaster(rounds: Round[], master: string) {
+  if (master === "all") {
+    return rounds.reduce((s, r) => s + (r.two_day && !r.day ? 2 : 1), 0);
+  }
+  return rounds
+    .filter((r) => (r.fines_master ?? "").trim() === master)
+    .reduce((s, r) => s + (r.two_day && !r.day ? 2 : 1), 0);
+}
+
 function AwardCard({
   data,
   awardTitle,

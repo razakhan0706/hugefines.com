@@ -283,24 +283,30 @@ export type Database = {
       team_access: {
         Row: {
           created_at: string
+          created_by: string | null
           email: string | null
           id: string
+          invited_email: string | null
           team_id: string
-          user_id: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string
+          created_by?: string | null
           email?: string | null
           id?: string
+          invited_email?: string | null
           team_id: string
-          user_id: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string
+          created_by?: string | null
           email?: string | null
           id?: string
+          invited_email?: string | null
           team_id?: string
-          user_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
@@ -418,6 +424,7 @@ export type Database = {
     }
     Functions: {
       can_edit_team: { Args: { _team_id: string }; Returns: boolean }
+      claim_team_invites: { Args: never; Returns: number }
       team_is_public: { Args: { _team_id: string }; Returns: boolean }
     }
     Enums: {

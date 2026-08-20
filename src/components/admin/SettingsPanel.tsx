@@ -101,7 +101,26 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
                 Anyone with the link can view — no login needed.
               </p>
             </div>
-            <Switch checked={isPublic} onCheckedChange={setIsPublic} />
+            <div className="flex gap-1.5">
+              <Button
+                type="button"
+                size="sm"
+                variant={isPublic ? "default" : "outline"}
+                className="w-14 px-2"
+                onClick={() => setIsPublic(true)}
+              >
+                Yes
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={!isPublic ? "default" : "outline"}
+                className="w-14 px-2"
+                onClick={() => setIsPublic(false)}
+              >
+                No
+              </Button>
+            </div>
           </div>
           <div className="flex items-center justify-between gap-3">
             <div>
@@ -110,7 +129,26 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
                 Turn off to keep Player of the Season a surprise.
               </p>
             </div>
-            <Switch checked={votesPublic} onCheckedChange={setVotesPublic} />
+            <div className="flex gap-1.5">
+              <Button
+                type="button"
+                size="sm"
+                variant={votesPublic ? "default" : "outline"}
+                className="w-14 px-2"
+                onClick={() => setVotesPublic(true)}
+              >
+                Yes
+              </Button>
+              <Button
+                type="button"
+                size="sm"
+                variant={!votesPublic ? "default" : "outline"}
+                className="w-14 px-2"
+                onClick={() => setVotesPublic(false)}
+              >
+                No
+              </Button>
+            </div>
           </div>
           <div className="flex gap-2">
             <Input readOnly value={link} />

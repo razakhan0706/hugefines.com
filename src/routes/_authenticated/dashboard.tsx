@@ -69,6 +69,8 @@ function Dashboard() {
   const teams = useQuery({
     queryKey: ["my-teams"],
     queryFn: async () => {
+      // Link any pending co-admin invites sent to this user's email.
+      await supabase.rpc("claim_team_invites");
       const { data, error } = await supabase
         .from("teams")
         .select("*")

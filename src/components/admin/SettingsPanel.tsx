@@ -9,6 +9,7 @@ import { Copy } from "lucide-react";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
 import { uploadPhoto } from "@/lib/photos";
+import { TeamAdminsCard } from "@/components/admin/TeamAdminsCard";
 
 export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const [name, setName] = useState(data.team.name);
@@ -128,6 +129,8 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
           <Button onClick={save}>Save sharing settings</Button>
         </CardContent>
       </Card>
+
+      <TeamAdminsCard teamId={data.team.id} ownerId={data.team.owner_id} />
     </div>
   );
 }

@@ -307,7 +307,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
               placeholder="e.g. 5"
             />
             <p className="mt-1 text-xs text-muted-foreground">
-              Max a player can be fined this round
+              Max a player can be fined in a day
             </p>
           </div>
           <div>

@@ -581,7 +581,6 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
   const total = data.fines.reduce((s, f) => s + (splits.get(f.id)?.counted ?? Number(f.amount)), 0);
   const totalDiscounted = data.fines.reduce((s, f) => s + (splits.get(f.id)?.discounted ?? 0), 0);
   const byRound = roundTotals(data.fines, data.rounds, splits);
-  const byMaster = finesMasterBreakdown(data.fines, data.rounds, splits);
   const byOpponent = opponentBreakdown(data.fines, data.rounds, splits);
   const byVenue = venueBreakdown(data.fines, data.rounds, splits);
   const byResult = resultBreakdown(data.fines, data.rounds, splits);

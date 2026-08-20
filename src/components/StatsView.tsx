@@ -29,6 +29,7 @@ import {
   type Breakdown,
   type Round,
   type Fine,
+  type FineSplit,
   roundOpponentLabel,
   newestRoundsFirst,
 } from "@/lib/fines";

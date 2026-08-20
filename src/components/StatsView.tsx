@@ -450,6 +450,123 @@ function FinesLeaderboardCard({ data }: { data: TeamBundle }) {
   );
 }
 
+function FinesMasterCard({
+  data,
+  splits,
+  currency,
+}: {
+  data: TeamBundle;
+  splits: Map<string, FineSplit>;
+  currency: string;
+}) {
+  const [result, setResult] = useState("all");
+
+  const resultOptions = useMemo(() => {
+    const counts = new Map<string, { value: string; count: number }>();
+    for (const r of data.rounds) {
+      const raw = (r.result ?? "").trim();
+      if (!raw) continue;
+      const key = raw.toLowerCase();
+      const existing = counts.get(key);
+      if (existing) {
+        existing.count += 1;
+      } else {
+        counts.set(key, { value: raw, count: 1 });
+      }
+    }
+    return [...counts.values()]
+      .sort((a, b) => b.count - a.count)
+      .map((c) => c.value);
+  }, [data.rounds]);
+
+  const filteredRounds = useMemo(() => {
+    if (result === "all") return data.rounds;
+    return data.rounds.filter(
+      (r) => (r.result ?? "").trim().toLowerCase() === result.toLowerCase(),
+    );
+  }, [data.rounds, result]);
+
+  const byMaster = finesMasterBreakdown(data.fines, filteredRounds, splits);
+
+  return (
+    <Card>
+      <CardContent className="p-3 sm:p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h3 className="text-sm font-bold uppercase tracking-wide sm:text-lg">
+            Fines master
+          </h3>
+          <Select value={result} onValueChange={setResult}>
+            <SelectTrigger className="h-8 w-36 text-xs sm:w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All results</SelectItem>
+              {resultOptions.map((opt) => (
+                <SelectItem key={opt} value={opt}>
+                  {opt}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        {byMaster.length === 0 ? (
+          <p className="mt-3 text-sm text-muted-foreground">
+            {result === "all"
+              ? "Add a fines master to a round to see this."
+              : "No fines masters for this result."}
+          </p>
+        ) : (
+          <div className="mt-3 overflow-x-auto">
+            <table className="w-full text-xs sm:text-sm">
+              <thead>
+                <tr className="text-left uppercase text-muted-foreground">
+                  <th className="py-1.5 pr-2">Name</th>
+                  <th className="px-2 text-right">Total</th>
+                  <th className="whitespace-nowrap px-2 text-right text-destructive">
+                    Disc.
+                  </th>
+                  <th className="px-2 text-right">Weeks</th>
+                  <th className="pl-2 text-right">Avg</th>
+                </tr>
+              </thead>
+              <tbody>
+                {byMaster.map((r) => (
+                  <tr key={r.label} className="border-t border-border">
+                    <td className="py-1.5 pr-2">
+                      <span className="flex items-center gap-1.5 font-medium uppercase">
+                        <PhotoAvatar
+                          url={r.photo}
+                          name={r.label}
+                          className="size-6 shrink-0 sm:size-8"
+                        />
+                        <span className="min-w-0 break-words leading-tight">
+                          {r.label}
+                        </span>
+                      </span>
+                    </td>
+                    <td className="stat-num whitespace-nowrap px-2 text-right font-bold">
+                      {money(r.total, currency)}
+                    </td>
+                    <td className="stat-num whitespace-nowrap px-2 text-right font-bold text-destructive">
+                      {r.discounted > 0 ? money(r.discounted, currency) : "—"}
+                    </td>
+                    <td className="stat-num whitespace-nowrap px-2 text-right">
+                      {r.rounds}
+                    </td>
+                    <td className="stat-num whitespace-nowrap pl-2 text-right">
+                      {money(r.avg, currency)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
 function FinesTabInner({ data }: { data: TeamBundle }) {
   const splits = applyCaps(data.fines, data.rounds);
   const stats = buildPlayerStats(

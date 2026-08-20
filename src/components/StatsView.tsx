@@ -573,13 +573,7 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
       </div>
 
       <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
-        <BreakdownCard
-          title="Fines master"
-          rows={byMaster}
-          currency={currency}
-          unit="Weeks"
-          empty="Add a fines master to a round to see this."
-        />
+        <FinesMasterCard data={data} splits={splits} currency={currency} />
         <BreakdownCard
           title="Fines by opponent"
           rows={byOpponent}

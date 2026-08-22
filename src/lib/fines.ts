@@ -511,6 +511,46 @@ export function resultBreakdown(fines: Fine[], rounds: Round[], splits?: Map<str
   return roundAttributeBreakdown(fines, rounds, (r) => resultBucket(r.result), undefined, splits);
 }
 
+/** Groups vote points by an attribute of the round they belong to. */
+export function voteAttributeBreakdown(
+  votes: { round_id: string; points: number }[],
+  rounds: Round[],
+  pick: (r: Round) => string | null | undefined,
+  photo?: (r: Round) => string | null | undefined,
+): Breakdown[] {
+  const map = new Map<
+    string,
+    { total: number; count: number; rounds: Set<string>; photo?: string | null }
+  >();
+  for (const r of rounds) {
+    const key = (pick(r) ?? "").trim();
+    if (!key) continue;
+    const row = map.get(key) ?? { total: 0, count: 0, rounds: new Set<string>(), photo: photo?.(r) };
+    if (!row.photo && photo?.(r)) row.photo = photo(r);
+    row.rounds.add(r.id);
+    for (const v of votes) {
+      if (v.round_id !== r.id) continue;
+      row.total += Number(v.points);
+      row.count += 1;
+    }
+    map.set(key, row);
+  }
+  return [...map.entries()]
+    .map(([label, v]) => ({
+      label,
+      total: v.total,
+      discounted: 0,
+      count: v.count,
+      rounds: v.rounds.size,
+      avg: v.rounds.size ? v.total / v.rounds.size : 0,
+      photo: v.photo,
+    }))
+    .filter((r) => r.total > 0)
+    .sort((a, b) => (b.total !== a.total ? b.total - a.total : b.rounds - a.rounds));
+}
+
+
+
 /** Fines grouped by round, split into days for two-day rounds. */
 export function weekBreakdown(fines: Fine[], rounds: Round[], splits?: Map<string, FineSplit>): Breakdown[] {
   const capSplits = splits ?? applyCaps(fines, rounds);

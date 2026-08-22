@@ -582,10 +582,13 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                 <p className="text-sm text-muted-foreground">
                   {(() => {
                     const cat = f.category_id ? categoryLabel.get(f.category_id) ?? "" : "";
-                    const same =
-                      cat.trim().toLowerCase() === f.description.trim().toLowerCase();
-                    return `${f.description}${cat && !same ? ` · ${cat}` : ""}`;
+                    const desc = (f.description ?? "").trim();
+                    if (!cat) return desc || "Custom fine";
+                    // Keep any extra detail (e.g. a quote) but never repeat the category
+                    const extra = desc.includes(" — ") ? desc.split(" — ").slice(1).join(" — ") : "";
+                    return extra ? `${cat} — ${extra}` : cat;
                   })()}
+
                   {f.round_id ? ` · ${roundLabel.get(f.round_id) ?? ""}` : ""}
                 </p>
               </div>

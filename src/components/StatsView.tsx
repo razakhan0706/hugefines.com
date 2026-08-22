@@ -892,21 +892,32 @@ function VotesTab({ data }: { data: TeamBundle }) {
       <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
         <VotesBreakdownCard
           title="Votes by opponent"
-          rows={voteByOpponent}
+          votes={data.votes}
+          rounds={data.rounds}
+          players={votePlayers}
+          pick={(r) => r.opponent}
+          photo={(r) => r.opponent_logo_url}
           empty="Add opponents to your rounds to see this."
         />
         <VotesBreakdownCard
           title="Votes by venue"
-          rows={voteByVenue}
+          votes={data.votes}
+          rounds={data.rounds}
+          players={votePlayers}
+          pick={(r) => r.venue}
           empty="Add venues to your rounds to see this."
         />
         <VotesBreakdownCard
           title="Votes by result"
-          rows={voteByResult}
+          votes={data.votes}
+          rounds={data.rounds}
+          players={votePlayers}
+          pick={(r) => resultBucket(r.result)}
           empty="Add results to your rounds to see this."
           resultMode
         />
       </div>
+
     </div>
   );
 }

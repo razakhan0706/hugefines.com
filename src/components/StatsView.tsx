@@ -896,7 +896,7 @@ function VotesTab({ data }: { data: TeamBundle }) {
           rounds={data.rounds}
           players={votePlayers}
           pick={(r) => r.opponent}
-          photo={(r) => r.opponent_logo_url}
+          filterLabel="All opponents"
           empty="Add opponents to your rounds to see this."
         />
         <VotesBreakdownCard
@@ -905,6 +905,7 @@ function VotesTab({ data }: { data: TeamBundle }) {
           rounds={data.rounds}
           players={votePlayers}
           pick={(r) => r.venue}
+          filterLabel="All venues"
           empty="Add venues to your rounds to see this."
         />
         <VotesBreakdownCard
@@ -913,8 +914,10 @@ function VotesTab({ data }: { data: TeamBundle }) {
           rounds={data.rounds}
           players={votePlayers}
           pick={(r) => resultBucket(r.result)}
+          filterLabel="All results"
           empty="Add results to your rounds to see this."
           resultMode
+
         />
       </div>
 

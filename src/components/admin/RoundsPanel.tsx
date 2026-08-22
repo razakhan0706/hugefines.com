@@ -175,6 +175,21 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     }
   }
 
+  async function clearRoundPhoto(
+    id: string,
+    field: "fines_master_photo_url" | "opponent_logo_url",
+  ) {
+    setBusy(id + field);
+    const patch =
+      field === "fines_master_photo_url"
+        ? { fines_master_photo_url: null }
+        : { opponent_logo_url: null };
+    const { error } = await supabase.from("rounds").update(patch).eq("id", id);
+    setBusy(null);
+    if (error) return toast.error(error.message);
+    refresh();
+  }
+
   async function addRound() {
     const typed = roundName.trim();
     const num = Number(typed.match(/\d+/)?.[0] ?? NaN) || nextNumber;

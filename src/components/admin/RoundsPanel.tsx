@@ -175,6 +175,21 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
     }
   }
 
+  async function clearRoundPhoto(
+    id: string,
+    field: "fines_master_photo_url" | "opponent_logo_url",
+  ) {
+    setBusy(id + field);
+    const patch =
+      field === "fines_master_photo_url"
+        ? { fines_master_photo_url: null }
+        : { opponent_logo_url: null };
+    const { error } = await supabase.from("rounds").update(patch).eq("id", id);
+    setBusy(null);
+    if (error) return toast.error(error.message);
+    refresh();
+  }
+
   async function addRound() {
     const typed = roundName.trim();
     const num = Number(typed.match(/\d+/)?.[0] ?? NaN) || nextNumber;
@@ -483,6 +498,56 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                       onValueChange={(v) => setEdit((s) => ({ ...s, fines_master: v }))}
                       suggestions={finesMasterOptions}
                     />
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Opposition logo</label>
+                    <div className="mt-2 flex items-center gap-2">
+                      <PhotoAvatar
+                        url={r.opponent_logo_url}
+                        name={edit.opponent}
+                        busy={busy === r.id + "opponent_logo_url"}
+                        title="Opposition logo"
+                        label={r.opponent_logo_url ? "Change logo" : "Add logo"}
+                        labelAlways
+                        onPick={(f) => updateRoundPhoto(r.id, "opponent_logo_url", f)}
+                      />
+                      {r.opponent_logo_url && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          title="Remove logo"
+                          onClick={() => clearRoundPhoto(r.id, "opponent_logo_url")}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="text-sm font-medium">Fines master photo</label>
+                    <div className="mt-2 flex items-center gap-2">
+                      <PhotoAvatar
+                        url={r.fines_master_photo_url}
+                        name={edit.fines_master}
+                        busy={busy === r.id + "fines_master_photo_url"}
+                        title="Fines master photo"
+                        label={r.fines_master_photo_url ? "Change photo" : "Add photo"}
+                        labelAlways
+                        onPick={(f) => updateRoundPhoto(r.id, "fines_master_photo_url", f)}
+                      />
+                      {r.fines_master_photo_url && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          title="Remove photo"
+                          onClick={() => clearRoundPhoto(r.id, "fines_master_photo_url")}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
                   <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-3">
                     <Button onClick={saveEdit}>

@@ -10,10 +10,12 @@ interface Props {
   title?: string;
   /** Short text shown next to the avatar when it is an upload target and empty. */
   label?: string;
+  /** Show the label even when a photo already exists (e.g. "Change photo"). */
+  labelAlways?: boolean;
 }
 
 /** Round avatar that optionally doubles as a photo upload button. */
-export function PhotoAvatar({ url, name, className, busy, onPick, title, label }: Props) {
+export function PhotoAvatar({ url, name, className, busy, onPick, title, label, labelAlways }: Props) {
   const initial = (name ?? "?").trim().charAt(0).toUpperCase() || "?";
 
   const inner = (
@@ -56,7 +58,7 @@ export function PhotoAvatar({ url, name, className, busy, onPick, title, label }
       title={title ?? "Upload photo"}
     >
       <span className="relative inline-block shrink-0">{inner}</span>
-      {label && !url && (
+      {label && (!url || labelAlways) && (
         <span className="whitespace-nowrap text-xs font-medium text-accent-strong underline">
           {label}
         </span>

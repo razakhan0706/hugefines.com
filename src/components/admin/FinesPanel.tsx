@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -106,6 +106,36 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
     [data.categories],
   );
 
+  // Absorb custom fines back into a category when a matching category exists,
+  // so a fine never shows two categories at once.
+  const absorbing = useRef(false);
+  useEffect(() => {
+    if (absorbing.current) return;
+    const byLabel = new Map(
+      data.categories.map((c) => [c.label.trim().toLowerCase(), c.id]),
+    );
+    const toFix = data.fines.filter((f) => {
+      if (f.category_id) return false;
+      const base = (f.description ?? "").split(" — ")[0].trim().toLowerCase();
+      return base.length > 0 && byLabel.has(base);
+    });
+    if (toFix.length === 0) return;
+    absorbing.current = true;
+    (async () => {
+      for (const f of toFix) {
+        const base = f.description.split(" — ")[0].trim().toLowerCase();
+        await supabase
+          .from("fines")
+          .update({ category_id: byLabel.get(base)! })
+          .eq("id", f.id);
+      }
+      absorbing.current = false;
+      refresh();
+    })();
+  }, [data.fines, data.categories, refresh]);
+
+
+
   const groupedCategories = useMemo(() => {
     const order = [...FINE_CATEGORY_GROUPS.map((g) => g.group), "Other"];
     const map = new Map<string, typeof data.categories>();
@@ -207,11 +237,24 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   }
 
   async function removeCategory(id: string) {
+    // Turn any fines on this category into custom fines so nothing is lost
+    const label = data.categories.find((c) => c.id === id)?.label ?? "";
+    const orphans = data.fines.filter((f) => f.category_id === id);
+    for (const f of orphans) {
+      await supabase
+        .from("fines")
+        .update({
+          category_id: null,
+          description: f.description?.trim() || label || "Custom fine",
+        })
+        .eq("id", f.id);
+    }
     const { error } = await supabase.from("fine_categories").delete().eq("id", id);
     if (error) return toast.error(error.message);
     if (categoryId === id) setCategoryId("");
     refresh();
   }
+
 
   async function removeFine(id: string) {
     await supabase.from("fines").delete().eq("id", id);
@@ -539,10 +582,13 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                 <p className="text-sm text-muted-foreground">
                   {(() => {
                     const cat = f.category_id ? categoryLabel.get(f.category_id) ?? "" : "";
-                    const same =
-                      cat.trim().toLowerCase() === f.description.trim().toLowerCase();
-                    return `${f.description}${cat && !same ? ` · ${cat}` : ""}`;
+                    const desc = (f.description ?? "").trim();
+                    if (!cat) return desc || "Custom fine";
+                    // Keep any extra detail (e.g. a quote) but never repeat the category
+                    const extra = desc.includes(" — ") ? desc.split(" — ").slice(1).join(" — ") : "";
+                    return extra ? `${cat} — ${extra}` : cat;
                   })()}
+
                   {f.round_id ? ` · ${roundLabel.get(f.round_id) ?? ""}` : ""}
                 </p>
               </div>

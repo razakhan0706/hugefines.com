@@ -389,7 +389,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
           return (
             <Card key={r.id}>
               {editId === r.id ? (
-                <CardContent className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
+                <CardContent className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-6">
                   <div>
                     <label className="text-sm font-medium">Opponent</label>
                     <AutocompleteInput
@@ -397,7 +397,30 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                       onValueChange={(v) => setEdit((s) => ({ ...s, opponent: v }))}
                       suggestions={opponentOptions}
                     />
+                    <div className="mt-2 flex items-center gap-2">
+                      <PhotoAvatar
+                        url={r.opponent_logo_url}
+                        name={edit.opponent}
+                        busy={busy === r.id + "opponent_logo_url"}
+                        title="Opposition logo"
+                        label="Opposition logo"
+                        labelAlways
+                        onPick={(f) => updateRoundPhoto(r.id, "opponent_logo_url", f)}
+                      />
+                      {r.opponent_logo_url && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          title="Remove logo"
+                          onClick={() => clearRoundPhoto(r.id, "opponent_logo_url")}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
+
                   <div>
                     <label className="text-sm font-medium">Round</label>
                     <Input
@@ -464,6 +487,10 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                       inputMode="decimal"
                       placeholder="e.g. 5"
                     />
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Max a player can be fined in a day
+                    </p>
+
                   </div>
                   <div>
                     <label className="text-sm font-medium">Venue</label>
@@ -497,42 +524,15 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                       value={edit.fines_master}
                       onValueChange={(v) => setEdit((s) => ({ ...s, fines_master: v }))}
                       suggestions={finesMasterOptions}
+                      placeholder="Who ran the fines"
                     />
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Opposition logo</label>
-                    <div className="mt-2 flex items-center gap-2">
-                      <PhotoAvatar
-                        url={r.opponent_logo_url}
-                        name={edit.opponent}
-                        busy={busy === r.id + "opponent_logo_url"}
-                        title="Opposition logo"
-                        label={r.opponent_logo_url ? "Change logo" : "Add logo"}
-                        labelAlways
-                        onPick={(f) => updateRoundPhoto(r.id, "opponent_logo_url", f)}
-                      />
-                      {r.opponent_logo_url && (
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="icon"
-                          title="Remove logo"
-                          onClick={() => clearRoundPhoto(r.id, "opponent_logo_url")}
-                        >
-                          <Trash2 className="size-4" />
-                        </Button>
-                      )}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="text-sm font-medium">Fines master photo</label>
                     <div className="mt-2 flex items-center gap-2">
                       <PhotoAvatar
                         url={r.fines_master_photo_url}
                         name={edit.fines_master}
                         busy={busy === r.id + "fines_master_photo_url"}
                         title="Fines master photo"
-                        label={r.fines_master_photo_url ? "Change photo" : "Add photo"}
+                        label="Fines master photo"
                         labelAlways
                         onPick={(f) => updateRoundPhoto(r.id, "fines_master_photo_url", f)}
                       />
@@ -549,7 +549,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                       )}
                     </div>
                   </div>
-                  <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-3">
+                  <div className="flex items-end gap-2 sm:col-span-2 lg:col-span-6">
                     <Button onClick={saveEdit}>
                       <Check className="size-4" /> Save changes
                     </Button>
@@ -557,6 +557,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                       <X className="size-4" /> Cancel
                     </Button>
                   </div>
+
                 </CardContent>
               ) : (
               <CardContent className="grid grid-cols-[auto_1fr] items-start gap-3 p-4">

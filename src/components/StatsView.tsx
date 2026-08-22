@@ -924,19 +924,50 @@ function VotesTab({ data }: { data: TeamBundle }) {
 
 function VotesBreakdownCard({
   title,
-  rows,
+  votes,
+  rounds,
+  players,
+  pick,
+  photo,
   empty,
   resultMode = false,
 }: {
   title: string;
-  rows: Breakdown[];
+  votes: { round_id: string; player_id: string; points: number }[];
+  rounds: Round[];
+  players: { id: string; name: string }[];
+  pick: (r: Round) => string | null | undefined;
+  photo?: (r: Round) => string | null | undefined;
   empty: string;
   resultMode?: boolean;
 }) {
+  const [player, setPlayer] = useState("all");
+  const rows = useMemo(() => {
+    const filtered = player === "all" ? votes : votes.filter((v) => v.player_id === player);
+    return voteAttributeBreakdown(filtered, rounds, pick, photo);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [votes, rounds, player]);
+
   return (
     <Card>
       <CardContent className="p-3 sm:p-5">
-        <h3 className="text-sm font-bold uppercase tracking-wide sm:text-lg">{title}</h3>
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-sm font-bold uppercase tracking-wide sm:text-lg">{title}</h3>
+          <Select value={player} onValueChange={setPlayer}>
+            <SelectTrigger className="h-8 w-[130px] shrink-0 text-xs sm:w-[160px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All players</SelectItem>
+              {players.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         {rows.length === 0 ? (
           <p className="mt-3 text-sm text-muted-foreground">{empty}</p>
         ) : (

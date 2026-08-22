@@ -787,6 +787,17 @@ function VotesTab({ data }: { data: TeamBundle }) {
     { label: "Weeks with votes", value: String(roundsWithVotes) },
     { label: "Leader", value: leader ? `${leader.player.name} (${leader.points})` : "—" },
   ];
+  const voteByOpponent = voteAttributeBreakdown(
+    data.votes,
+    data.rounds,
+    (r) => r.opponent,
+    (r) => r.opponent_logo_url,
+  );
+  const voteByVenue = voteAttributeBreakdown(data.votes, data.rounds, (r) => r.venue);
+  const voteByResult = voteAttributeBreakdown(data.votes, data.rounds, (r) =>
+    resultBucket(r.result),
+  );
+
 
   return (
     <div className="space-y-6">

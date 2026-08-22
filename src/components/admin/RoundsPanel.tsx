@@ -487,6 +487,10 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                       inputMode="decimal"
                       placeholder="e.g. 5"
                     />
+                    <p className="mt-1 text-xs text-muted-foreground">
+                      Max a player can be fined in a day
+                    </p>
+
                   </div>
                   <div>
                     <label className="text-sm font-medium">Venue</label>

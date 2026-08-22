@@ -106,6 +106,36 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
     [data.categories],
   );
 
+  // Absorb custom fines back into a category when a matching category exists,
+  // so a fine never shows two categories at once.
+  const absorbing = useRef(false);
+  useEffect(() => {
+    if (absorbing.current) return;
+    const byLabel = new Map(
+      data.categories.map((c) => [c.label.trim().toLowerCase(), c.id]),
+    );
+    const toFix = data.fines.filter((f) => {
+      if (f.category_id) return false;
+      const base = (f.description ?? "").split(" — ")[0].trim().toLowerCase();
+      return base.length > 0 && byLabel.has(base);
+    });
+    if (toFix.length === 0) return;
+    absorbing.current = true;
+    (async () => {
+      for (const f of toFix) {
+        const base = f.description.split(" — ")[0].trim().toLowerCase();
+        await supabase
+          .from("fines")
+          .update({ category_id: byLabel.get(base)! })
+          .eq("id", f.id);
+      }
+      absorbing.current = false;
+      refresh();
+    })();
+  }, [data.fines, data.categories, refresh]);
+
+
+
   const groupedCategories = useMemo(() => {
     const order = [...FINE_CATEGORY_GROUPS.map((g) => g.group), "Other"];
     const map = new Map<string, typeof data.categories>();

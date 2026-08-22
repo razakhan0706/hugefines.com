@@ -207,11 +207,24 @@ export function FinesPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
   }
 
   async function removeCategory(id: string) {
+    // Turn any fines on this category into custom fines so nothing is lost
+    const label = data.categories.find((c) => c.id === id)?.label ?? "";
+    const orphans = data.fines.filter((f) => f.category_id === id);
+    for (const f of orphans) {
+      await supabase
+        .from("fines")
+        .update({
+          category_id: null,
+          description: f.description?.trim() || label || "Custom fine",
+        })
+        .eq("id", f.id);
+    }
     const { error } = await supabase.from("fine_categories").delete().eq("id", id);
     if (error) return toast.error(error.message);
     if (categoryId === id) setCategoryId("");
     refresh();
   }
+
 
   async function removeFine(id: string) {
     await supabase.from("fines").delete().eq("id", id);

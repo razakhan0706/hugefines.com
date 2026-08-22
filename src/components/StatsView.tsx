@@ -787,16 +787,10 @@ function VotesTab({ data }: { data: TeamBundle }) {
     { label: "Weeks with votes", value: String(roundsWithVotes) },
     { label: "Leader", value: leader ? `${leader.player.name} (${leader.points})` : "—" },
   ];
-  const voteByOpponent = voteAttributeBreakdown(
-    data.votes,
-    data.rounds,
-    (r) => r.opponent,
-    (r) => r.opponent_logo_url,
-  );
-  const voteByVenue = voteAttributeBreakdown(data.votes, data.rounds, (r) => r.venue);
-  const voteByResult = voteAttributeBreakdown(data.votes, data.rounds, (r) =>
-    resultBucket(r.result),
-  );
+  const votePlayers = data.players
+    .filter((p) => data.votes.some((v) => v.player_id === p.id))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
 
 
   return (

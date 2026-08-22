@@ -389,7 +389,7 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
           return (
             <Card key={r.id}>
               {editId === r.id ? (
-                <CardContent className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-3">
+                <CardContent className="grid gap-3 p-4 sm:grid-cols-2 lg:grid-cols-6">
                   <div>
                     <label className="text-sm font-medium">Opponent</label>
                     <AutocompleteInput
@@ -397,7 +397,30 @@ export function RoundsPanel({ data, refresh }: { data: TeamBundle; refresh: () =
                       onValueChange={(v) => setEdit((s) => ({ ...s, opponent: v }))}
                       suggestions={opponentOptions}
                     />
+                    <div className="mt-2 flex items-center gap-2">
+                      <PhotoAvatar
+                        url={r.opponent_logo_url}
+                        name={edit.opponent}
+                        busy={busy === r.id + "opponent_logo_url"}
+                        title="Opposition logo"
+                        label="Opposition logo"
+                        labelAlways
+                        onPick={(f) => updateRoundPhoto(r.id, "opponent_logo_url", f)}
+                      />
+                      {r.opponent_logo_url && (
+                        <Button
+                          type="button"
+                          variant="ghost"
+                          size="icon"
+                          title="Remove logo"
+                          onClick={() => clearRoundPhoto(r.id, "opponent_logo_url")}
+                        >
+                          <Trash2 className="size-4" />
+                        </Button>
+                      )}
+                    </div>
                   </div>
+
                   <div>
                     <label className="text-sm font-medium">Round</label>
                     <Input

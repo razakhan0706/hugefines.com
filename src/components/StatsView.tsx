@@ -787,16 +787,10 @@ function VotesTab({ data }: { data: TeamBundle }) {
     { label: "Weeks with votes", value: String(roundsWithVotes) },
     { label: "Leader", value: leader ? `${leader.player.name} (${leader.points})` : "—" },
   ];
-  const voteByOpponent = voteAttributeBreakdown(
-    data.votes,
-    data.rounds,
-    (r) => r.opponent,
-    (r) => r.opponent_logo_url,
-  );
-  const voteByVenue = voteAttributeBreakdown(data.votes, data.rounds, (r) => r.venue);
-  const voteByResult = voteAttributeBreakdown(data.votes, data.rounds, (r) =>
-    resultBucket(r.result),
-  );
+  const votePlayers = data.players
+    .filter((p) => data.votes.some((v) => v.player_id === p.id))
+    .sort((a, b) => a.name.localeCompare(b.name));
+
 
 
   return (
@@ -898,40 +892,82 @@ function VotesTab({ data }: { data: TeamBundle }) {
       <div className="grid gap-3 sm:gap-6 lg:grid-cols-2">
         <VotesBreakdownCard
           title="Votes by opponent"
-          rows={voteByOpponent}
+          votes={data.votes}
+          rounds={data.rounds}
+          players={votePlayers}
+          pick={(r) => r.opponent}
+          photo={(r) => r.opponent_logo_url}
           empty="Add opponents to your rounds to see this."
         />
         <VotesBreakdownCard
           title="Votes by venue"
-          rows={voteByVenue}
+          votes={data.votes}
+          rounds={data.rounds}
+          players={votePlayers}
+          pick={(r) => r.venue}
           empty="Add venues to your rounds to see this."
         />
         <VotesBreakdownCard
           title="Votes by result"
-          rows={voteByResult}
+          votes={data.votes}
+          rounds={data.rounds}
+          players={votePlayers}
+          pick={(r) => resultBucket(r.result)}
           empty="Add results to your rounds to see this."
           resultMode
         />
       </div>
+
     </div>
   );
 }
 
 function VotesBreakdownCard({
   title,
-  rows,
+  votes,
+  rounds,
+  players,
+  pick,
+  photo,
   empty,
   resultMode = false,
 }: {
   title: string;
-  rows: Breakdown[];
+  votes: { round_id: string; player_id: string; points: number }[];
+  rounds: Round[];
+  players: { id: string; name: string }[];
+  pick: (r: Round) => string | null | undefined;
+  photo?: (r: Round) => string | null | undefined;
   empty: string;
   resultMode?: boolean;
 }) {
+  const [player, setPlayer] = useState("all");
+  const rows = useMemo(() => {
+    const filtered = player === "all" ? votes : votes.filter((v) => v.player_id === player);
+    return voteAttributeBreakdown(filtered, rounds, pick, photo);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [votes, rounds, player]);
+
   return (
     <Card>
       <CardContent className="p-3 sm:p-5">
-        <h3 className="text-sm font-bold uppercase tracking-wide sm:text-lg">{title}</h3>
+        <div className="flex items-start justify-between gap-2">
+          <h3 className="text-sm font-bold uppercase tracking-wide sm:text-lg">{title}</h3>
+          <Select value={player} onValueChange={setPlayer}>
+            <SelectTrigger className="h-8 w-[130px] shrink-0 text-xs sm:w-[160px]">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All players</SelectItem>
+              {players.map((p) => (
+                <SelectItem key={p.id} value={p.id}>
+                  {p.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
         {rows.length === 0 ? (
           <p className="mt-3 text-sm text-muted-foreground">{empty}</p>
         ) : (

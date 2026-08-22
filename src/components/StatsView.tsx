@@ -928,40 +928,78 @@ function VotesBreakdownCard({
   rounds,
   players,
   pick,
-  photo,
+  filterLabel,
   empty,
   resultMode = false,
 }: {
   title: string;
   votes: { round_id: string; player_id: string; points: number }[];
   rounds: Round[];
-  players: { id: string; name: string }[];
+  players: { id: string; name: string; photo_url?: string | null }[];
   pick: (r: Round) => string | null | undefined;
-  photo?: (r: Round) => string | null | undefined;
+  filterLabel: string;
   empty: string;
   resultMode?: boolean;
 }) {
-  const [player, setPlayer] = useState("all");
-  const rows = useMemo(() => {
-    const filtered = player === "all" ? votes : votes.filter((v) => v.player_id === player);
-    return voteAttributeBreakdown(filtered, rounds, pick, photo);
+  const [value, setValue] = useState("all");
+
+  const roundValue = useMemo(() => {
+    const m = new Map<string, string>();
+    for (const r of rounds) {
+      const v = pick(r);
+      if (v && String(v).trim()) m.set(r.id, String(v));
+    }
+    return m;
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [votes, rounds, player]);
+  }, [rounds]);
+
+  const options = useMemo(
+    () => Array.from(new Set(roundValue.values())).sort((a, b) => a.localeCompare(b)),
+    [roundValue],
+  );
+
+  const rows = useMemo(() => {
+    const relevant = votes.filter((v) => {
+      const rv = roundValue.get(v.round_id);
+      if (!rv) return false;
+      return value === "all" || rv === value;
+    });
+    const map = new Map<string, { points: number; rounds: Set<string> }>();
+    for (const v of relevant) {
+      const e = map.get(v.player_id) ?? { points: 0, rounds: new Set<string>() };
+      e.points += v.points;
+      e.rounds.add(v.round_id);
+      map.set(v.player_id, e);
+    }
+    return players
+      .map((p) => {
+        const e = map.get(p.id);
+        if (!e || e.points === 0) return null;
+        return {
+          player: p,
+          points: e.points,
+          weeks: e.rounds.size,
+          avg: e.points / Math.max(1, e.rounds.size),
+        };
+      })
+      .filter((r): r is NonNullable<typeof r> => r !== null)
+      .sort((a, b) => b.points - a.points || b.weeks - a.weeks);
+  }, [votes, players, roundValue, value]);
 
   return (
     <Card>
       <CardContent className="p-3 sm:p-5">
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-sm font-bold uppercase tracking-wide sm:text-lg">{title}</h3>
-          <Select value={player} onValueChange={setPlayer}>
-            <SelectTrigger className="h-8 w-[130px] shrink-0 text-xs sm:w-[160px]">
+          <Select value={value} onValueChange={setValue}>
+            <SelectTrigger className="h-8 w-[130px] shrink-0 text-xs sm:w-[170px]">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All players</SelectItem>
-              {players.map((p) => (
-                <SelectItem key={p.id} value={p.id}>
-                  {p.name}
+              <SelectItem value="all">{filterLabel}</SelectItem>
+              {options.map((o) => (
+                <SelectItem key={o} value={o}>
+                  {o}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -983,31 +1021,31 @@ function VotesBreakdownCard({
               </thead>
               <tbody>
                 {rows.map((r) => (
-                  <tr key={r.label} className="border-t border-border">
+                  <tr key={r.player.id} className="border-t border-border">
                     <td className="py-1.5 pr-2">
                       <span className="flex items-center gap-1.5 font-medium uppercase">
-                        {resultMode ? (
+                        {resultMode && value !== "all" ? (
                           <span
                             className={`inline-flex size-6 shrink-0 items-center justify-center rounded-sm text-[10px] font-bold sm:size-8 sm:text-xs ${
-                              resultBadge(r.label)?.className ?? "bg-muted text-muted-foreground"
+                              resultBadge(value)?.className ?? "bg-muted text-muted-foreground"
                             }`}
                           >
-                            {resultBadge(r.label)?.letter ?? r.label[0]}
+                            {resultBadge(value)?.letter ?? value[0]}
                           </span>
                         ) : (
                           <PhotoAvatar
-                            url={r.photo}
-                            name={r.label}
+                            url={r.player.photo_url}
+                            name={r.player.name}
                             className="size-6 shrink-0 sm:size-8"
                           />
                         )}
-                        <span className="min-w-0 break-words leading-tight">{r.label}</span>
+                        <span className="min-w-0 break-words leading-tight">{r.player.name}</span>
                       </span>
                     </td>
                     <td className="stat-num whitespace-nowrap px-2 text-right font-bold">
-                      {r.total}
+                      {r.points}
                     </td>
-                    <td className="stat-num whitespace-nowrap px-2 text-right">{r.rounds}</td>
+                    <td className="stat-num whitespace-nowrap px-2 text-right">{r.weeks}</td>
                     <td className="stat-num whitespace-nowrap pl-2 text-right">
                       {r.avg.toFixed(1)}
                     </td>
@@ -1018,6 +1056,7 @@ function VotesBreakdownCard({
           </div>
         )}
       </CardContent>
+
     </Card>
   );
 }

@@ -32,7 +32,10 @@ import {
   type FineSplit,
   roundOpponentLabel,
   newestRoundsFirst,
+  voteAttributeBreakdown,
+  resultBucket,
 } from "@/lib/fines";
+
 import { PhotoAvatar } from "@/components/PhotoAvatar";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { Trophy } from "lucide-react";

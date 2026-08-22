@@ -967,11 +967,12 @@ function VotesBreakdownCard({
       if (!rv) return false;
       return value === "all" || rv === value;
     });
-    const map = new Map<string, { points: number; rounds: Set<string> }>();
+    // Total weeks in scope (all rounds with votes matching the filter)
+    const totalWeeks = new Set(relevant.map((v) => v.round_id)).size;
+    const map = new Map<string, { points: number }>();
     for (const v of relevant) {
-      const e = map.get(v.player_id) ?? { points: 0, rounds: new Set<string>() };
+      const e = map.get(v.player_id) ?? { points: 0 };
       e.points += v.points;
-      e.rounds.add(v.round_id);
       map.set(v.player_id, e);
     }
     return players
@@ -981,13 +982,14 @@ function VotesBreakdownCard({
         return {
           player: p,
           points: e.points,
-          weeks: e.rounds.size,
-          avg: e.points / Math.max(1, e.rounds.size),
+          weeks: totalWeeks,
+          avg: e.points / Math.max(1, totalWeeks),
         };
       })
       .filter((r): r is NonNullable<typeof r> => r !== null)
-      .sort((a, b) => b.points - a.points || b.weeks - a.weeks);
+      .sort((a, b) => b.points - a.points);
   }, [votes, players, roundValue, value]);
+
 
   return (
     <Card>

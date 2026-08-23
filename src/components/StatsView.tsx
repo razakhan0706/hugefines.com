@@ -274,7 +274,7 @@ function MasterFilterSelect({
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger
         className={cn(
-          "h-8 text-xs [&>span]:line-clamp-none",
+          "h-8 pl-1.5 text-xs [&>span]:line-clamp-none",
           className ?? "w-28 sm:w-36",
         )}
       >
@@ -290,6 +290,7 @@ function MasterFilterSelect({
       </SelectContent>
     </Select>
   );
+
 }
 
 

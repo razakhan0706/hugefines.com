@@ -173,7 +173,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
           <h3 className="text-lg font-bold uppercase tracking-wide">Top offence categories</h3>
           <div className="grid grid-cols-3 gap-2 w-full sm:w-auto">
             <Select value={player} onValueChange={setPlayer}>
-              <SelectTrigger className="h-8 w-full min-w-0 text-xs">
+              <SelectTrigger className="h-8 w-full min-w-0 pl-1.5 text-xs">
                 <SelectValue className="truncate" />
               </SelectTrigger>
               <SelectContent>
@@ -186,7 +186,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
               </SelectContent>
             </Select>
             <Select value={week} onValueChange={setWeek}>
-              <SelectTrigger className="h-8 w-full min-w-0 text-xs">
+              <SelectTrigger className="h-8 w-full min-w-0 pl-1.5 text-xs">
                 <SelectValue className="truncate" />
               </SelectTrigger>
               <SelectContent>
@@ -204,6 +204,7 @@ function TopCategoriesCard({ data }: { data: TeamBundle }) {
               options={masterOptions}
               className="w-full sm:w-36"
             />
+
           </div>
         </div>
         <div className="-ml-5 mt-2 h-[26rem] sm:h-[30rem]">
@@ -273,7 +274,7 @@ function MasterFilterSelect({
     <Select value={value} onValueChange={onChange}>
       <SelectTrigger
         className={cn(
-          "h-8 text-xs [&>span]:line-clamp-none",
+          "h-8 pl-1.5 text-xs [&>span]:line-clamp-none",
           className ?? "w-28 sm:w-36",
         )}
       >
@@ -289,6 +290,7 @@ function MasterFilterSelect({
       </SelectContent>
     </Select>
   );
+
 }
 
 

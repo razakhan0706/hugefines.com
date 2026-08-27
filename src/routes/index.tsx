@@ -224,8 +224,8 @@ function Index() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-6xl px-4 pt-6 pb-0">
-        <p className="text-sm text-muted-foreground">
+      <section className="mx-auto max-w-6xl px-4 pt-4 pb-2">
+        <p className="text-base text-muted-foreground">
           Email enquiries:{" "}
           <a href="mailto:hugefines@gmail.com" className="text-accent hover:underline">
             hugefines@gmail.com
@@ -233,7 +233,7 @@ function Index() {
         </p>
       </section>
 
-      <section id="how" className="mx-auto max-w-6xl px-4 py-16">
+      <section id="how" className="mx-auto max-w-6xl px-4 py-12">
         <h2 className="text-3xl font-bold">Everything the fines book can't do</h2>
         <div className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {FEATURES.map((f) => (

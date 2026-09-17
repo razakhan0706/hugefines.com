@@ -86,12 +86,19 @@ function TrialPage() {
         msg.toLowerCase().includes("user already exists") ||
         msg.toLowerCase().includes("email address is already")
       ) {
-        toast.error("An account with this email already exists. Please sign in instead.", {
-          action: {
-            label: "Sign in",
-            onClick: () => navigate({ to: "/auth" }),
-          },
-        });
+        // Email exists — try to sign them in automatically
+        try {
+          const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+          if (signInError) {
+            toast.error("An account with this email already exists. Check your password and try again.");
+          } else {
+            toast.success("Welcome back! Signing you in.");
+            navigate({ to: "/dashboard" });
+          }
+        } catch {
+          toast.error("An account with this email already exists. Please sign in instead.");
+          navigate({ to: "/auth" });
+        }
       } else {
         toast.error(msg);
       }

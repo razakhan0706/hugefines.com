@@ -55,7 +55,7 @@ function TrialPage() {
 
       if (signInError && signInError.message.toLowerCase().includes("invalid login")) {
         // Wrong password for existing account
-        toast.error("An account with this email already exists. Check your password.");
+        toast.error("This email is already registered.");
         setBusy(false);
         return;
       }

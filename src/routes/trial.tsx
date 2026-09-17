@@ -80,7 +80,21 @@ function TrialPage() {
       navigate({ to: "/card-details" });
 
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      const msg = err instanceof Error ? err.message : "Something went wrong";
+      if (
+        msg.toLowerCase().includes("already registered") ||
+        msg.toLowerCase().includes("user already exists") ||
+        msg.toLowerCase().includes("email address is already")
+      ) {
+        toast.error("An account with this email already exists. Please sign in instead.", {
+          action: {
+            label: "Sign in",
+            onClick: () => navigate({ to: "/auth" }),
+          },
+        });
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setBusy(false);
     }

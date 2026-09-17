@@ -1,5 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, getRouteApi } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRefreshTeam, useTeamBundle } from "@/lib/useTeamData";
 import { PlayersPanel } from "@/components/admin/PlayersPanel";
@@ -10,6 +13,8 @@ import { RecapPanel } from "@/components/admin/RecapPanel";
 import { SettingsPanel } from "@/components/admin/SettingsPanel";
 import { StatsView } from "@/components/StatsView";
 import logoAsset from "@/assets/Website_Logo.png.asset.json";
+
+const authedRoute = getRouteApi("/_authenticated");
 
 export const Route = createFileRoute("/_authenticated/team/$teamId")({
   head: () => ({
@@ -28,8 +33,20 @@ export const Route = createFileRoute("/_authenticated/team/$teamId")({
 
 function TeamWorkspace() {
   const { teamId } = Route.useParams();
+  const { user } = authedRoute.useRouteContext();
   const bundle = useTeamBundle(teamId);
   const refresh = useRefreshTeam(teamId);
+
+  const access = useQuery({
+    queryKey: ["can-edit", teamId, user.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("can_edit_team", { _team_id: teamId });
+      if (error) throw error;
+      return Boolean(data);
+    },
+  });
+
+  const readOnly = bundle.data != null && access.data === false;
 
   return (
     <div className="min-h-screen">
@@ -53,6 +70,19 @@ function TeamWorkspace() {
               />
             </div>
 
+            {readOnly ? (
+              <div className="rounded-lg border-2 border-dashed p-10 text-center">
+                <p className="font-semibold">You don't manage this team</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Only the team owner and invited co-admins can edit its fines, votes and settings.
+                </p>
+                <Button asChild className="mt-4">
+                  <Link to="/t/$slug" params={{ slug: bundle.data.team.slug }}>
+                    View the public page
+                  </Link>
+                </Button>
+              </div>
+            ) : (
             <Tabs defaultValue="rounds">
               <TabsList className="grid h-auto w-full grid-cols-4 gap-1 p-1 text-xs sm:grid-cols-7 sm:text-sm">
                 <TabsTrigger className="w-full px-1" value="rounds">
@@ -101,6 +131,7 @@ function TeamWorkspace() {
                 </TabsContent>
               </div>
             </Tabs>
+            )}
           </>
         )}
       </main>

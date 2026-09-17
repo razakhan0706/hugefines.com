@@ -71,12 +71,38 @@ function Dashboard() {
     queryFn: async () => {
       // Link any pending co-admin invites sent to this user's email.
       await supabase.rpc("claim_team_invites");
-      const { data, error } = await supabase
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) return [];
+
+      // Teams I own
+      const owned = await supabase
         .from("teams")
         .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as unknown as Team[];
+        .eq("owner_id", uid);
+      if (owned.error) throw owned.error;
+
+      // Teams I'm invited to as a co-admin
+      const access = await supabase
+        .from("team_access")
+        .select("team_id")
+        .eq("user_id", uid);
+      if (access.error) throw access.error;
+      const accessIds = (access.data ?? []).map((a) => a.team_id);
+
+      let shared: Team[] = [];
+      if (accessIds.length > 0) {
+        const sharedRes = await supabase
+          .from("teams")
+          .select("*")
+          .in("id", accessIds);
+        if (sharedRes.error) throw sharedRes.error;
+        shared = (sharedRes.data ?? []) as unknown as Team[];
+      }
+
+      const all = [...((owned.data ?? []) as unknown as Team[]), ...shared];
+      const byId = new Map(all.map((t) => [t.id, t]));
+      return [...byId.values()];
     },
   });
 

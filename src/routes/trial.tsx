@@ -16,8 +16,7 @@ export const Route = createFileRoute("/trial")({
       { title: "Start your free trial — Huge Fines" },
       {
         name: "description",
-        content:
-          "7 days free, then $19.99/year. Enter your details to get started — you won't be charged until day 7.",
+        content: "7 days free, then $19.99/year. Enter your details to get started.",
       },
     ],
   }),
@@ -44,7 +43,25 @@ function TrialPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const { error } = await supabase.auth.signUp({
+      // First try to sign in — if it works, account already exists
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (signInData.session) {
+        // Account exists and password matches — just log them in
+        toast.success("Welcome back! Signing you in.");
+        navigate({ to: "/dashboard" });
+        return;
+      }
+
+      if (signInError && signInError.message.toLowerCase().includes("invalid login")) {
+        // Wrong password for existing account
+        toast.error("An account with this email already exists. Check your password.");
+        setBusy(false);
+        return;
+      }
+
+      // No account exists — sign them up
+      const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -52,11 +69,11 @@ function TrialPage() {
           emailRedirectTo: `${window.location.origin}/dashboard`,
         },
       });
-      if (error) throw error;
+
+      if (signUpError) throw signUpError;
 
       const { data: sessionData } = await supabase.auth.getSession();
-      const user = sessionData.session?.user;
-      if (!user) {
+      if (!sessionData.session) {
         toast.success("Check your email to confirm your account.");
         setBusy(false);
         return;
@@ -64,13 +81,8 @@ function TrialPage() {
 
       // ----------------------------------------------------------------
       // TODO: STRIPE — uncomment below once Stripe edge function is ready
-      //
       // const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
-      //   body: {
-      //     userId: user.id,
-      //     email: user.email,
-      //     returnUrl: `${window.location.origin}/dashboard`,
-      //   },
+      //   body: { userId: sessionData.session.user.id, email, returnUrl: `${window.location.origin}/dashboard` },
       // });
       // if (fnError) throw fnError;
       // window.location.href = data.url;
@@ -80,28 +92,7 @@ function TrialPage() {
       navigate({ to: "/card-details" });
 
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Something went wrong";
-      if (
-        msg.toLowerCase().includes("already registered") ||
-        msg.toLowerCase().includes("user already exists") ||
-        msg.toLowerCase().includes("email address is already")
-      ) {
-        // Email exists — try to sign them in automatically
-        try {
-          const { error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-          if (signInError) {
-            toast.error("An account with this email already exists. Check your password and try again.");
-          } else {
-            toast.success("Welcome back! Signing you in.");
-            navigate({ to: "/dashboard" });
-          }
-        } catch {
-          toast.error("An account with this email already exists. Please sign in instead.");
-          navigate({ to: "/auth" });
-        }
-      } else {
-        toast.error(msg);
-      }
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setBusy(false);
     }

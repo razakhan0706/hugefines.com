@@ -33,8 +33,20 @@ export const Route = createFileRoute("/_authenticated/team/$teamId")({
 
 function TeamWorkspace() {
   const { teamId } = Route.useParams();
+  const { user } = authedRoute.useRouteContext();
   const bundle = useTeamBundle(teamId);
   const refresh = useRefreshTeam(teamId);
+
+  const access = useQuery({
+    queryKey: ["can-edit", teamId, user.id],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc("can_edit_team", { _team_id: teamId });
+      if (error) throw error;
+      return Boolean(data);
+    },
+  });
+
+  const readOnly = bundle.data != null && access.data === false;
 
   return (
     <div className="min-h-screen">

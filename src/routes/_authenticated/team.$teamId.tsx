@@ -70,6 +70,19 @@ function TeamWorkspace() {
               />
             </div>
 
+            {readOnly ? (
+              <div className="rounded-lg border-2 border-dashed p-10 text-center">
+                <p className="font-semibold">You don't manage this team</p>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Only the team owner and invited co-admins can edit its fines, votes and settings.
+                </p>
+                <Button asChild className="mt-4">
+                  <Link to="/t/$slug" params={{ slug: bundle.data.team.slug }}>
+                    View the public page
+                  </Link>
+                </Button>
+              </div>
+            ) : (
             <Tabs defaultValue="rounds">
               <TabsList className="grid h-auto w-full grid-cols-4 gap-1 p-1 text-xs sm:grid-cols-7 sm:text-sm">
                 <TabsTrigger className="w-full px-1" value="rounds">

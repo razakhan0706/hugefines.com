@@ -52,7 +52,7 @@ function PublicBoard() {
         .from("teams")
         .select("id")
         .eq("slug", slug)
-        .eq("is_public", true)
+        .or("is_public.eq.true,votes_public.eq.true")
         .maybeSingle();
       if (error) throw error;
       if (!data) throw new Error("not found");
@@ -103,8 +103,13 @@ function PublicBoard() {
               </p>
               <h1 className="text-3xl font-bold">{query.data.team.name}</h1>
             </div>
-            <StatsView data={query.data} />
-            {query.data.recaps.length > 0 && (
+            <StatsView
+              data={query.data}
+              showFines={query.data.team.is_public}
+              showVotes={query.data.team.votes_public}
+            />
+
+            {query.data.team.is_public && query.data.recaps.length > 0 && (
               <Card className="mt-6">
                 <CardContent className="p-5">
                   <h2 className="text-lg font-bold">Latest recap</h2>

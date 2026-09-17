@@ -52,7 +52,7 @@ import { cn } from "@/lib/utils";
 
 const DISCOUNT_COLOR = "var(--color-destructive)";
 
-export function StatsView({ data }: { data: TeamBundle }) {
+/* export function StatsView({ data }: { data: TeamBundle }) {
   return (
     <Tabs defaultValue="fines">
       <TabsList className="grid w-full grid-cols-2">
@@ -66,6 +66,43 @@ export function StatsView({ data }: { data: TeamBundle }) {
         <TabsContent value="votes">
           <VotesTab data={data} />
         </TabsContent>
+      </div>
+    </Tabs>
+  );
+} */
+
+export function StatsView({
+  data,
+  showFines = true,
+  showVotes = true,
+}: {
+  data: TeamBundle;
+  showFines?: boolean;
+  showVotes?: boolean;
+}) {
+  return (
+    <Tabs defaultValue={showFines ? "fines" : "votes"}>
+      <TabsList
+        className={`grid w-full ${
+          showFines && showVotes ? "grid-cols-2" : "grid-cols-1"
+        }`}
+      >
+        {showFines && <TabsTrigger value="fines">Fines</TabsTrigger>}
+        {showVotes && <TabsTrigger value="votes">Votes</TabsTrigger>}
+      </TabsList>
+
+      <div className="mt-6">
+        {showFines && (
+          <TabsContent value="fines">
+            <FinesTab data={data} />
+          </TabsContent>
+        )}
+
+        {showVotes && (
+          <TabsContent value="votes">
+            <VotesTab data={data} />
+          </TabsContent>
+        )}
       </div>
     </Tabs>
   );

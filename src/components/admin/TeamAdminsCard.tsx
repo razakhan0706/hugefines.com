@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { Trash2, Loader2 } from "lucide-react";
+import { inviteAdmin } from "@/lib/invite-admin.server";
 
 type AccessRow = {
   id: string;
@@ -39,30 +40,20 @@ export function TeamAdminsCard({ teamId, ownerId }: { teamId: string; ownerId: s
   const isOwner = me.data?.id === ownerId;
 
   async function invite() {
-    const value = email.trim().toLowerCase();
-    if (!value.includes("@")) return toast.error("Enter a valid email address");
-    setBusy(true);
-    try {
-      const { error } = await supabase.from("team_access").insert({
-        team_id: teamId,
-        invited_email: value,
-        email: value,
-        created_by: me.data?.id ?? null,
-      });
-      if (error) {
-        throw new Error(
-          error.code === "23505" ? "That email already has access" : error.message,
-        );
-      }
-      setEmail("");
-      admins.refetch();
-      toast.success("Co-admin invited");
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Could not invite");
-    } finally {
-      setBusy(false);
-    }
+  const value = email.trim().toLowerCase();
+  if (!value.includes("@")) return toast.error("Enter a valid email address");
+  setBusy(true);
+  try {
+    await inviteAdmin({ data: { teamId, email: value } });
+    setEmail("");
+    admins.refetch();
+    toast.success("Invite sent");
+  } catch (e) {
+    toast.error(e instanceof Error ? e.message : "Could not invite");
+  } finally {
+    setBusy(false);
   }
+}
 
   async function remove(id: string) {
     const { error } = await supabase.from("team_access").delete().eq("id", id);

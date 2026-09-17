@@ -96,9 +96,9 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
           <h3 className="text-lg font-bold">Public link</h3>
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="font-medium">Share the live fines page</p>
+              <p className="font-medium">Show fines publicly</p>
               <p className="text-sm text-muted-foreground">
-                Anyone with the link can view — no login needed.
+                Anyone with the link can view fines — no login needed.
               </p>
             </div>
             <div className="flex gap-1.5">

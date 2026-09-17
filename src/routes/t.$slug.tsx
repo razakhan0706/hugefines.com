@@ -1,9 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { fetchTeamBundle } from "@/lib/useTeamData";
 import { StatsView } from "@/components/StatsView";
 import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import logoAsset from "@/assets/Website_Logo.png.asset.json";
 
 const SHARE_IMAGE =
@@ -27,6 +29,21 @@ export const Route = createFileRoute("/t/$slug")({
 
 function PublicBoard() {
   const { slug } = Route.useParams();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    supabase.auth.getUser().then(({ data }) => {
+      if (active) setIsLoggedIn(!!data.user);
+    });
+    const { data } = supabase.auth.onAuthStateChange((_e, session) => {
+      setIsLoggedIn(!!session?.user);
+    });
+    return () => {
+      active = false;
+      data.subscription.unsubscribe();
+    };
+  }, []);
 
   const query = useQuery({
     queryKey: ["public-team", slug],
@@ -50,9 +67,20 @@ function PublicBoard() {
           <Link to="/" className="flex items-center">
             <img src={logoAsset.url} alt="Huge Fines" className="h-12 w-auto md:h-14" />
           </Link>
-          <span className="text-xs font-semibold uppercase tracking-widest text-muted-foreground">
-            Live board
-          </span>
+          <nav className="flex items-center gap-2">
+            <span className="hidden text-xs font-semibold uppercase tracking-widest text-muted-foreground sm:inline">
+              Live board
+            </span>
+            {isLoggedIn ? (
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/dashboard">My teams</Link>
+              </Button>
+            ) : (
+              <Button asChild variant="outline" size="sm">
+                <Link to="/auth">Admin sign in</Link>
+              </Button>
+            )}
+          </nav>
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-10">

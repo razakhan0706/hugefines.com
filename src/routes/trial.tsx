@@ -43,25 +43,8 @@ function TrialPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      // First try to sign in — if it works, account already exists
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-
-      if (signInData.session) {
-        // Account exists and password matches — just log them in
-        toast.success("Welcome back! Signing you in.");
-        navigate({ to: "/dashboard" });
-        return;
-      }
-
-      if (signInError && (signInError.message.toLowerCase().includes("invalid") || signInError.message.toLowerCase().includes("credentials") || signInError.message.toLowerCase().includes("wrong"))) {
-        // Wrong password for existing account
-        toast.error("This email is already registered.");
-        setBusy(false);
-        return;
-      }
-
-      // No account exists — sign them up
-      const { error: signUpError } = await supabase.auth.signUp({
+      // Sign up directly — identities.length === 0 means email already exists
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -70,7 +53,19 @@ function TrialPage() {
         },
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        toast.error(signUpError.message);
+        setBusy(false);
+        return;
+      }
+
+      // When auto-confirm is ON and email already exists, Supabase returns
+      // a user with an empty identities array instead of throwing an error
+      if (signUpData?.user && signUpData.user.identities?.length === 0) {
+        toast.error("This email is already registered.");
+        setBusy(false);
+        return;
+      }
 
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData.session) {

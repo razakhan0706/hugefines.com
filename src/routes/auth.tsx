@@ -141,6 +141,16 @@ function AuthPage() {
             <Button type="submit" className="w-full" disabled={busy}>
               {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
             </Button>
+            {mode === "signin" && (
+              <div className="text-right">
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-muted-foreground underline-offset-4 hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+            )}
           </form>
           {mode === "signin" ? (
             <Link

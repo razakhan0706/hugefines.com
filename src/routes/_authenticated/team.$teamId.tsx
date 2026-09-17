@@ -131,6 +131,7 @@ function TeamWorkspace() {
                 </TabsContent>
               </div>
             </Tabs>
+            )}
           </>
         )}
       </main>

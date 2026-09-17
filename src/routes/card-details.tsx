@@ -15,26 +15,77 @@ export const Route = createFileRoute("/card-details")({
   component: CardDetailsPage,
 });
 
+function formatCard(val: string) {
+  return val.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
+}
+
+function formatExpiry(val: string) {
+  const v = val.replace(/\D/g, "").slice(0, 4);
+  if (v.length >= 2) return v.slice(0, 2) + "/" + v.slice(2);
+  return v;
+}
+
+function validateCard(card: string): string | null {
+  const digits = card.replace(/\s/g, "");
+  if (digits.length !== 16) return "Card number must be 16 digits";
+  // Luhn algorithm check
+  let sum = 0;
+  for (let i = 0; i < digits.length; i++) {
+    let n = parseInt(digits[digits.length - 1 - i]);
+    if (i % 2 === 1) { n *= 2; if (n > 9) n -= 9; }
+    sum += n;
+  }
+  if (sum % 10 !== 0) return "Invalid card number";
+  return null;
+}
+
+function validateExpiry(expiry: string): string | null {
+  if (!/^\d{2}\/\d{2}$/.test(expiry)) return "Enter expiry as MM/YY";
+  const [mm, yy] = expiry.split("/").map(Number);
+  if (mm < 1 || mm > 12) return "Month must be 01–12";
+  const now = new Date();
+  const cardDate = new Date(2000 + yy, mm - 1);
+  if (cardDate < new Date(now.getFullYear(), now.getMonth())) return "Card has expired";
+  return null;
+}
+
+function validateCVV(cvv: string): string | null {
+  if (cvv.length < 3) return "CVV must be 3 or 4 digits";
+  return null;
+}
+
+function validateName(name: string): string | null {
+  if (name.trim().length < 2) return "Enter the name on your card";
+  if (!/^[a-zA-Z\s'-]+$/.test(name.trim())) return "Name must contain letters only";
+  return null;
+}
+
 function CardDetailsPage() {
   const navigate = useNavigate();
   const [card, setCard] = useState("");
   const [expiry, setExpiry] = useState("");
   const [cvv, setCvv] = useState("");
   const [name, setName] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [busy, setBusy] = useState(false);
 
-  function formatCard(val: string) {
-    return val.replace(/\D/g, "").slice(0, 16).replace(/(.{4})/g, "$1 ").trim();
-  }
-
-  function formatExpiry(val: string) {
-    const v = val.replace(/\D/g, "").slice(0, 4);
-    if (v.length >= 2) return v.slice(0, 2) + "/" + v.slice(2);
-    return v;
+  function validate(): boolean {
+    const newErrors: Record<string, string> = {};
+    const nameErr = validateName(name);
+    const cardErr = validateCard(card);
+    const expiryErr = validateExpiry(expiry);
+    const cvvErr = validateCVV(cvv);
+    if (nameErr) newErrors.name = nameErr;
+    if (cardErr) newErrors.card = cardErr;
+    if (expiryErr) newErrors.expiry = expiryErr;
+    if (cvvErr) newErrors.cvv = cvvErr;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!validate()) return;
     setBusy(true);
 
     // TODO: STRIPE — replace this with real Stripe checkout call
@@ -43,7 +94,6 @@ function CardDetailsPage() {
     // });
     // window.location.href = data.url;
 
-    // Simulate for now
     await new Promise((r) => setTimeout(r, 1000));
     toast.success("Trial started! You won't be charged for 7 days.");
     navigate({ to: "/dashboard" });
@@ -65,7 +115,6 @@ function CardDetailsPage() {
       </header>
 
       <main className="mx-auto max-w-md px-4 py-12">
-        {/* Steps */}
         <div className="mb-8 flex items-center justify-center gap-2 text-xs font-semibold uppercase tracking-widest">
           <span className="text-muted-foreground">1. Account</span>
           <span className="text-muted-foreground">→</span>
@@ -86,7 +135,6 @@ function CardDetailsPage() {
               </div>
             </div>
 
-            {/* Trial summary */}
             <div className="mb-6 rounded-xl border border-border bg-secondary px-4 py-3">
               <div className="flex items-center justify-between">
                 <div>
@@ -101,49 +149,58 @@ function CardDetailsPage() {
             </div>
 
             <form onSubmit={onSubmit} className="space-y-4">
-              <div className="space-y-2">
+              {/* Name on card */}
+              <div className="space-y-1">
                 <Label htmlFor="cardname">Name on card</Label>
                 <Input
                   id="cardname"
                   placeholder="e.g. Jake Smith"
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  required
+                  onChange={(e) => { setName(e.target.value); setErrors((p) => ({ ...p, name: "" })); }}
+                  className={errors.name ? "border-destructive" : ""}
                 />
+                {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
               </div>
-              <div className="space-y-2">
+
+              {/* Card number */}
+              <div className="space-y-1">
                 <Label htmlFor="cardnumber">Card number</Label>
                 <Input
                   id="cardnumber"
                   placeholder="1234 5678 9012 3456"
                   value={card}
-                  onChange={(e) => setCard(formatCard(e.target.value))}
+                  onChange={(e) => { setCard(formatCard(e.target.value)); setErrors((p) => ({ ...p, card: "" })); }}
                   maxLength={19}
-                  required
+                  className={errors.card ? "border-destructive" : ""}
                 />
+                {errors.card && <p className="text-xs text-destructive">{errors.card}</p>}
               </div>
+
+              {/* Expiry + CVV */}
               <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <Label htmlFor="expiry">Expiry date</Label>
                   <Input
                     id="expiry"
                     placeholder="MM/YY"
                     value={expiry}
-                    onChange={(e) => setExpiry(formatExpiry(e.target.value))}
+                    onChange={(e) => { setExpiry(formatExpiry(e.target.value)); setErrors((p) => ({ ...p, expiry: "" })); }}
                     maxLength={5}
-                    required
+                    className={errors.expiry ? "border-destructive" : ""}
                   />
+                  {errors.expiry && <p className="text-xs text-destructive">{errors.expiry}</p>}
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <Label htmlFor="cvv">CVV</Label>
                   <Input
                     id="cvv"
                     placeholder="123"
                     value={cvv}
-                    onChange={(e) => setCvv(e.target.value.replace(/\D/g, "").slice(0, 4))}
+                    onChange={(e) => { setCvv(e.target.value.replace(/\D/g, "").slice(0, 4)); setErrors((p) => ({ ...p, cvv: "" })); }}
                     maxLength={4}
-                    required
+                    className={errors.cvv ? "border-destructive" : ""}
                   />
+                  {errors.cvv && <p className="text-xs text-destructive">{errors.cvv}</p>}
                 </div>
               </div>
 

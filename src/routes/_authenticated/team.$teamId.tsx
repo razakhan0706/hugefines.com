@@ -1,5 +1,8 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link, getRouteApi } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
+import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useRefreshTeam, useTeamBundle } from "@/lib/useTeamData";
 import { PlayersPanel } from "@/components/admin/PlayersPanel";
@@ -10,6 +13,8 @@ import { RecapPanel } from "@/components/admin/RecapPanel";
 import { SettingsPanel } from "@/components/admin/SettingsPanel";
 import { StatsView } from "@/components/StatsView";
 import logoAsset from "@/assets/Website_Logo.png.asset.json";
+
+const authedRoute = getRouteApi("/_authenticated");
 
 export const Route = createFileRoute("/_authenticated/team/$teamId")({
   head: () => ({

@@ -53,7 +53,7 @@ function TrialPage() {
         return;
       }
 
-      if (signInError && signInError.message.toLowerCase().includes("invalid login")) {
+      if (signInError && signInError.message.toLowerCase().includes("invalid") || signInError.message.toLowerCase().includes("credentials") || signInError.message.toLowerCase().includes("wrong")) {
         // Wrong password for existing account
         toast.error("This email is already registered.");
         setBusy(false);

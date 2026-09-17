@@ -5,6 +5,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import logoAsset from "@/assets/Website_Logo.png.asset.json";
 
+function truncateEmail(email: string, max = 24): string {
+  if (email.length <= max) return email;
+  return email.slice(0, max) + "…";
+}
+
 export function SiteHeader() {
   const [email, setEmail] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -35,11 +40,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
         <Link to="/" className="flex items-center">
-          <img
-            src={logoAsset.url}
-            alt="Huge Fines"
-            className="h-12 w-auto md:h-14"
-          />
+          <img src={logoAsset.url} alt="Huge Fines" className="h-12 w-auto md:h-14" />
         </Link>
         <nav className="flex items-center gap-2">
           {email ? (
@@ -47,7 +48,9 @@ export function SiteHeader() {
               <Button asChild variant="ghost" size="sm">
                 <Link to="/dashboard">My teams</Link>
               </Button>
-              <span className="hidden text-sm text-muted-foreground sm:inline">{email}</span>
+              <span className="hidden max-w-[160px] truncate text-sm text-muted-foreground sm:inline">
+                {truncateEmail(email)}
+              </span>
               <Button variant="outline" size="sm" onClick={signOut}>
                 Sign out
               </Button>

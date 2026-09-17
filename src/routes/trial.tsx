@@ -77,7 +77,7 @@ function TrialPage() {
       // ----------------------------------------------------------------
 
       toast.success("Account created! Your 7-day trial has started.");
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/card-details" });
 
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");

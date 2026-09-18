@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ClipboardList, BarChart3, Vote, Sparkles, Share2, Users, Check } from "lucide-react";
+import { PasswordStrength, isPasswordStrong } from "@/components/PasswordStrength";
 import logoAsset from "@/assets/Website_Logo.png.asset.json";
 
 export const Route = createFileRoute("/trial")({
@@ -43,8 +44,25 @@ function TrialPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      // Sign up directly — identities.length === 0 means email already exists
-      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+      // First try to sign in — if it works, account already exists
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
+
+      if (signInData.session) {
+        // Account exists and password matches — just log them in
+        toast.success("Welcome back! Signing you in.");
+        navigate({ to: "/dashboard" });
+        return;
+      }
+
+      if (signInError && (signInError.message.toLowerCase().includes("invalid") || signInError.message.toLowerCase().includes("credentials") || signInError.message.toLowerCase().includes("wrong"))) {
+        // Wrong password for existing account
+        toast.error("This email is already registered.");
+        setBusy(false);
+        return;
+      }
+
+      // No account exists — sign them up
+      const { error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -53,19 +71,7 @@ function TrialPage() {
         },
       });
 
-      if (signUpError) {
-        toast.error(signUpError.message);
-        setBusy(false);
-        return;
-      }
-
-      // When auto-confirm is ON and email already exists, Supabase returns
-      // a user with an empty identities array instead of throwing an error
-      if (signUpData?.user && signUpData.user.identities?.length === 0) {
-        toast.error("This email is already registered.");
-        setBusy(false);
-        return;
-      }
+      if (signUpError) throw signUpError;
 
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData.session) {
@@ -187,12 +193,13 @@ function TrialPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
-                    <Input id="password" type="password" placeholder="Min. 6 characters" minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <Input id="password" type="password" placeholder="Min. 8 characters" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <PasswordStrength password={password} />
                   </div>
                   <div className="rounded-lg border border-border bg-secondary px-4 py-3 text-xs text-muted-foreground">
                     💳 After clicking below you'll enter your card details securely on Stripe. <strong>You won't be charged until day 7.</strong>
                   </div>
-                  <Button type="submit" className="w-full" size="lg" disabled={busy}>
+                  <Button type="submit" className="w-full" size="lg" disabled={busy || !isPasswordStrong(password)}>
                     {busy ? "Setting up your account…" : "Start free trial →"}
                   </Button>
                 </form>

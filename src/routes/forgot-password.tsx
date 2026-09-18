@@ -28,6 +28,7 @@ function ForgotPasswordPage() {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) throw error;
+      // Always show success — Supabase doesn't reveal if email exists (security)
       setSent(true);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
@@ -49,15 +50,24 @@ function ForgotPasswordPage() {
         <CardContent>
           {sent ? (
             <div className="space-y-4 text-center">
+              <p className="text-4xl">📧</p>
+              <p className="font-semibold">Check your email</p>
               <p className="text-sm text-muted-foreground">
-                ✅ Check your email — we've sent a password reset link to <strong>{email}</strong>.
+                If <strong>{email}</strong> has an account, we've sent a
+                password reset link. Check your spam folder too.
               </p>
-              <Link to="/auth" className="block text-sm underline underline-offset-4">
-                Back to sign in
-              </Link>
+              <p className="text-xs text-muted-foreground">
+                The link expires after 1 hour.
+              </p>
+              <Button asChild variant="outline" className="w-full">
+                <Link to="/auth">Back to sign in</Link>
+              </Button>
             </div>
           ) : (
             <form onSubmit={onSubmit} className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Enter your email and we'll send you a link to reset your password.
+              </p>
               <div className="space-y-2">
                 <Label htmlFor="email">Email address</Label>
                 <Input

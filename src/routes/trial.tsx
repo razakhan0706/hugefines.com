@@ -106,7 +106,7 @@ function TrialPage() {
 
   async function googleSignup() {
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: window.location.origin,
+      redirect_uri: "https://hugefines.lovable.app/card-details",
     });
     if (result.error) {
       toast.error("Google sign-in failed. Try email instead.");

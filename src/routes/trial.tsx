@@ -41,7 +41,7 @@ function TrialPage() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) {
-        navigate({ to: "https://hugefines.lovable.app/card-details" });
+        navigate({ to: "/card-details" });
       }
     });
   }, [navigate]);

@@ -139,13 +139,34 @@ function CardDetailsPage() {
 
         <Card>
           <CardContent className="p-6 sm:p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <span className="flex size-10 items-center justify-center rounded-lg bg-accent-soft">
-                <CreditCard className="size-5 text-accent-strong" />
-              </span>
-              <div>
-                <h2 className="text-xl font-bold">Card details</h2>
-                <p className="text-sm text-muted-foreground">You won't be charged for 7 days</p>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <span className="flex size-10 items-center justify-center rounded-lg bg-accent-soft">
+                  <CreditCard className="size-5 text-accent-strong" />
+                </span>
+                <div>
+                  <h2 className="text-xl font-bold">Card details</h2>
+                  <p className="text-sm text-muted-foreground">You won't be charged for 7 days</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5">
+                {/* Visa */}
+                <svg width="38" height="24" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="rounded border border-border">
+                  <rect width="38" height="24" rx="4" fill="#1A1F71"/>
+                  <text x="19" y="16" textAnchor="middle" fill="white" fontSize="10" fontWeight="bold" fontFamily="Arial">VISA</text>
+                </svg>
+                {/* Mastercard */}
+                <svg width="38" height="24" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="rounded border border-border">
+                  <rect width="38" height="24" rx="4" fill="#252525"/>
+                  <circle cx="15" cy="12" r="7" fill="#EB001B"/>
+                  <circle cx="23" cy="12" r="7" fill="#F79E1B"/>
+                  <path d="M19 6.8A7 7 0 0 1 22.5 12 7 7 0 0 1 19 17.2 7 7 0 0 1 15.5 12 7 7 0 0 1 19 6.8z" fill="#FF5F00"/>
+                </svg>
+                {/* Amex */}
+                <svg width="38" height="24" viewBox="0 0 38 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="rounded border border-border">
+                  <rect width="38" height="24" rx="4" fill="#2557D6"/>
+                  <text x="19" y="16" textAnchor="middle" fill="white" fontSize="7" fontWeight="bold" fontFamily="Arial">AMEX</text>
+                </svg>
               </div>
             </div>
 

@@ -1,5 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,7 +29,6 @@ function formatExpiry(val: string) {
 function validateCard(card: string): string | null {
   const digits = card.replace(/\s/g, "");
   if (digits.length !== 16) return "Card number must be 16 digits";
-  // Luhn algorithm check
   let sum = 0;
   for (let i = 0; i < digits.length; i++) {
     let n = parseInt(digits[digits.length - 1 - i]);
@@ -88,16 +88,29 @@ function CardDetailsPage() {
     if (!validate()) return;
     setBusy(true);
 
-    // TODO: STRIPE — replace this with real Stripe checkout call
-    // const { data, error } = await supabase.functions.invoke("create-checkout", {
-    //   body: { userId, email, returnUrl: window.location.origin + "/dashboard" },
-    // });
-    // window.location.href = data.url;
+    try {
+      // TODO: STRIPE — replace with real Stripe checkout once keys are ready
+      // const { data, error } = await supabase.functions.invoke("create-checkout", {
+      //   body: { userId, email, returnUrl: window.location.origin + "/dashboard" },
+      // });
+      // window.location.href = data.url;
 
-    await new Promise((r) => setTimeout(r, 1000));
-    toast.success("Trial started! You won't be charged for 7 days.");
-    navigate({ to: "/dashboard" });
-    setBusy(false);
+      // Mark card as captured in profiles table
+      const { data: userData } = await supabase.auth.getUser();
+      if (userData.user) {
+        await supabase
+          .from("profiles")
+          .update({ card_captured: true })
+          .eq("id", userData.user.id);
+      }
+
+      toast.success("Trial started! You won't be charged for 7 days.");
+      navigate({ to: "/dashboard" });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setBusy(false);
+    }
   }
 
   return (
@@ -149,7 +162,6 @@ function CardDetailsPage() {
             </div>
 
             <form onSubmit={onSubmit} className="space-y-4">
-              {/* Name on card */}
               <div className="space-y-1">
                 <Label htmlFor="cardname">Name on card</Label>
                 <Input
@@ -162,7 +174,6 @@ function CardDetailsPage() {
                 {errors.name && <p className="text-xs text-destructive">{errors.name}</p>}
               </div>
 
-              {/* Card number */}
               <div className="space-y-1">
                 <Label htmlFor="cardnumber">Card number</Label>
                 <Input
@@ -176,7 +187,6 @@ function CardDetailsPage() {
                 {errors.card && <p className="text-xs text-destructive">{errors.card}</p>}
               </div>
 
-              {/* Expiry + CVV */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
                   <Label htmlFor="expiry">Expiry date</Label>

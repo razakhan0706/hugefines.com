@@ -14,6 +14,14 @@ export const Route = createFileRoute("/_authenticated")({
       });
     }
 
+    // Skip card check if already on card-details page
+    if (location.pathname === "/card-details") {
+      return { user: data.user };
+    }
+
+    // Wait a moment for profile to be created by trigger
+    await new Promise((r) => setTimeout(r, 500));
+
     // Check if card has been captured
     const { data: profile } = await supabase
       .from("profiles")
@@ -21,8 +29,8 @@ export const Route = createFileRoute("/_authenticated")({
       .eq("id", data.user.id)
       .maybeSingle();
 
-    // Not on card-details already and card not captured → redirect there
-    if (!profile?.card_captured && location.pathname !== "/card-details") {
+    // Profile doesn't exist yet OR card not captured → redirect to card details
+    if (!profile || !profile.card_captured) {
       throw redirect({ to: "/card-details" });
     }
 

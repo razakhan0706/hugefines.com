@@ -157,18 +157,21 @@ export type Database = {
       }
       profiles: {
         Row: {
+          card_captured: boolean
           created_at: string
           display_name: string | null
           email: string | null
           id: string
         }
         Insert: {
+          card_captured?: boolean
           created_at?: string
           display_name?: string | null
           email?: string | null
           id: string
         }
         Update: {
+          card_captured?: boolean
           created_at?: string
           display_name?: string | null
           email?: string | null
@@ -331,10 +334,14 @@ export type Database = {
           logo_url: string | null
           name: string
           owner_id: string
+          paid: boolean
           player_limit: number
           season_name: string
           slug: string
           sport: string
+          stripe_customer_id: string | null
+          stripe_subscription_id: string | null
+          trial_ends_at: string
           vote_format: string
           votes_public: boolean
         }
@@ -347,10 +354,14 @@ export type Database = {
           logo_url?: string | null
           name: string
           owner_id: string
+          paid?: boolean
           player_limit?: number
           season_name?: string
           slug: string
           sport?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string
           vote_format?: string
           votes_public?: boolean
         }
@@ -363,10 +374,14 @@ export type Database = {
           logo_url?: string | null
           name?: string
           owner_id?: string
+          paid?: boolean
           player_limit?: number
           season_name?: string
           slug?: string
           sport?: string
+          stripe_customer_id?: string | null
+          stripe_subscription_id?: string | null
+          trial_ends_at?: string
           vote_format?: string
           votes_public?: boolean
         }

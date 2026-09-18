@@ -37,6 +37,15 @@ function TrialPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy]         = useState(false);
 
+  // If already logged in (e.g. after Google OAuth), redirect to card details
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+      if (data.session) {
+        navigate({ to: "/card-details" });
+      }
+    });
+  }, [navigate]);
+
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);

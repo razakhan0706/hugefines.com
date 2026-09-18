@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,9 @@ import { PhotoAvatar } from "@/components/PhotoAvatar";
 import logoAsset from "@/assets/Website_Logo.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  validateSearch: (s: Record<string, unknown>): { payment?: string } => ({
+    payment: typeof s.payment === "string" ? s.payment : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "My teams — Huge Fines" },

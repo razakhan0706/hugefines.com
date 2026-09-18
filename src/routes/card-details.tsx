@@ -89,23 +89,24 @@ function CardDetailsPage() {
     setBusy(true);
 
     try {
-      // TODO: STRIPE — replace with real Stripe checkout once keys are ready
-      // const { data, error } = await supabase.functions.invoke("create-checkout", {
-      //   body: { userId, email, returnUrl: window.location.origin + "/dashboard" },
-      // });
-      // window.location.href = data.url;
-
-      // Mark card as captured in profiles table
+      // Get current user
       const { data: userData } = await supabase.auth.getUser();
-      if (userData.user) {
-        await supabase
-          .from("profiles")
-          .update({ card_captured: true })
-          .eq("id", userData.user.id);
-      }
+      if (!userData.user) throw new Error("Not logged in");
 
-      toast.success("Trial started! You won't be charged for 7 days.");
-      navigate({ to: "/dashboard" });
+      // Call Stripe checkout edge function
+      const { data: checkoutData, error: checkoutError } = await supabase.functions.invoke("create-checkout", {
+        body: {
+          userId: userData.user.id,
+          email: userData.user.email,
+          returnUrl: `${window.location.origin}/dashboard`,
+        },
+      });
+
+      if (checkoutError) throw checkoutError;
+      if (!checkoutData?.url) throw new Error("No checkout URL returned");
+
+      // Redirect to Stripe checkout
+      window.location.href = checkoutData.url;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {

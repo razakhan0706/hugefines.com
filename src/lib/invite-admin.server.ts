@@ -37,7 +37,7 @@ export const inviteAdmin = createServerFn({ method: "POST" })
     }
 
     // Send the actual invite email
-    const siteUrl = process.env.SITE_URL ?? "https://hugefines.lovable.app";
+    const siteUrl = process.env.SITE_URL ?? "https://hugefines.lovable.app/invite-welcome";
     const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(normalizedEmail, {
       redirectTo: `${siteUrl}/auth`,
       data: { invited_to_team: team.name },

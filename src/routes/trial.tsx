@@ -93,7 +93,12 @@ function TrialPage() {
       navigate({ to: "/card-details" });
 
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Something went wrong");
+      const msg = err instanceof Error ? err.message : "Something went wrong";
+      if (msg.toLowerCase().includes("password") || msg.toLowerCase().includes("hibp") || msg.toLowerCase().includes("weak")) {
+        toast.error("This password is too common. Please choose a more unique password.");
+      } else {
+        toast.error(msg);
+      }
     } finally {
       setBusy(false);
     }

@@ -78,6 +78,11 @@ export function PasswordStrength({ password }: Props) {
           </li>
         ))}
       </ul>
+      {metCount === 5 && (
+        <p className="text-xs text-muted-foreground">
+          Tip: avoid common passwords like "Password1!" — use something unique.
+        </p>
+      )}
     </div>
   );
 }

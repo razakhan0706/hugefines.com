@@ -107,7 +107,7 @@ function InviteWelcomePage() {
                   />
                 </div>
                 <Button type="submit" className="w-full" disabled={busy}>
-                  {busy ? "Setting up…" : "Finish setup"}
+                  {busy ? "Setting up…" : "Join Team"}
                 </Button>
               </form>
 

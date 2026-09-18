@@ -4,7 +4,7 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
   apiVersion: "2024-04-10",
 });
 
-const PRICE_ID = Deno.env.get("STRIPE_PRICE_ID")!;
+const PRICE_ID = "price_1UGyxZAUU9TzrSrhNEHxrje8";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {

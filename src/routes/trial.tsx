@@ -15,10 +15,7 @@ export const Route = createFileRoute("/trial")({
   head: () => ({
     meta: [
       { title: "Start your free trial — Huge Fines" },
-      {
-        name: "description",
-        content: "7 days free, then $19.99/year. Enter your details to get started.",
-      },
+      { name: "description", content: "7 days free, then $19.99/year." },
     ],
   }),
   component: TrialPage,
@@ -43,26 +40,10 @@ function TrialPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
+
     try {
-      // First try to sign in — if it works, account already exists
-      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email, password });
-
-      if (signInData.session) {
-        // Account exists and password matches — just log them in
-        toast.success("Welcome back! Signing you in.");
-        navigate({ to: "/dashboard" });
-        return;
-      }
-
-      if (signInError && (signInError.message.toLowerCase().includes("invalid") || signInError.message.toLowerCase().includes("credentials") || signInError.message.toLowerCase().includes("wrong"))) {
-        // Wrong password for existing account
-        toast.error("This email is already registered.");
-        setBusy(false);
-        return;
-      }
-
-      // No account exists — sign them up
-      const { error: signUpError } = await supabase.auth.signUp({
+      // Sign up directly — identities.length === 0 means email already exists
+      const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
         password,
         options: {
@@ -71,7 +52,23 @@ function TrialPage() {
         },
       });
 
-      if (signUpError) throw signUpError;
+      if (signUpError) {
+        const msg = signUpError.message.toLowerCase();
+        if (msg.includes("password") || msg.includes("hibp") || msg.includes("weak") || msg.includes("common")) {
+          toast.error("This password is too common. Please choose a more unique password.");
+        } else {
+          toast.error(signUpError.message);
+        }
+        setBusy(false);
+        return;
+      }
+
+      // Empty identities = email already registered
+      if (signUpData?.user && signUpData.user.identities?.length === 0) {
+        toast.error("This email is already registered.");
+        setBusy(false);
+        return;
+      }
 
       const { data: sessionData } = await supabase.auth.getSession();
       if (!sessionData.session) {
@@ -81,7 +78,7 @@ function TrialPage() {
       }
 
       // ----------------------------------------------------------------
-      // TODO: STRIPE — uncomment below once Stripe edge function is ready
+      // TODO: STRIPE — uncomment once Stripe edge function is ready
       // const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
       //   body: { userId: sessionData.session.user.id, email, returnUrl: `${window.location.origin}/dashboard` },
       // });
@@ -93,12 +90,7 @@ function TrialPage() {
       navigate({ to: "/card-details" });
 
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Something went wrong";
-      if (msg.toLowerCase().includes("password") || msg.toLowerCase().includes("hibp") || msg.toLowerCase().includes("weak")) {
-        toast.error("This password is too common. Please choose a more unique password.");
-      } else {
-        toast.error(msg);
-      }
+      toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
       setBusy(false);
     }
@@ -141,8 +133,7 @@ function TrialPage() {
               <span className="text-accent"> finally worth reading.</span>
             </h1>
             <p className="mt-4 text-muted-foreground">
-              Enter your details to start your free trial. Your card won't be
-              charged until day 7 — cancel any time before then.
+              Enter your details to start your free trial. Your card won't be charged until day 7.
             </p>
             <ul className="mt-8 space-y-3">
               {FEATURES.map((f) => (
@@ -198,13 +189,25 @@ function TrialPage() {
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="password">Password</Label>
-                    <Input id="password" type="password" placeholder="Min. 8 characters" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    <Input
+                      id="password"
+                      type="password"
+                      placeholder="Min. 8 characters"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
                     <PasswordStrength password={password} />
                   </div>
                   <div className="rounded-lg border border-border bg-secondary px-4 py-3 text-xs text-muted-foreground">
                     💳 After clicking below you'll enter your card details securely on Stripe. <strong>You won't be charged until day 7.</strong>
                   </div>
-                  <Button type="submit" className="w-full" size="lg" disabled={busy || !isPasswordStrong(password)}>
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    size="lg"
+                    disabled={busy || !isPasswordStrong(password)}
+                  >
                     {busy ? "Setting up your account…" : "Start free trial →"}
                   </Button>
                 </form>

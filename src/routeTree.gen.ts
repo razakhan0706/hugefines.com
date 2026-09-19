@@ -15,7 +15,6 @@ import { Route as McpRouteImport } from './routes/mcp'
 import { Route as InviteWelcomeRouteImport } from './routes/invite-welcome'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as CheckoutStartRouteImport } from './routes/checkout-start'
-import { Route as CardDetailsRouteImport } from './routes/card-details'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -57,11 +56,6 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
 const CheckoutStartRoute = CheckoutStartRouteImport.update({
   id: '/checkout-start',
   path: '/checkout-start',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CardDetailsRoute = CardDetailsRouteImport.update({
-  id: '/card-details',
-  path: '/card-details',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -130,7 +124,6 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/card-details': typeof CardDetailsRoute
   '/checkout-start': typeof CheckoutStartRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/invite-welcome': typeof InviteWelcomeRoute
@@ -150,7 +143,6 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
-  '/card-details': typeof CardDetailsRoute
   '/checkout-start': typeof CheckoutStartRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/invite-welcome': typeof InviteWelcomeRoute
@@ -172,7 +164,6 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
-  '/card-details': typeof CardDetailsRoute
   '/checkout-start': typeof CheckoutStartRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/invite-welcome': typeof InviteWelcomeRoute
@@ -194,7 +185,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
-    | '/card-details'
     | '/checkout-start'
     | '/forgot-password'
     | '/invite-welcome'
@@ -214,7 +204,6 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
-    | '/card-details'
     | '/checkout-start'
     | '/forgot-password'
     | '/invite-welcome'
@@ -235,7 +224,6 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
-    | '/card-details'
     | '/checkout-start'
     | '/forgot-password'
     | '/invite-welcome'
@@ -257,7 +245,6 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
-  CardDetailsRoute: typeof CardDetailsRoute
   CheckoutStartRoute: typeof CheckoutStartRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   InviteWelcomeRoute: typeof InviteWelcomeRoute
@@ -314,13 +301,6 @@ declare module '@tanstack/react-router' {
       path: '/checkout-start'
       fullPath: '/checkout-start'
       preLoaderRoute: typeof CheckoutStartRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/card-details': {
-      id: '/card-details'
-      path: '/card-details'
-      fullPath: '/card-details'
-      preLoaderRoute: typeof CardDetailsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -429,7 +409,6 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
-  CardDetailsRoute: CardDetailsRoute,
   CheckoutStartRoute: CheckoutStartRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   InviteWelcomeRoute: InviteWelcomeRoute,

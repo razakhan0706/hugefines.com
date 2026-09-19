@@ -10,17 +10,15 @@ export interface ShareBundle extends TeamBundle {
 }
 
 export async function fetchShareBundle(token: string): Promise<ShareBundle> {
-  const rpc = supabase.rpc as unknown as (
-    functionName: string,
-    args: Record<string, unknown>,
-  ) => Promise<{
+  // Call rpc as a method on the client — aliasing `supabase.rpc` unbinds `this`
+  // and throws before any request is made.
+  const { data, error } = (await supabase.rpc(
+    "get_share_bundle" as never,
+    { _token: token } as never,
+  )) as unknown as {
     data: unknown;
     error: { message: string } | null;
-  }>;
-
-  const { data, error } = await rpc("get_share_bundle", {
-    _token: token,
-  });
+  };
 
   if (error) {
     throw new Error(error.message);

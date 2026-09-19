@@ -7,15 +7,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import { ClipboardList, BarChart3, Vote, Sparkles, Share2, Users, Check } from "lucide-react";
+import { ClipboardList, BarChart3, Vote, Sparkles, Share2, Users, Check, CircleAlert } from "lucide-react";
 import { PasswordStrength, isPasswordStrong } from "@/components/PasswordStrength";
 import logoAsset from "@/assets/Website_Logo.png.asset.json";
 
 export const Route = createFileRoute("/trial")({
+  validateSearch: (search: Record<string, unknown>): { notice?: "account-not-found" } => ({
+    notice: search.notice === "account-not-found" ? "account-not-found" : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Start your free trial — Huge Fines" },
       { name: "description", content: "7 days free, then $19.99/year." },
+      { property: "og:title", content: "Start your free trial — Huge Fines" },
+      { property: "og:description", content: "Start Huge Fines free for 7 days, then continue for $19.99/year." },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary" },
     ],
   }),
   component: TrialPage,
@@ -31,6 +38,7 @@ const FEATURES = [
 ];
 
 function TrialPage() {
+  const { notice } = Route.useSearch();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -208,6 +216,15 @@ function TrialPage() {
           <div className="flex items-start justify-center lg:justify-end">
             <Card className="w-full max-w-md">
               <CardContent className="p-6 sm:p-8">
+                {notice === "account-not-found" && (
+                  <div role="alert" className="mb-6 flex gap-3 rounded-lg border border-destructive/40 bg-destructive/10 p-4 text-destructive">
+                    <CircleAlert className="mt-0.5 size-5 shrink-0" aria-hidden="true" />
+                    <div>
+                      <p className="font-semibold">This account doesn't exist.</p>
+                      <p className="mt-1 text-sm">Register now for a 7-day free trial.</p>
+                    </div>
+                  </div>
+                )}
                 <h2 className="text-2xl font-bold">Create your account</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   Free for 7 days · card details collected via Stripe · cancel any time

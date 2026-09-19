@@ -32,6 +32,7 @@ function BillingPage() {
 
   async function openBillingPortal() {
     setBusy(true);
+    const portalWindow = window.open("", "_blank");
     try {
       const result = await createPortal({
         data: {
@@ -40,8 +41,13 @@ function BillingPage() {
         },
       });
       if ("error" in result) throw new Error(result.error);
-      window.location.href = result.url;
+      if (portalWindow) {
+        portalWindow.location.href = result.url;
+      } else {
+        window.location.href = result.url;
+      }
     } catch (error) {
+      portalWindow?.close();
       toast.error(error instanceof Error ? error.message : "Could not open billing management.");
       setBusy(false);
     }

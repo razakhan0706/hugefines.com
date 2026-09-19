@@ -36,13 +36,33 @@ export async function fetchTeamBundle(teamId: string): Promise<TeamBundle> {
   };
 }
 
-// Public boards must read team info from the public_teams view, which excludes
-// billing columns (stripe ids, trial dates, paid status).
+// Public boards must read team info from the get_public_teams() function, which
+// excludes billing columns (stripe ids, trial dates, paid status).
+export interface PublicTeam {
+  id: string;
+  name: string;
+  slug: string;
+  sport: string;
+  season_name: string;
+  logo_url: string | null;
+  accent_color: string;
+  vote_format: string;
+  votes_public: boolean;
+  is_public: boolean;
+  player_limit: number;
+  currency: string;
+  created_at: string;
+}
+
+export async function fetchPublicTeams(): Promise<PublicTeam[]> {
+  const { data, error } = await supabase.rpc("get_public_teams" as never);
+  if (error) throw error;
+  return (data ?? []) as unknown as PublicTeam[];
+}
+
 export async function fetchPublicTeamBundle(teamId: string): Promise<TeamBundle> {
-  const fromView = supabase.from as unknown as (
-    table: string,
-  ) => ReturnType<typeof supabase.from>;
-  const team = await fromView("public_teams").select("*").eq("id", teamId).maybeSingle();
+  const teams = await fetchPublicTeams();
+  const team = teams.find((t) => t.id === teamId) ?? null;
   const [players, rounds, categories, fines, votes, recaps] = await Promise.all([
     supabase.from("players").select("*").eq("team_id", teamId).order("name"),
     supabase.from("rounds").select("*").eq("team_id", teamId).order("round_number"),

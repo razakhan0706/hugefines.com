@@ -48,16 +48,10 @@ function PublicBoard() {
   const query = useQuery({
     queryKey: ["public-team", slug],
     queryFn: async () => {
-      const fromView = supabase.from as unknown as (
-        table: string,
-      ) => ReturnType<typeof supabase.from>;
-      const { data, error } = await fromView("public_teams")
-        .select("id")
-        .eq("slug", slug)
-        .maybeSingle();
-      if (error) throw error;
-      if (!data || !data.id) throw new Error("not found");
-      return fetchPublicTeamBundle(String(data.id));
+      const teams = await fetchPublicTeams();
+      const team = teams.find((t) => t.slug === slug);
+      if (!team) throw new Error("not found");
+      return fetchPublicTeamBundle(team.id);
     },
   });
 

@@ -16,7 +16,7 @@ export const createBillingPortalSession = createServerFn({ method: "POST" })
 
       // Use the same Stripe account as the create-checkout edge function
       // (the user's own account), not the Lovable connector gateway.
-      const secretKey = process.env.STRIPE_SECRET_KEY;
+      const secretKey = process.env.STRIPE_LIVE_API_KEY ?? process.env.STRIPE_SECRET_KEY;
       if (!secretKey) return { error: "Billing is not configured yet." };
       const stripe = new Stripe(secretKey, { apiVersion: "2024-04-10" as any });
 

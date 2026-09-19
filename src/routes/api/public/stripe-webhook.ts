@@ -5,7 +5,7 @@ export const Route = createFileRoute("/api/public/stripe-webhook")({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const secretKey = process.env.STRIPE_SECRET_KEY;
+        const secretKey = process.env.STRIPE_LIVE_API_KEY ?? process.env.STRIPE_SECRET_KEY;
         const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
         if (!secretKey || !webhookSecret) {
           return new Response("Billing is not configured", { status: 500 });

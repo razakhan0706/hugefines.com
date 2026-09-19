@@ -30,6 +30,36 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
   const [isPublic, setIsPublic] = useState(data.team.is_public);
   const [votesPublic, setVotesPublic] = useState(data.team.votes_public);
   const [uploading, setUploading] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setIsOwner(data.user?.id === data.team?.owner_id);
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  async function deleteTeam() {
+    setDeleting(true);
+    try {
+      const tid = data.team.id;
+      // Delete child records first, then the team itself.
+      const tables = ["votes", "fines", "recaps", "rounds", "players", "fine_categories", "team_access"] as const;
+      for (const table of tables) {
+        const { error } = await supabase.from(table).delete().eq("team_id", tid);
+        if (error) throw error;
+      }
+      const { error } = await supabase.from("teams").delete().eq("id", tid);
+      if (error) throw error;
+      toast.success("Team deleted");
+      navigate({ to: "/dashboard" });
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not delete team");
+      setDeleting(false);
+    }
+  }
 
   async function pickLogo(file: File) {
     setUploading(true);

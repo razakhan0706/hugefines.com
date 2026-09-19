@@ -72,10 +72,10 @@ export async function fetchPublicTeamBundle(teamId: string): Promise<TeamBundle>
     supabase.from("recaps").select("*").eq("team_id", teamId).order("created_at", { ascending: false }),
   ]);
 
-  if (!team.data) throw new Error("Team not found");
+  if (!team) throw new Error("Team not found");
 
   return {
-    team: team.data as unknown as Team,
+    team: team as unknown as Team,
     players: (players.data ?? []) as unknown as Player[],
     rounds: (rounds.data ?? []) as unknown as Round[],
     categories: (categories.data ?? []) as unknown as FineCategory[],

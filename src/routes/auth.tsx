@@ -40,13 +40,14 @@ function AuthPage() {
       const user = data.session?.user;
       if (user) {
         // A Google sign-in for an email that has no account silently creates one.
-        // Detect that (account created at the same moment as this sign-in) and
-        // send brand-new users to the trial page instead of the dashboard.
+        // Detect that (account created at the same moment as this sign-in), tell
+        // the user no account exists, and send them to the trial signup instead.
         const isNewGoogleUser =
           user.app_metadata?.provider === "google" &&
           !!user.last_sign_in_at &&
           Math.abs(new Date(user.last_sign_in_at).getTime() - new Date(user.created_at).getTime()) < 60_000;
         if (isNewGoogleUser) {
+          toast.error("No account found for this email. Start a free trial to create one.");
           navigate({ to: "/trial", replace: true });
           return;
         }

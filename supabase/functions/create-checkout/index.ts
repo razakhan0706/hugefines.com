@@ -7,7 +7,7 @@ const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY")!, {
 
 const supabaseAdmin = createClient(Deno.env.get("SUPABASE_URL")!, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
 
-const PRICE_ID = "price_1UGyxZAUU9TzrSrhNEHxrje8";
+const PRICE_ID = "price_1UHJsdAuE7syJnwDv9Ba8k61";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {

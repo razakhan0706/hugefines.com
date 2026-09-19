@@ -10,7 +10,7 @@ type BillingPortalResult = { url: string } | { error: string };
 
 export const createBillingPortalSession = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((data: { environment: StripeEnv; returnUrl: string }) => data)
+  .validator((data: { environment: StripeEnv; returnUrl: string }) => data)
   .handler(async ({ data, context }): Promise<BillingPortalResult> => {
     try {
       const { data: userData, error: userError } = await context.supabase.auth.getUser();

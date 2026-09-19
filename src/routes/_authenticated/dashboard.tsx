@@ -120,10 +120,22 @@ function Dashboard() {
 
       const { data, error } = await supabase
         .from("teams")
-        .insert({ owner_id: uid, name, slug, season_name: season, logo_url: logoUrl, sport, vote_format: format })
+        .insert({ owner_id: uid, name, slug, season_name: season, sport, vote_format: format })
         .select()
         .single();
       if (error) throw error;
+
+      if (logoFile) {
+        setUploading(true);
+        try {
+          const url = await uploadPhoto(data.id, logoFile);
+          await supabase.from("teams").update({ logo_url: url }).eq("id", data.id);
+        } catch (e) {
+          toast.error("Team created, but the photo couldn't be uploaded. Add it in Settings.");
+        } finally {
+          setUploading(false);
+        }
+      }
 
       await supabase
         .from("fine_categories")
@@ -132,6 +144,9 @@ function Dashboard() {
       toast.success("Team created");
       setOpen(false);
       setLogoUrl(null);
+      setLogoFile(null);
+      navigate({ to: "/team/$teamId", params: { teamId: data.id } });
+
       navigate({ to: "/team/$teamId", params: { teamId: data.id } });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not create team");

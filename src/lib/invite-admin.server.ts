@@ -59,7 +59,7 @@ export const inviteAdmin = createServerFn({ method: "POST" })
       const { data: magic } = await supabaseAdmin.auth.admin.generateLink({
         type: "magiclink",
         email: normalizedEmail,
-        options: { redirectTo: `${siteUrl}/dashboard` },
+        options: { redirectTo },
       });
       if (magic?.properties?.action_link) inviteUrl = magic.properties.action_link;
     }

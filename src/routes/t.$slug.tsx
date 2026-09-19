@@ -56,8 +56,8 @@ function PublicBoard() {
         .eq("slug", slug)
         .maybeSingle();
       if (error) throw error;
-      if (!data) throw new Error("not found");
-      return fetchPublicTeamBundle(data.id);
+      if (!data || !data.id) throw new Error("not found");
+      return fetchPublicTeamBundle(String(data.id));
     },
   });
 

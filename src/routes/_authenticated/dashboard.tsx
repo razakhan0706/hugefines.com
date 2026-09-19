@@ -50,7 +50,9 @@ function Dashboard() {
   const [format, setFormat] = useState("3-2-1");
   const [busy, setBusy] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [deleteTeam, setDeleteTeam] = useState<Team | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -70,16 +72,13 @@ function Dashboard() {
     }
   }, []);
 
-  async function pickLogo(file: File) {
-    setUploading(true);
-    try {
-      setLogoUrl(await uploadPhoto("teams", file));
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Upload failed");
-    } finally {
-      setUploading(false);
-    }
+  // The photo can only be stored under the team's own folder, which doesn't
+  // exist until the team is created — so hold the file and upload afterwards.
+  function pickLogo(file: File) {
+    setLogoFile(file);
+    setLogoUrl(URL.createObjectURL(file));
   }
+
 
   const teams = useQuery({
     queryKey: ["my-teams"],

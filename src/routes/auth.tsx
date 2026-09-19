@@ -91,9 +91,12 @@ function AuthPage() {
   }
 
   async function google() {
-    const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: next ? `${window.location.origin}${next}` : window.location.origin,
-    });
+    // Return to /auth after Google so we can tell a brand-new account
+    // (which must start a trial) apart from an existing user signing in.
+    const redirect_uri = next
+      ? `${window.location.origin}/auth?next=${encodeURIComponent(next)}`
+      : `${window.location.origin}/auth`;
+    const result = await lovable.auth.signInWithOAuth("google", { redirect_uri });
     if (result.error) {
       toast.error("Google sign-in failed. Try email instead.");
       return;

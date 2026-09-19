@@ -444,6 +444,8 @@ export type Database = {
       can_edit_team: { Args: { _team_id: string }; Returns: boolean }
       claim_team_invites: { Args: never; Returns: number }
       team_is_public: { Args: { _team_id: string }; Returns: boolean }
+      team_is_visible: { Args: { _team_id: string }; Returns: boolean }
+      team_votes_public: { Args: { _team_id: string }; Returns: boolean }
     }
     Enums: {
       [_ in never]: never

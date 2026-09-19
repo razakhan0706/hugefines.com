@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchPublicTeamBundle } from "@/lib/useTeamData";
+import { fetchPublicTeamBundle, fetchPublicTeams } from "@/lib/useTeamData";
 import { StatsView } from "@/components/StatsView";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -48,16 +48,10 @@ function PublicBoard() {
   const query = useQuery({
     queryKey: ["public-team", slug],
     queryFn: async () => {
-      const fromView = supabase.from as unknown as (
-        table: string,
-      ) => ReturnType<typeof supabase.from>;
-      const { data, error } = await fromView("public_teams")
-        .select("id")
-        .eq("slug", slug)
-        .maybeSingle();
-      if (error) throw error;
-      if (!data || !data.id) throw new Error("not found");
-      return fetchPublicTeamBundle(String(data.id));
+      const teams = await fetchPublicTeams();
+      const team = teams.find((t) => t.slug === slug);
+      if (!team) throw new Error("not found");
+      return fetchPublicTeamBundle(team.id);
     },
   });
 

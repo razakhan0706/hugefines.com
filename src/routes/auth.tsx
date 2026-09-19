@@ -26,6 +26,16 @@ export const Route = createFileRoute("/auth")({
   component: AuthPage,
 });
 
+async function hasCompletedProfile(userId: string) {
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("card_captured")
+    .eq("id", userId)
+    .maybeSingle();
+
+  return !error && profile?.card_captured === true;
+}
+
 function AuthPage() {
   const navigate = useNavigate();
   const { next } = Route.useSearch();
@@ -41,13 +51,7 @@ function AuthPage() {
       if (user) {
         const isGoogleUser = user.app_metadata?.provider === "google";
         if (isGoogleUser) {
-          const { data: profile, error: profileError } = await supabase
-            .from("profiles")
-            .select("card_captured")
-            .eq("id", user.id)
-            .maybeSingle();
-
-          if (profileError || !profile?.card_captured) {
+          if (!(await hasCompletedProfile(user.id))) {
             await supabase.auth.signOut();
             toast.error("No profile exists for this ID. Register to continue.");
             navigate({ to: "/trial", replace: true });
@@ -110,6 +114,15 @@ function AuthPage() {
       return;
     }
     if (result.redirected) return;
+
+    const { data } = await supabase.auth.getUser();
+    if (!data.user || !(await hasCompletedProfile(data.user.id))) {
+      await supabase.auth.signOut();
+      toast.error("No profile exists for this ID. Register to continue.");
+      navigate({ to: "/trial", replace: true });
+      return;
+    }
+
     if (next) window.location.assign(next);
     else navigate({ to: "/dashboard" });
   }

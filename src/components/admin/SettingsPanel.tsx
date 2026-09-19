@@ -10,6 +10,7 @@ import type { TeamBundle } from "@/lib/useTeamData";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
 import { uploadPhoto } from "@/lib/photos";
 import { TeamAdminsCard } from "@/components/admin/TeamAdminsCard";
+import { ShareLinksCard } from "@/components/admin/ShareLinksCard";
 
 export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: () => void }) {
   const [name, setName] = useState(data.team.name);
@@ -167,7 +168,7 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
           <Button onClick={save}>Save sharing settings</Button>
         </CardContent>
       </Card>
-
+      <ShareLinksCard teamId={data.team.id} />        
       <TeamAdminsCard teamId={data.team.id} ownerId={data.team.owner_id} />
 
       <Card>

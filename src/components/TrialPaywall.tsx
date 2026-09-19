@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 
@@ -49,7 +48,7 @@ export function TrialPaywall({ paid, trialEndsAt }: Props) {
           </div>
 
           <Button asChild className="mt-6 w-full" size="lg">
-            <Link to="/card-details">Subscribe now — $19.99/yr</Link>
+            <Link to="/checkout-start">Subscribe now — $19.99/yr</Link>
           </Button>
 
           <p className="mt-3 text-xs text-muted-foreground">

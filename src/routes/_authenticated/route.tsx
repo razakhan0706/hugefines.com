@@ -15,7 +15,7 @@ export const Route = createFileRoute("/_authenticated")({
     }
 
     // Billing must remain reachable so a customer can cancel a trial or renewal.
-    if (location.pathname === "/card-details" || location.pathname === "/billing") {
+    if (location.pathname === "/billing") {
       return { user: data.user };
     }
 
@@ -29,9 +29,9 @@ export const Route = createFileRoute("/_authenticated")({
       .eq("id", data.user.id)
       .maybeSingle();
 
-    // Profile doesn't exist yet OR card not captured → redirect to card details
+    // An incomplete registration must return to the trial signup flow.
     if (!profile || !profile.card_captured) {
-      throw redirect({ to: "/card-details" });
+      throw redirect({ to: "/trial" });
     }
 
     return { user: data.user };

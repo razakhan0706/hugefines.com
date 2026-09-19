@@ -37,7 +37,19 @@ function AuthPage() {
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
+      const user = data.session?.user;
+      if (user) {
+        // A Google sign-in for an email that has no account silently creates one.
+        // Detect that (account created at the same moment as this sign-in) and
+        // send brand-new users to the trial page instead of the dashboard.
+        const isNewGoogleUser =
+          user.app_metadata?.provider === "google" &&
+          !!user.last_sign_in_at &&
+          Math.abs(new Date(user.last_sign_in_at).getTime() - new Date(user.created_at).getTime()) < 60_000;
+        if (isNewGoogleUser) {
+          navigate({ to: "/trial", replace: true });
+          return;
+        }
         if (next) window.location.replace(next);
         else navigate({ to: "/dashboard", replace: true });
       }

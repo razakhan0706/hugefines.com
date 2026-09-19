@@ -29,9 +29,18 @@ export const Route = createFileRoute("/_authenticated")({
       .eq("id", data.user.id)
       .maybeSingle();
 
-    // An incomplete registration must return to the trial signup flow.
+    // An incomplete registration must return to the trial signup flow —
+    // unless the user was invited as a team admin (no subscription needed).
     if (!profile || !profile.card_captured) {
-      throw redirect({ to: "/trial" });
+      await supabase.rpc("claim_team_invites");
+      const { data: access } = await supabase
+        .from("team_access")
+        .select("id")
+        .or(`user_id.eq.${data.user.id},invited_email.eq.${data.user.email ?? ""}`)
+        .limit(1);
+      if (!access || access.length === 0) {
+        throw redirect({ to: "/trial" });
+      }
     }
 
     return { user: data.user };

@@ -14,8 +14,8 @@ export const Route = createFileRoute("/_authenticated")({
       });
     }
 
-    // Skip card check if already on card-details page
-    if (location.pathname === "/card-details") {
+    // Billing must remain reachable so a customer can cancel a trial or renewal.
+    if (location.pathname === "/card-details" || location.pathname === "/billing") {
       return { user: data.user };
     }
 

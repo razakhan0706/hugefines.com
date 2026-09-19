@@ -37,11 +37,11 @@ function TrialPage() {
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
 
-  // If already logged in (e.g. after Google OAuth), redirect to card details
+  // If already logged in (e.g. after Google OAuth), continue to Stripe checkout
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       if (data.session) {
-        navigate({ to: "/card-details" });
+        navigate({ to: "/checkout-start" });
       }
     });
   }, [navigate]);
@@ -86,17 +86,19 @@ function TrialPage() {
         return;
       }
 
-      // ----------------------------------------------------------------
-      // TODO: STRIPE — uncomment once Stripe edge function is ready
-      // const { data, error: fnError } = await supabase.functions.invoke("create-checkout", {
-      //   body: { userId: sessionData.session.user.id, email, returnUrl: `${window.location.origin}/dashboard` },
-      // });
-      // if (fnError) throw fnError;
-      // window.location.href = data.url;
-      // ----------------------------------------------------------------
+      // Create Stripe checkout session (7-day trial) and redirect to Stripe
+      const { data: checkoutData, error: fnError } = await supabase.functions.invoke("create-checkout", {
+        body: {
+          userId: sessionData.session.user.id,
+          email: sessionData.session.user.email ?? email,
+          returnUrl: `${window.location.origin}/dashboard`,
+        },
+      });
+      if (fnError) throw fnError;
+      if (!checkoutData?.url) throw new Error("No checkout URL returned");
 
-      toast.success("Account created! Your 7-day trial has started.");
-      navigate({ to: "/card-details" });
+      toast.success("Account created! Redirecting to secure checkout…");
+      window.location.href = checkoutData.url;
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -106,14 +108,14 @@ function TrialPage() {
 
   async function googleSignup() {
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/card-details`,
+      redirect_uri: `${window.location.origin}/checkout-start`,
     });
     if (result.error) {
       toast.error("Google sign-in failed. Try email instead.");
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/card-details" });
+    navigate({ to: "/checkout-start" });
   }
 
   return (

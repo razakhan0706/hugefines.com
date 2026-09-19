@@ -7,18 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { slugify, type Team } from "@/lib/fines";
-import { Plus } from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { uploadPhoto } from "@/lib/photos";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
 import logoAsset from "@/assets/Website_Logo.png.asset.json";
@@ -49,6 +42,7 @@ const DEFAULT_CATEGORIES = [
 
 function Dashboard() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState("");
   const [season, setSeason] = useState("Season 2026");
@@ -57,6 +51,24 @@ function Dashboard() {
   const [busy, setBusy] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [deleteTeam, setDeleteTeam] = useState<Team | null>(null);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) setCurrentUserId(data.user.id);
+    });
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("payment") === "success") {
+      toast.success("🎉 Trial started! Welcome to Huge Fines.");
+    } else if (params.get("payment") === "cancelled") {
+      toast.error("Payment cancelled. Enter your card to start the trial.");
+    }
+  }, []);
 
   async function pickLogo(file: File) {
     setUploading(true);
@@ -72,33 +84,21 @@ function Dashboard() {
   const teams = useQuery({
     queryKey: ["my-teams"],
     queryFn: async () => {
-      // Link any pending co-admin invites sent to this user's email.
       await supabase.rpc("claim_team_invites");
       const { data: userData } = await supabase.auth.getUser();
       const uid = userData.user?.id;
       if (!uid) return [];
 
-      // Teams I own
-      const owned = await supabase
-        .from("teams")
-        .select("*")
-        .eq("owner_id", uid);
+      const owned = await supabase.from("teams").select("*").eq("owner_id", uid);
       if (owned.error) throw owned.error;
 
-      // Teams I'm invited to as a co-admin
-      const access = await supabase
-        .from("team_access")
-        .select("team_id")
-        .eq("user_id", uid);
+      const access = await supabase.from("team_access").select("team_id").eq("user_id", uid);
       if (access.error) throw access.error;
       const accessIds = (access.data ?? []).map((a) => a.team_id);
 
       let shared: Team[] = [];
       if (accessIds.length > 0) {
-        const sharedRes = await supabase
-          .from("teams")
-          .select("*")
-          .in("id", accessIds);
+        const sharedRes = await supabase.from("teams").select("*").in("id", accessIds);
         if (sharedRes.error) throw sharedRes.error;
         shared = (sharedRes.data ?? []) as unknown as Team[];
       }
@@ -121,26 +121,14 @@ function Dashboard() {
 
       const { data, error } = await supabase
         .from("teams")
-        .insert({
-          owner_id: uid,
-          name,
-          slug,
-          season_name: season,
-          logo_url: logoUrl,
-          sport,
-          vote_format: format,
-        })
+        .insert({ owner_id: uid, name, slug, season_name: season, logo_url: logoUrl, sport, vote_format: format })
         .select()
         .single();
       if (error) throw error;
 
-      await supabase.from("fine_categories").insert(
-        DEFAULT_CATEGORIES.map((label) => ({
-          team_id: data.id,
-          label,
-          default_amount: 1,
-        })),
-      );
+      await supabase
+        .from("fine_categories")
+        .insert(DEFAULT_CATEGORIES.map((label) => ({ team_id: data.id, label, default_amount: 1 })));
 
       toast.success("Team created");
       setOpen(false);
@@ -150,6 +138,22 @@ function Dashboard() {
       toast.error(err instanceof Error ? err.message : "Could not create team");
     } finally {
       setBusy(false);
+    }
+  }
+
+  async function confirmDelete() {
+    if (!deleteTeam) return;
+    setDeleting(true);
+    try {
+      const { error } = await supabase.from("teams").delete().eq("id", deleteTeam.id);
+      if (error) throw error;
+      toast.success(`"${deleteTeam.name}" deleted`);
+      setDeleteTeam(null);
+      queryClient.invalidateQueries({ queryKey: ["my-teams"] });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not delete team");
+    } finally {
+      setDeleting(false);
     }
   }
 
@@ -184,9 +188,7 @@ function Dashboard() {
                     title="Team photo"
                     onPick={pickLogo}
                   />
-                  <p className="text-sm text-muted-foreground">
-                    Add a team photo or badge (optional)
-                  </p>
+                  <p className="text-sm text-muted-foreground">Add a team photo or badge (optional)</p>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="tname">Team name</Label>
@@ -235,46 +237,71 @@ function Dashboard() {
           {teams.data?.length === 0 && (
             <Card className="sm:col-span-2 border-dashed">
               <CardContent className="flex flex-col items-center gap-3 p-10 text-center">
-                <img
-                  src={logoAsset.url}
-                  alt=""
-                  aria-hidden="true"
-                  className="h-40 w-auto opacity-25 md:h-48"
-                />
+                <img src={logoAsset.url} alt="" aria-hidden="true" className="h-40 w-auto opacity-25 md:h-48" />
                 <p className="font-semibold">No teams yet</p>
-                <p className="text-sm text-muted-foreground">
-                  Create your first team to start logging fines.
-                </p>
+                <p className="text-sm text-muted-foreground">Create your first team to start logging fines.</p>
               </CardContent>
             </Card>
           )}
           {teams.data?.map((t) => (
-            <Link key={t.id} to="/team/$teamId" params={{ teamId: t.id }}>
-              <Card className="h-full transition-colors hover:border-accent">
-                <CardContent className="flex gap-4 p-6">
-                  <PhotoAvatar url={t.logo_url} name={t.name} className="size-12" />
-                  <div>
-                  <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">
-                    {t.sport}
-                  </p>
-                  <h2 className="mt-1 text-xl font-bold">{t.name}</h2>
-                  <p className="text-sm text-muted-foreground">{t.season_name}</p>
-                  <p className="mt-4 text-xs text-muted-foreground">/t/{t.slug}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </Link>
+            <div key={t.id} className="relative group">
+              <Link to="/team/$teamId" params={{ teamId: t.id }}>
+                <Card className="h-full transition-colors hover:border-accent">
+                  <CardContent className="flex gap-4 p-6">
+                    <PhotoAvatar url={t.logo_url} name={t.name} className="size-12" />
+                    <div>
+                      <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">{t.sport}</p>
+                      <h2 className="mt-1 text-xl font-bold">{t.name}</h2>
+                      <p className="text-sm text-muted-foreground">{t.season_name}</p>
+                      <p className="mt-4 text-xs text-muted-foreground">/t/{t.slug}</p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </Link>
+              {t.owner_id === currentUserId && (
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setDeleteTeam(t);
+                  }}
+                  className="absolute top-3 right-3 p-1.5 rounded-md text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors opacity-0 group-hover:opacity-100"
+                  title="Delete team"
+                >
+                  <Trash2 className="size-4" />
+                </button>
+              )}
+            </div>
           ))}
         </div>
 
         <div className="mt-16 flex flex-col items-center justify-center md:mt-24">
-          <img
-            src={logoAsset.url}
-            alt="Huge Fines"
-            className="h-40 w-auto md:h-56"
-          />
+          <img src={logoAsset.url} alt="Huge Fines" className="h-40 w-auto md:h-56" />
         </div>
       </main>
+
+      <Dialog
+        open={!!deleteTeam}
+        onOpenChange={(o) => {
+          if (!o) setDeleteTeam(null);
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete "{deleteTeam?.name}"?</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            This will permanently delete the team and all its data — players, fines, and votes. This cannot be undone.
+          </p>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setDeleteTeam(null)} disabled={deleting}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={confirmDelete} disabled={deleting}>
+              {deleting ? "Deleting…" : "Delete team"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

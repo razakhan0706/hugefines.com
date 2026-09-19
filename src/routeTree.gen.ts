@@ -21,6 +21,7 @@ import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated/billing'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedTeamTeamIdRouteImport } from './routes/_authenticated/team.$teamId'
@@ -86,6 +87,11 @@ const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   path: '/dashboard',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedBillingRoute = AuthenticatedBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
   Char91DotwellKnownChar93OauthProtectedResourceRouteImport.update({
     id: '/.well-known/oauth-protected-resource',
@@ -127,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/trial': typeof TrialRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/t/$slug': typeof TSlugRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -145,6 +152,7 @@ export interface FileRoutesByTo {
   '/trial': typeof TrialRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/t/$slug': typeof TSlugRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -165,6 +173,7 @@ export interface FileRoutesById {
   '/trial': typeof TrialRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/_authenticated/billing': typeof AuthenticatedBillingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/t/$slug': typeof TSlugRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -185,6 +194,7 @@ export interface FileRouteTypes {
     | '/trial'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/billing'
     | '/dashboard'
     | '/t/$slug'
     | '/.lovable/oauth/consent'
@@ -203,6 +213,7 @@ export interface FileRouteTypes {
     | '/trial'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/billing'
     | '/dashboard'
     | '/t/$slug'
     | '/.lovable/oauth/consent'
@@ -222,6 +233,7 @@ export interface FileRouteTypes {
     | '/trial'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/_authenticated/billing'
     | '/_authenticated/dashboard'
     | '/t/$slug'
     | '/.lovable/oauth/consent'
@@ -333,6 +345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/billing': {
+      id: '/_authenticated/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof AuthenticatedBillingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/.well-known/oauth-protected-resource': {
       id: '/.well-known/oauth-protected-resource'
       path: '/.well-known/oauth-protected-resource'
@@ -372,11 +391,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBillingRoute: typeof AuthenticatedBillingRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedTeamTeamIdRoute: typeof AuthenticatedTeamTeamIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBillingRoute: AuthenticatedBillingRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedTeamTeamIdRoute: AuthenticatedTeamTeamIdRoute,
 }

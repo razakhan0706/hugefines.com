@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteHeader } from "@/components/SiteHeader";
 import { Button } from "@/components/ui/button";
@@ -24,6 +24,9 @@ import { PhotoAvatar } from "@/components/PhotoAvatar";
 import logoAsset from "@/assets/Website_Logo.png.asset.json";
 
 export const Route = createFileRoute("/_authenticated/dashboard")({
+  validateSearch: (s: Record<string, unknown>): { payment?: string } => ({
+    payment: typeof s.payment === "string" ? s.payment : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "My teams — Huge Fines" },
@@ -71,12 +74,38 @@ function Dashboard() {
     queryFn: async () => {
       // Link any pending co-admin invites sent to this user's email.
       await supabase.rpc("claim_team_invites");
-      const { data, error } = await supabase
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) return [];
+
+      // Teams I own
+      const owned = await supabase
         .from("teams")
         .select("*")
-        .order("created_at", { ascending: false });
-      if (error) throw error;
-      return (data ?? []) as unknown as Team[];
+        .eq("owner_id", uid);
+      if (owned.error) throw owned.error;
+
+      // Teams I'm invited to as a co-admin
+      const access = await supabase
+        .from("team_access")
+        .select("team_id")
+        .eq("user_id", uid);
+      if (access.error) throw access.error;
+      const accessIds = (access.data ?? []).map((a) => a.team_id);
+
+      let shared: Team[] = [];
+      if (accessIds.length > 0) {
+        const sharedRes = await supabase
+          .from("teams")
+          .select("*")
+          .in("id", accessIds);
+        if (sharedRes.error) throw sharedRes.error;
+        shared = (sharedRes.data ?? []) as unknown as Team[];
+      }
+
+      const all = [...((owned.data ?? []) as unknown as Team[]), ...shared];
+      const byId = new Map(all.map((t) => [t.id, t]));
+      return [...byId.values()];
     },
   });
 

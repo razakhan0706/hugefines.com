@@ -43,9 +43,14 @@ export const inviteAdmin = createServerFn({ method: "POST" })
       data: { invited_to_team: team.name },
     });
 
-    if (inviteError && !inviteError.message.toLowerCase().includes("already registered")) {
+    const alreadyRegistered =
+      !!inviteError &&
+      /already (been )?registered|already exists|email_exists/i.test(inviteError.message);
+
+    if (inviteError && !alreadyRegistered) {
       throw new Error(`Access granted, but the email couldn't be sent: ${inviteError.message}`);
     }
 
-    return { success: true };
+    return { success: true, alreadyRegistered };
+
   });

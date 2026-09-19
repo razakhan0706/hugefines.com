@@ -9,7 +9,12 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TrialRouteImport } from './routes/trial'
+import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as McpRouteImport } from './routes/mcp'
+import { Route as InviteWelcomeRouteImport } from './routes/invite-welcome'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as CardDetailsRouteImport } from './routes/card-details'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
@@ -21,9 +26,34 @@ import { Route as AuthenticatedTeamTeamIdRouteImport } from './routes/_authentic
 import { Route as Char91DotmcpChar93InvokeToolToolRouteImport } from './routes/[.mcp]/invoke-tool/$tool'
 import { Route as DotlovableOauthConsentRouteImport } from './routes/[.]lovable.oauth.consent'
 
+const TrialRoute = TrialRouteImport.update({
+  id: '/trial',
+  path: '/trial',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ResetPasswordRoute = ResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const McpRoute = McpRouteImport.update({
   id: '/mcp',
   path: '/mcp',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const InviteWelcomeRoute = InviteWelcomeRouteImport.update({
+  id: '/invite-welcome',
+  path: '/invite-welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CardDetailsRoute = CardDetailsRouteImport.update({
+  id: '/card-details',
+  path: '/card-details',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRoute = AuthRouteImport.update({
@@ -82,7 +112,12 @@ const DotlovableOauthConsentRoute = DotlovableOauthConsentRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/card-details': typeof CardDetailsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/invite-welcome': typeof InviteWelcomeRoute
   '/mcp': typeof McpRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/trial': typeof TrialRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -94,7 +129,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
+  '/card-details': typeof CardDetailsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/invite-welcome': typeof InviteWelcomeRoute
   '/mcp': typeof McpRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/trial': typeof TrialRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
@@ -108,7 +148,12 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
+  '/card-details': typeof CardDetailsRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/invite-welcome': typeof InviteWelcomeRoute
   '/mcp': typeof McpRoute
+  '/reset-password': typeof ResetPasswordRoute
+  '/trial': typeof TrialRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
@@ -122,7 +167,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/auth'
+    | '/card-details'
+    | '/forgot-password'
+    | '/invite-welcome'
     | '/mcp'
+    | '/reset-password'
+    | '/trial'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/dashboard'
@@ -134,7 +184,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/auth'
+    | '/card-details'
+    | '/forgot-password'
+    | '/invite-welcome'
     | '/mcp'
+    | '/reset-password'
+    | '/trial'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/dashboard'
@@ -147,7 +202,12 @@ export interface FileRouteTypes {
     | '/'
     | '/_authenticated'
     | '/auth'
+    | '/card-details'
+    | '/forgot-password'
+    | '/invite-welcome'
     | '/mcp'
+    | '/reset-password'
+    | '/trial'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
     | '/_authenticated/dashboard'
@@ -161,7 +221,12 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
+  CardDetailsRoute: typeof CardDetailsRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  InviteWelcomeRoute: typeof InviteWelcomeRoute
   McpRoute: typeof McpRoute
+  ResetPasswordRoute: typeof ResetPasswordRoute
+  TrialRoute: typeof TrialRoute
   Char91DotmcpChar93ListToolsRoute: typeof Char91DotmcpChar93ListToolsRoute
   Char91DotwellKnownChar93OauthProtectedResourceRoute: typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
   TSlugRoute: typeof TSlugRoute
@@ -171,11 +236,46 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/trial': {
+      id: '/trial'
+      path: '/trial'
+      fullPath: '/trial'
+      preLoaderRoute: typeof TrialRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/reset-password': {
+      id: '/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof ResetPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/mcp': {
       id: '/mcp'
       path: '/mcp'
       fullPath: '/mcp'
       preLoaderRoute: typeof McpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/invite-welcome': {
+      id: '/invite-welcome'
+      path: '/invite-welcome'
+      fullPath: '/invite-welcome'
+      preLoaderRoute: typeof InviteWelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/card-details': {
+      id: '/card-details'
+      path: '/card-details'
+      fullPath: '/card-details'
+      preLoaderRoute: typeof CardDetailsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/auth': {
@@ -268,7 +368,12 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
+  CardDetailsRoute: CardDetailsRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  InviteWelcomeRoute: InviteWelcomeRoute,
   McpRoute: McpRoute,
+  ResetPasswordRoute: ResetPasswordRoute,
+  TrialRoute: TrialRoute,
   Char91DotmcpChar93ListToolsRoute: Char91DotmcpChar93ListToolsRoute,
   Char91DotwellKnownChar93OauthProtectedResourceRoute:
     Char91DotwellKnownChar93OauthProtectedResourceRoute,

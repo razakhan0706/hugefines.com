@@ -214,7 +214,7 @@ function Index() {
                 <Link to="/auth">Create your team</Link>
               </Button>
               <Button asChild size="default" variant="outline" className="w-full text-xs sm:text-sm">
-                <Link to="/auth">Start 7 day free trial</Link>
+                <Link to="/trial">Start 7 day free trial</Link>
               </Button>
             </div>
             <p className="text-xs text-muted-foreground sm:text-sm">
@@ -262,7 +262,7 @@ function Index() {
               <Link to="/auth">Create your team</Link>
             </Button>
             <Button asChild size="lg" variant="outline" className="w-full text-xs sm:text-sm">
-              <Link to="/auth">Start 7 day free trial</Link>
+              <Link to="/trial">Start 7 day free trial</Link>
             </Button>
           </div>
           <p className="mt-4 text-sm text-muted-foreground sm:text-base">

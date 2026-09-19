@@ -141,16 +141,33 @@ function AuthPage() {
             <Button type="submit" className="w-full" disabled={busy}>
               {busy ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
             </Button>
+            {mode === "signin" && (
+              <div className="text-right">
+                <Link
+                  to="/forgot-password"
+                  className="text-xs text-muted-foreground underline-offset-4 hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+            )}
           </form>
-          <button
-            type="button"
-            className="mt-4 w-full text-sm text-muted-foreground underline-offset-4 hover:underline"
-            onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
-          >
-            {mode === "signin"
-              ? "No account yet? Create one"
-              : "Already have an account? Sign in"}
-          </button>
+          {mode === "signin" ? (
+            <Link
+              to="/trial"
+              className="mt-4 block w-full text-center text-sm text-muted-foreground underline-offset-4 hover:underline"
+            >
+              No account yet? Start your free trial
+            </Link>
+          ) : (
+            <button
+              type="button"
+              className="mt-4 w-full text-sm text-muted-foreground underline-offset-4 hover:underline"
+              onClick={() => setMode("signin")}
+            >
+              Already have an account? Sign in
+            </button>
+          )}
         </CardContent>
       </Card>
     </div>

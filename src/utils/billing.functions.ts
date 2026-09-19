@@ -1,10 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
+import Stripe from "stripe";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
-import {
-  type StripeEnv,
-  createStripeClient,
-  getStripeErrorMessage,
-} from "@/lib/stripe.server";
+import { type StripeEnv, getStripeErrorMessage } from "@/lib/stripe.server";
 
 type BillingPortalResult = { url: string } | { error: string };
 
@@ -17,19 +14,30 @@ export const createBillingPortalSession = createServerFn({ method: "POST" })
       const email = userData.user?.email;
       if (userError || !email) return { error: "Please sign in to manage billing." };
 
-      const stripe = createStripeClient(data.environment);
-      const customersByUser = await stripe.customers.search({
-        query: `metadata['userId']:'${context.userId}'`,
-        limit: 10,
-      });
-      const customers = customersByUser.data.length
-        ? customersByUser.data
-        : (await stripe.customers.list({ email, limit: 10 })).data;
-      const customer = customers[0];
-      if (!customer) return { error: "No subscription was found for this account." };
+      // Use the same Stripe account as the create-checkout edge function
+      // (the user's own account), not the Lovable connector gateway.
+      const secretKey = process.env.STRIPE_SECRET_KEY;
+      if (!secretKey) return { error: "Billing is not configured yet." };
+      const stripe = new Stripe(secretKey, { apiVersion: "2024-04-10" as any });
+
+      let customerId: string | undefined;
+      try {
+        const bySearch = await stripe.customers.search({
+          query: `metadata['userId']:'${context.userId}'`,
+          limit: 1,
+        });
+        customerId = bySearch.data[0]?.id;
+      } catch {
+        // search may need a moment to index; fall through to email lookup
+      }
+      if (!customerId) {
+        const byEmail = await stripe.customers.list({ email, limit: 1 });
+        customerId = byEmail.data[0]?.id;
+      }
+      if (!customerId) return { error: "No subscription was found for this account." };
 
       const portal = await stripe.billingPortal.sessions.create({
-        customer: customer.id,
+        customer: customerId,
         return_url: data.returnUrl,
       });
       return { url: portal.url };

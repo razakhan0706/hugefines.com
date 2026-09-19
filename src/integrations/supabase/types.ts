@@ -283,6 +283,47 @@ export type Database = {
           },
         ]
       }
+      share_links: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by: string | null
+          id: string
+          show_fines: boolean
+          show_votes: boolean
+          team_id: string
+          token: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          show_fines?: boolean
+          show_votes?: boolean
+          team_id: string
+          token?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          show_fines?: boolean
+          show_votes?: boolean
+          team_id?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "share_links_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "teams"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_access: {
         Row: {
           created_at: string
@@ -443,6 +484,11 @@ export type Database = {
     Functions: {
       can_edit_team: { Args: { _team_id: string }; Returns: boolean }
       claim_team_invites: { Args: never; Returns: number }
+      create_share_link: {
+        Args: { _show_fines: boolean; _show_votes: boolean; _team_id: string }
+        Returns: string
+      }
+      get_share_bundle: { Args: { _token: string }; Returns: Json }
       team_is_public: { Args: { _team_id: string }; Returns: boolean }
       team_is_visible: { Args: { _team_id: string }; Returns: boolean }
       team_votes_public: { Args: { _team_id: string }; Returns: boolean }

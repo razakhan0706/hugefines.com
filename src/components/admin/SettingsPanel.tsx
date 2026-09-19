@@ -227,6 +227,7 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
             <Link to="/billing">Manage subscription</Link>
           </Button>
         </CardContent>
+      </Card>
     </div>
   );
 }

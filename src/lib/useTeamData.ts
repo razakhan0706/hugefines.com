@@ -36,6 +36,35 @@ export async function fetchTeamBundle(teamId: string): Promise<TeamBundle> {
   };
 }
 
+// Public boards must read team info from the public_teams view, which excludes
+// billing columns (stripe ids, trial dates, paid status).
+export async function fetchPublicTeamBundle(teamId: string): Promise<TeamBundle> {
+  const fromView = supabase.from as unknown as (
+    table: string,
+  ) => ReturnType<typeof supabase.from>;
+  const team = await fromView("public_teams").select("*").eq("id", teamId).maybeSingle();
+  const [players, rounds, categories, fines, votes, recaps] = await Promise.all([
+    supabase.from("players").select("*").eq("team_id", teamId).order("name"),
+    supabase.from("rounds").select("*").eq("team_id", teamId).order("round_number"),
+    supabase.from("fine_categories").select("*").eq("team_id", teamId).order("label"),
+    supabase.from("fines").select("*").eq("team_id", teamId).order("created_at", { ascending: false }),
+    supabase.from("votes").select("*").eq("team_id", teamId),
+    supabase.from("recaps").select("*").eq("team_id", teamId).order("created_at", { ascending: false }),
+  ]);
+
+  if (!team.data) throw new Error("Team not found");
+
+  return {
+    team: team.data as unknown as Team,
+    players: (players.data ?? []) as unknown as Player[],
+    rounds: (rounds.data ?? []) as unknown as Round[],
+    categories: (categories.data ?? []) as unknown as FineCategory[],
+    fines: (fines.data ?? []) as unknown as Fine[],
+    votes: (votes.data ?? []) as unknown as Vote[],
+    recaps: (recaps.data ?? []) as TeamBundle["recaps"],
+  };
+}
+
 export function useTeamBundle(teamId: string) {
   return useQuery({
     queryKey: ["team", teamId],

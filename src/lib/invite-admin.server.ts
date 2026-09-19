@@ -56,12 +56,8 @@ export const inviteAdmin = createServerFn({ method: "POST" })
       /already (been )?registered|already exists|email_exists/i.test(linkError.message)
     ) {
       alreadyRegistered = true;
-      const { data: magic } = await supabaseAdmin.auth.admin.generateLink({
-        type: "magiclink",
-        email: normalizedEmail,
-        options: { redirectTo },
-      });
-      if (magic?.properties?.action_link) inviteUrl = magic.properties.action_link;
+      // Existing users just sign in on the login page — access is already recorded.
+      inviteUrl = `${siteUrl}/auth`;
     }
 
     const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");

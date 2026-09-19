@@ -4,7 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Copy } from "lucide-react";
+import { Copy, CreditCard } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import type { TeamBundle } from "@/lib/useTeamData";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
 import { uploadPhoto } from "@/lib/photos";
@@ -168,6 +169,23 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
       </Card>
 
       <TeamAdminsCard teamId={data.team.id} ownerId={data.team.owner_id} />
+
+      <Card>
+        <CardContent className="space-y-4 p-5">
+          <div className="flex items-start gap-3">
+            <CreditCard className="mt-0.5 size-5 text-accent-strong" />
+            <div>
+              <h3 className="text-lg font-bold">Billing</h3>
+              <p className="text-sm text-muted-foreground">
+                Update payment details, view invoices or cancel renewal.
+              </p>
+            </div>
+          </div>
+          <Button asChild variant="outline">
+            <Link to="/billing">Manage subscription</Link>
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 }

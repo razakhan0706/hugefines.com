@@ -3,7 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { TrialBanner } from "@/components/TrialBanner";
+import { CreditCard } from "lucide-react";
 import logoAsset from "@/assets/Website_Logo.png.asset.json";
 
 function truncateEmail(email: string, max = 24): string {
@@ -38,34 +38,37 @@ export function SiteHeader() {
   }
 
   return (
-    <>
-      <TrialBanner />
-      <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-          <Link to="/" className="flex items-center">
-            <img src={logoAsset.url} alt="Huge Fines" className="h-12 w-auto md:h-14" />
-          </Link>
-          <nav className="flex items-center gap-2">
-            {email ? (
-              <>
-                <Button asChild variant="ghost" size="sm">
-                  <Link to="/dashboard">My teams</Link>
-                </Button>
-                <span className="hidden max-w-[160px] truncate text-sm text-muted-foreground sm:inline">
-                  {truncateEmail(email)}
-                </span>
-                <Button variant="outline" size="sm" onClick={signOut}>
-                  Sign out
-                </Button>
-              </>
-            ) : (
-              <Button asChild size="sm">
-                <Link to="/auth">Sign in</Link>
+    <header className="sticky top-0 z-40 border-b border-border bg-background/90 backdrop-blur">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+        <Link to="/" className="flex items-center">
+          <img src={logoAsset.url} alt="Huge Fines" className="h-12 w-auto md:h-14" />
+        </Link>
+        <nav className="flex items-center gap-2">
+          {email ? (
+            <>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/dashboard">My teams</Link>
               </Button>
-            )}
-          </nav>
-        </div>
-      </header>
-    </>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/billing">
+                  <CreditCard className="size-4" />
+                  <span className="hidden sm:inline">Billing</span>
+                </Link>
+              </Button>
+              <span className="hidden max-w-[160px] truncate text-sm text-muted-foreground sm:inline">
+                {truncateEmail(email)}
+              </span>
+              <Button variant="outline" size="sm" onClick={signOut}>
+                Sign out
+              </Button>
+            </>
+          ) : (
+            <Button asChild size="sm">
+              <Link to="/auth">Sign in</Link>
+            </Button>
+          )}
+        </nav>
+      </div>
+    </header>
   );
 }

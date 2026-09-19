@@ -14,12 +14,14 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as McpRouteImport } from './routes/mcp'
 import { Route as InviteWelcomeRouteImport } from './routes/invite-welcome'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as CheckoutStartRouteImport } from './routes/checkout-start'
 import { Route as CardDetailsRouteImport } from './routes/card-details'
 import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TSlugRouteImport } from './routes/t.$slug'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedBillingRouteImport } from './routes/_authenticated/billing'
 import { Route as Char91DotwellKnownChar93OauthProtectedResourceRouteImport } from './routes/[.well-known]/oauth-protected-resource'
 import { Route as Char91DotmcpChar93ListToolsRouteImport } from './routes/[.mcp]/list-tools'
 import { Route as AuthenticatedTeamTeamIdRouteImport } from './routes/_authenticated/team.$teamId'
@@ -51,6 +53,11 @@ const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
   path: '/forgot-password',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CheckoutStartRoute = CheckoutStartRouteImport.update({
+  id: '/checkout-start',
+  path: '/checkout-start',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CardDetailsRoute = CardDetailsRouteImport.update({
   id: '/card-details',
   path: '/card-details',
@@ -78,6 +85,11 @@ const TSlugRoute = TSlugRouteImport.update({
 const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedBillingRoute = AuthenticatedBillingRouteImport.update({
+  id: '/billing',
+  path: '/billing',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
 const Char91DotwellKnownChar93OauthProtectedResourceRoute =
@@ -113,6 +125,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/card-details': typeof CardDetailsRoute
+  '/checkout-start': typeof CheckoutStartRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/invite-welcome': typeof InviteWelcomeRoute
   '/mcp': typeof McpRoute
@@ -120,6 +133,7 @@ export interface FileRoutesByFullPath {
   '/trial': typeof TrialRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/t/$slug': typeof TSlugRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -130,6 +144,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/card-details': typeof CardDetailsRoute
+  '/checkout-start': typeof CheckoutStartRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/invite-welcome': typeof InviteWelcomeRoute
   '/mcp': typeof McpRoute
@@ -137,6 +152,7 @@ export interface FileRoutesByTo {
   '/trial': typeof TrialRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/billing': typeof AuthenticatedBillingRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/t/$slug': typeof TSlugRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -149,6 +165,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/card-details': typeof CardDetailsRoute
+  '/checkout-start': typeof CheckoutStartRoute
   '/forgot-password': typeof ForgotPasswordRoute
   '/invite-welcome': typeof InviteWelcomeRoute
   '/mcp': typeof McpRoute
@@ -156,6 +173,7 @@ export interface FileRoutesById {
   '/trial': typeof TrialRoute
   '/.mcp/list-tools': typeof Char91DotmcpChar93ListToolsRoute
   '/.well-known/oauth-protected-resource': typeof Char91DotwellKnownChar93OauthProtectedResourceRoute
+  '/_authenticated/billing': typeof AuthenticatedBillingRoute
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/t/$slug': typeof TSlugRoute
   '/.lovable/oauth/consent': typeof DotlovableOauthConsentRoute
@@ -168,6 +186,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/card-details'
+    | '/checkout-start'
     | '/forgot-password'
     | '/invite-welcome'
     | '/mcp'
@@ -175,6 +194,7 @@ export interface FileRouteTypes {
     | '/trial'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/billing'
     | '/dashboard'
     | '/t/$slug'
     | '/.lovable/oauth/consent'
@@ -185,6 +205,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/card-details'
+    | '/checkout-start'
     | '/forgot-password'
     | '/invite-welcome'
     | '/mcp'
@@ -192,6 +213,7 @@ export interface FileRouteTypes {
     | '/trial'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/billing'
     | '/dashboard'
     | '/t/$slug'
     | '/.lovable/oauth/consent'
@@ -203,6 +225,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/card-details'
+    | '/checkout-start'
     | '/forgot-password'
     | '/invite-welcome'
     | '/mcp'
@@ -210,6 +233,7 @@ export interface FileRouteTypes {
     | '/trial'
     | '/.mcp/list-tools'
     | '/.well-known/oauth-protected-resource'
+    | '/_authenticated/billing'
     | '/_authenticated/dashboard'
     | '/t/$slug'
     | '/.lovable/oauth/consent'
@@ -222,6 +246,7 @@ export interface RootRouteChildren {
   AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
   AuthRoute: typeof AuthRoute
   CardDetailsRoute: typeof CardDetailsRoute
+  CheckoutStartRoute: typeof CheckoutStartRoute
   ForgotPasswordRoute: typeof ForgotPasswordRoute
   InviteWelcomeRoute: typeof InviteWelcomeRoute
   McpRoute: typeof McpRoute
@@ -271,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ForgotPasswordRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/checkout-start': {
+      id: '/checkout-start'
+      path: '/checkout-start'
+      fullPath: '/checkout-start'
+      preLoaderRoute: typeof CheckoutStartRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/card-details': {
       id: '/card-details'
       path: '/card-details'
@@ -313,6 +345,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedDashboardRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/billing': {
+      id: '/_authenticated/billing'
+      path: '/billing'
+      fullPath: '/billing'
+      preLoaderRoute: typeof AuthenticatedBillingRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/.well-known/oauth-protected-resource': {
       id: '/.well-known/oauth-protected-resource'
       path: '/.well-known/oauth-protected-resource'
@@ -352,11 +391,13 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedRouteRouteChildren {
+  AuthenticatedBillingRoute: typeof AuthenticatedBillingRoute
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedTeamTeamIdRoute: typeof AuthenticatedTeamTeamIdRoute
 }
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedBillingRoute: AuthenticatedBillingRoute,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedTeamTeamIdRoute: AuthenticatedTeamTeamIdRoute,
 }
@@ -369,6 +410,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
   AuthRoute: AuthRoute,
   CardDetailsRoute: CardDetailsRoute,
+  CheckoutStartRoute: CheckoutStartRoute,
   ForgotPasswordRoute: ForgotPasswordRoute,
   InviteWelcomeRoute: InviteWelcomeRoute,
   McpRoute: McpRoute,

@@ -50,7 +50,9 @@ function Dashboard() {
   const [format, setFormat] = useState("3-2-1");
   const [busy, setBusy] = useState(false);
   const [logoUrl, setLogoUrl] = useState<string | null>(null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [deleteTeam, setDeleteTeam] = useState<Team | null>(null);
   const [deleting, setDeleting] = useState(false);
@@ -70,16 +72,13 @@ function Dashboard() {
     }
   }, []);
 
-  async function pickLogo(file: File) {
-    setUploading(true);
-    try {
-      setLogoUrl(await uploadPhoto("teams", file));
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : "Upload failed");
-    } finally {
-      setUploading(false);
-    }
+  // The photo can only be stored under the team's own folder, which doesn't
+  // exist until the team is created — so hold the file and upload afterwards.
+  function pickLogo(file: File) {
+    setLogoFile(file);
+    setLogoUrl(URL.createObjectURL(file));
   }
+
 
   const teams = useQuery({
     queryKey: ["my-teams"],
@@ -121,10 +120,22 @@ function Dashboard() {
 
       const { data, error } = await supabase
         .from("teams")
-        .insert({ owner_id: uid, name, slug, season_name: season, logo_url: logoUrl, sport, vote_format: format })
+        .insert({ owner_id: uid, name, slug, season_name: season, sport, vote_format: format })
         .select()
         .single();
       if (error) throw error;
+
+      if (logoFile) {
+        setUploading(true);
+        try {
+          const url = await uploadPhoto(data.id, logoFile);
+          await supabase.from("teams").update({ logo_url: url }).eq("id", data.id);
+        } catch (e) {
+          toast.error("Team created, but the photo couldn't be uploaded. Add it in Settings.");
+        } finally {
+          setUploading(false);
+        }
+      }
 
       await supabase
         .from("fine_categories")
@@ -133,6 +144,9 @@ function Dashboard() {
       toast.success("Team created");
       setOpen(false);
       setLogoUrl(null);
+      setLogoFile(null);
+      navigate({ to: "/team/$teamId", params: { teamId: data.id } });
+
       navigate({ to: "/team/$teamId", params: { teamId: data.id } });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Could not create team");

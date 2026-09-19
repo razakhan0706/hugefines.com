@@ -35,8 +35,8 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
   const navigate = useNavigate();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      setIsOwner(data.user?.id === data.team?.owner_id);
+    supabase.auth.getUser().then(({ data: authData }) => {
+      setIsOwner(authData.user?.id === data.team.owner_id);
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { fetchPublicTeamBundle } from "@/lib/useTeamData";
+import { fetchPublicTeamBundle, fetchPublicTeams } from "@/lib/useTeamData";
 import { StatsView } from "@/components/StatsView";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";

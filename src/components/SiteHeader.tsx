@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { CreditCard } from "lucide-react";
 import logoAsset from "@/assets/Website_Logo.png.asset.json";
 
 function truncateEmail(email: string, max = 24): string {
@@ -47,6 +48,12 @@ export function SiteHeader() {
             <>
               <Button asChild variant="ghost" size="sm">
                 <Link to="/dashboard">My teams</Link>
+              </Button>
+              <Button asChild variant="ghost" size="sm">
+                <Link to="/billing">
+                  <CreditCard className="size-4" />
+                  <span className="hidden sm:inline">Billing</span>
+                </Link>
               </Button>
               <span className="hidden max-w-[160px] truncate text-sm text-muted-foreground sm:inline">
                 {truncateEmail(email)}

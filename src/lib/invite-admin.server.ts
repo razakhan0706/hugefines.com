@@ -36,21 +36,46 @@ export const inviteAdmin = createServerFn({ method: "POST" })
       throw new Error(insertError.message);
     }
 
-    // Send the actual invite email
-    const siteUrl = process.env.SITE_URL ?? "https://hugefines.com/invite-welcome";
-    const { error: inviteError } = await supabaseAdmin.auth.admin.inviteUserByEmail(normalizedEmail, {
-      redirectTo: `${siteUrl}/auth`,
-      data: { invited_to_team: team.name },
+    // Build an invite/sign-in link and send it from our verified domain
+    const siteUrl = process.env.SITE_URL ?? "https://hugefines.com";
+    const redirectTo = `${siteUrl}/invite-welcome`;
+
+    let inviteUrl = `${siteUrl}/auth`;
+    let alreadyRegistered = false;
+
+    const { data: linkData, error: linkError } = await supabaseAdmin.auth.admin.generateLink({
+      type: "invite",
+      email: normalizedEmail,
+      options: { redirectTo, data: { invited_to_team: team.name } },
     });
 
-    const alreadyRegistered =
-      !!inviteError &&
-      /already (been )?registered|already exists|email_exists/i.test(inviteError.message);
+    if (linkData?.properties?.action_link) {
+      inviteUrl = linkData.properties.action_link;
+    } else if (
+      linkError &&
+      /already (been )?registered|already exists|email_exists/i.test(linkError.message)
+    ) {
+      alreadyRegistered = true;
+      const { data: magic } = await supabaseAdmin.auth.admin.generateLink({
+        type: "magiclink",
+        email: normalizedEmail,
+        options: { redirectTo: `${siteUrl}/dashboard` },
+      });
+      if (magic?.properties?.action_link) inviteUrl = magic.properties.action_link;
+    }
 
-    if (inviteError && !alreadyRegistered) {
-      throw new Error(`Access granted, but the email couldn't be sent: ${inviteError.message}`);
+    const { sendTemplateEmail } = await import("@/lib/email-templates/send-email");
+    try {
+      await sendTemplateEmail("team-invite", normalizedEmail, {
+        templateData: { teamName: team.name, inviteUrl },
+      });
+    } catch (e) {
+      throw new Error(
+        `Access granted, but the email couldn't be sent: ${
+          e instanceof Error ? e.message : "unknown error"
+        }`
+      );
     }
 
     return { success: true, alreadyRegistered };
-
   });

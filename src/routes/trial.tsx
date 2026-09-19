@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -31,26 +31,49 @@ const FEATURES = [
 ];
 
 function TrialPage() {
-  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [signedInEmail, setSignedInEmail] = useState<string | null>(null);
 
-  // If already logged in (e.g. after Google OAuth), continue to Stripe checkout
+  // If already signed in (e.g. after Google OAuth), stay on this page —
+  // Stripe checkout only starts when the user clicks "Start free trial".
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        navigate({ to: "/checkout-start" });
-      }
+      if (data.session?.user) setSignedInEmail(data.session.user.email ?? null);
     });
-  }, [navigate]);
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
 
     try {
+      // Already signed in (e.g. via Google) — the button click goes
+      // straight to Stripe checkout, no sign-up form needed.
+      if (signedInEmail) {
+        const { data: userData } = await supabase.auth.getUser();
+        const user = userData.user;
+        if (!user) {
+          setSignedInEmail(null);
+          toast.error("Please fill in your details to continue.");
+          setBusy(false);
+          return;
+        }
+        const { data: checkoutData, error: fnError } = await supabase.functions.invoke("create-checkout", {
+          body: {
+            userId: user.id,
+            email: user.email ?? signedInEmail,
+            returnUrl: `${window.location.origin}/dashboard`,
+          },
+        });
+        if (fnError) throw fnError;
+        if (!checkoutData?.url) throw new Error("No checkout URL returned");
+        window.location.href = checkoutData.url;
+        return;
+      }
+
       // Sign up directly — identities.length === 0 means email already exists
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
@@ -107,15 +130,18 @@ function TrialPage() {
   }
 
   async function googleSignup() {
+    // Return to /trial after Google so checkout only starts on button click.
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/checkout-start`,
+      redirect_uri: `${window.location.origin}/trial`,
     });
     if (result.error) {
       toast.error("Google sign-in failed. Try email instead.");
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/checkout-start" });
+
+    const { data } = await supabase.auth.getUser();
+    if (data.user) setSignedInEmail(data.user.email ?? null);
   }
 
   return (

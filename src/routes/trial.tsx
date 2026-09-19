@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
@@ -31,26 +31,49 @@ const FEATURES = [
 ];
 
 function TrialPage() {
-  const navigate = useNavigate();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [signedInEmail, setSignedInEmail] = useState<string | null>(null);
 
-  // If already logged in (e.g. after Google OAuth), continue to Stripe checkout
+  // If already signed in (e.g. after Google OAuth), stay on this page —
+  // Stripe checkout only starts when the user clicks "Start free trial".
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
-      if (data.session) {
-        navigate({ to: "/checkout-start" });
-      }
+      if (data.session?.user) setSignedInEmail(data.session.user.email ?? null);
     });
-  }, [navigate]);
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
 
     try {
+      // Already signed in (e.g. via Google) — the button click goes
+      // straight to Stripe checkout, no sign-up form needed.
+      if (signedInEmail) {
+        const { data: userData } = await supabase.auth.getUser();
+        const user = userData.user;
+        if (!user) {
+          setSignedInEmail(null);
+          toast.error("Please fill in your details to continue.");
+          setBusy(false);
+          return;
+        }
+        const { data: checkoutData, error: fnError } = await supabase.functions.invoke("create-checkout", {
+          body: {
+            userId: user.id,
+            email: user.email ?? signedInEmail,
+            returnUrl: `${window.location.origin}/dashboard`,
+          },
+        });
+        if (fnError) throw fnError;
+        if (!checkoutData?.url) throw new Error("No checkout URL returned");
+        window.location.href = checkoutData.url;
+        return;
+      }
+
       // Sign up directly — identities.length === 0 means email already exists
       const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
         email,
@@ -107,15 +130,18 @@ function TrialPage() {
   }
 
   async function googleSignup() {
+    // Return to /trial after Google so checkout only starts on button click.
     const result = await lovable.auth.signInWithOAuth("google", {
-      redirect_uri: `${window.location.origin}/checkout-start`,
+      redirect_uri: `${window.location.origin}/trial`,
     });
     if (result.error) {
       toast.error("Google sign-in failed. Try email instead.");
       return;
     }
     if (result.redirected) return;
-    navigate({ to: "/checkout-start" });
+
+    const { data } = await supabase.auth.getUser();
+    if (data.user) setSignedInEmail(data.user.email ?? null);
   }
 
   return (
@@ -186,70 +212,88 @@ function TrialPage() {
                 <p className="mt-1 text-sm text-muted-foreground">
                   Free for 7 days · card details collected via Stripe · cancel any time
                 </p>
-                <Button variant="outline" className="mt-6 w-full" type="button" onClick={googleSignup}>
-                  <svg className="mr-2 size-4" viewBox="0 0 18 18" fill="none">
-                    <path
-                      d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"
-                      fill="#4285F4"
-                    />
-                    <path
-                      d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"
-                      fill="#34A853"
-                    />
-                    <path
-                      d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"
-                      fill="#FBBC05"
-                    />
-                    <path
-                      d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.59C4.672 4.464 6.656 3.58 9 3.58z"
-                      fill="#EA4335"
-                    />
-                  </svg>
-                  Continue with Google
-                </Button>
-                <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
-                  <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
-                </div>
+                {signedInEmail && (
+                  <div className="mt-4 rounded-lg border border-border bg-secondary px-4 py-3 text-xs text-muted-foreground">
+                    You're signed in as <strong>{signedInEmail}</strong>. Click below to go to secure Stripe checkout.
+                  </div>
+                )}
+                {!signedInEmail && (
+                  <>
+                    <Button variant="outline" className="mt-6 w-full" type="button" onClick={googleSignup}>
+                      <svg className="mr-2 size-4" viewBox="0 0 18 18" fill="none">
+                        <path
+                          d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"
+                          fill="#4285F4"
+                        />
+                        <path
+                          d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z"
+                          fill="#34A853"
+                        />
+                        <path
+                          d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71s.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"
+                          fill="#FBBC05"
+                        />
+                        <path
+                          d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.958L3.964 6.59C4.672 4.464 6.656 3.58 9 3.58z"
+                          fill="#EA4335"
+                        />
+                      </svg>
+                      Continue with Google
+                    </Button>
+                    <div className="my-5 flex items-center gap-3 text-xs uppercase tracking-widest text-muted-foreground">
+                      <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
+                    </div>
+                  </>
+                )}
                 <form onSubmit={onSubmit} className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="name">Your name</Label>
-                    <Input
-                      id="name"
-                      placeholder="e.g. Jake Smith"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="Min. 8 characters"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                    <PasswordStrength password={password} />
-                  </div>
-                  <div className="rounded-lg border border-border bg-secondary px-4 py-3 text-xs text-muted-foreground">
-                    💳 After clicking below you'll enter your card details securely on Stripe.{" "}
-                    <strong>You won't be charged until day 7.</strong>
-                  </div>
-                  <Button type="submit" className="w-full" size="lg" disabled={busy || !isPasswordStrong(password)}>
-                    {busy ? "Setting up your account…" : "Start free trial →"}
+                  {!signedInEmail && (
+                    <>
+                      <div className="space-y-2">
+                        <Label htmlFor="name">Your name</Label>
+                        <Input
+                          id="name"
+                          placeholder="e.g. Jake Smith"
+                          value={name}
+                          onChange={(e) => setName(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          placeholder="you@example.com"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="password">Password</Label>
+                        <Input
+                          id="password"
+                          type="password"
+                          placeholder="Min. 8 characters"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          required
+                        />
+                        <PasswordStrength password={password} />
+                      </div>
+                      <div className="rounded-lg border border-border bg-secondary px-4 py-3 text-xs text-muted-foreground">
+                        💳 After clicking below you'll enter your card details securely on Stripe.{" "}
+                        <strong>You won't be charged until day 7.</strong>
+                      </div>
+                    </>
+                  )}
+                  <Button
+                    type="submit"
+                    className="w-full"
+                    size="lg"
+                    disabled={busy || (!signedInEmail && !isPasswordStrong(password))}
+                  >
+                    {busy ? (signedInEmail ? "Taking you to checkout…" : "Setting up your account…") : "Start free trial →"}
                   </Button>
                 </form>
                 <p className="mt-4 text-center text-xs text-muted-foreground">

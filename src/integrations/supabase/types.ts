@@ -41,6 +41,13 @@ export type Database = {
             foreignKeyName: "fine_categories_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
+            referencedRelation: "public_teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fine_categories_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
@@ -109,6 +116,13 @@ export type Database = {
             foreignKeyName: "fines_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
+            referencedRelation: "public_teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fines_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
@@ -146,6 +160,13 @@ export type Database = {
           team_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "players_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "public_teams"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "players_team_id_fkey"
             columns: ["team_id"]
@@ -216,6 +237,13 @@ export type Database = {
             foreignKeyName: "recaps_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
+            referencedRelation: "public_teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recaps_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
@@ -278,6 +306,13 @@ export type Database = {
             foreignKeyName: "rounds_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
+            referencedRelation: "public_teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rounds_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
@@ -319,6 +354,13 @@ export type Database = {
             foreignKeyName: "share_links_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
+            referencedRelation: "public_teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "share_links_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
@@ -356,6 +398,13 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "team_access_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
+            referencedRelation: "public_teams"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "team_access_team_id_fkey"
             columns: ["team_id"]
@@ -472,6 +521,13 @@ export type Database = {
             foreignKeyName: "votes_team_id_fkey"
             columns: ["team_id"]
             isOneToOne: false
+            referencedRelation: "public_teams"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "votes_team_id_fkey"
+            columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "teams"
             referencedColumns: ["id"]
           },
@@ -479,7 +535,54 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_teams: {
+        Row: {
+          accent_color: string | null
+          created_at: string | null
+          currency: string | null
+          id: string | null
+          is_public: boolean | null
+          logo_url: string | null
+          name: string | null
+          player_limit: number | null
+          season_name: string | null
+          slug: string | null
+          sport: string | null
+          vote_format: string | null
+          votes_public: boolean | null
+        }
+        Insert: {
+          accent_color?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string | null
+          is_public?: boolean | null
+          logo_url?: string | null
+          name?: string | null
+          player_limit?: number | null
+          season_name?: string | null
+          slug?: string | null
+          sport?: string | null
+          vote_format?: string | null
+          votes_public?: boolean | null
+        }
+        Update: {
+          accent_color?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string | null
+          is_public?: boolean | null
+          logo_url?: string | null
+          name?: string | null
+          player_limit?: number | null
+          season_name?: string | null
+          slug?: string | null
+          sport?: string | null
+          vote_format?: string | null
+          votes_public?: boolean | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       can_edit_team: { Args: { _team_id: string }; Returns: boolean }

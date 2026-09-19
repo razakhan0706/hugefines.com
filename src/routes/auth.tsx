@@ -53,8 +53,8 @@ function AuthPage() {
         if (isGoogleUser) {
           if (!(await hasCompletedProfile(user.id))) {
             await supabase.auth.signOut();
-            toast.error("No profile exists for this ID. Register to continue.");
-            navigate({ to: "/trial", replace: true });
+            toast.error("This account doesn't exist. Register now for a 7-day free trial.");
+            navigate({ to: "/trial", search: { notice: "account-not-found" }, replace: true });
             return;
           }
         }
@@ -118,8 +118,8 @@ function AuthPage() {
     const { data } = await supabase.auth.getUser();
     if (!data.user || !(await hasCompletedProfile(data.user.id))) {
       await supabase.auth.signOut();
-      toast.error("No profile exists for this ID. Register to continue.");
-      navigate({ to: "/trial", replace: true });
+      toast.error("This account doesn't exist. Register now for a 7-day free trial.");
+      navigate({ to: "/trial", search: { notice: "account-not-found" }, replace: true });
       return;
     }
 

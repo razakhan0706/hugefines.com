@@ -228,6 +228,47 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
           </Button>
         </CardContent>
       </Card>
+
+      {isOwner && (
+        <Card className="border-destructive/40">
+          <CardContent className="space-y-4 p-5">
+            <div className="flex items-start gap-3">
+              <Trash2 className="mt-0.5 size-5 text-destructive" />
+              <div>
+                <h3 className="text-lg font-bold">Delete team</h3>
+                <p className="text-sm text-muted-foreground">
+                  Permanently deletes this team and all its players, rounds, fines, votes and
+                  recaps. This can't be undone.
+                </p>
+              </div>
+            </div>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button variant="destructive">Delete team</Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Delete {data.team.name}?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This permanently removes the team and everything in it — players, rounds,
+                    fines, votes and recaps. This action cannot be undone.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Keep team</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={deleteTeam}
+                    disabled={deleting}
+                    className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    {deleting ? "Deleting…" : "Yes, delete everything"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

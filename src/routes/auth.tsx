@@ -36,23 +36,30 @@ function AuthPage() {
   const [busy, setBusy] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => {
+    supabase.auth.getSession().then(async ({ data }) => {
       const user = data.session?.user;
       if (user) {
-        // A Google sign-in for an email that has no account silently creates one.
-        // Detect that (account created at the same moment as this sign-in), tell
-        // the user no account exists, and send them to the trial signup instead.
-        const isNewGoogleUser =
-          user.app_metadata?.provider === "google" &&
-          !!user.last_sign_in_at &&
-          Math.abs(new Date(user.last_sign_in_at).getTime() - new Date(user.created_at).getTime()) < 60_000;
-        if (isNewGoogleUser) {
-          toast.error("No account found for this email. Start a free trial to create one.");
-          navigate({ to: "/trial", replace: true });
-          return;
+        const isGoogleUser = user.app_metadata?.provider === "google";
+        if (isGoogleUser) {
+          const { data: profile, error: profileError } = await supabase
+            .from("profiles")
+            .select("card_captured")
+            .eq("id", user.id)
+            .maybeSingle();
+
+          if (profileError || !profile?.card_captured) {
+            await supabase.auth.signOut();
+            toast.error("No profile exists for this ID. Register to continue.");
+            navigate({ to: "/trial", replace: true });
+            return;
+          }
         }
-        if (next) window.location.replace(next);
-        else navigate({ to: "/dashboard", replace: true });
+
+        if (next) {
+          window.location.replace(next);
+        } else {
+          navigate({ to: "/dashboard", replace: true });
+        }
       }
     });
   }, [navigate, next]);

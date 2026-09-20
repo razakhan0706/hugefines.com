@@ -75,7 +75,7 @@ export function ShareLinksCard({ teamId }: { teamId: string }) {
     <Card>
       <CardContent className="space-y-5 p-5">
         <div>
-          <h3 className="text-lg font-bold">Permanent share link</h3>
+          <h3 className="text-lg font-bold">Public link</h3>
           <p className="text-sm text-muted-foreground">
             Create a link with its own Fines and Votes permissions. The link keeps these permissions even if the team's
             normal public settings change later.
@@ -135,7 +135,7 @@ export function ShareLinksCard({ teamId }: { teamId: string }) {
         </div>
 
         <Button onClick={createLink} disabled={creating}>
-          {creating ? "Creating..." : "Create share link"}
+          {creating ? "Creating..." : "Create public link"}
         </Button>
 
         {generatedLink && (

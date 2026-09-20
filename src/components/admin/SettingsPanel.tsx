@@ -35,9 +35,6 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
     }
   }
 
-  const link =
-    typeof window !== "undefined" ? `${window.location.origin}/t/${data.team.slug}` : "";
-
   async function save() {
     const { error } = await supabase
       .from("teams")
@@ -93,81 +90,6 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
         </CardContent>
       </Card>
 
-      <Card>
-        <CardContent className="space-y-4 p-5">
-          <h3 className="text-lg font-bold">Public link</h3>
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="font-medium">Show fines publicly</p>
-              <p className="text-sm text-muted-foreground">
-                Anyone with the link can view fines — no login needed.
-              </p>
-            </div>
-            <div className="flex gap-1.5">
-              <Button
-                type="button"
-                size="sm"
-                variant={isPublic ? "default" : "outline"}
-                className="w-14 px-2"
-                onClick={() => setIsPublic(true)}
-              >
-                Yes
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant={!isPublic ? "default" : "outline"}
-                className="w-14 px-2"
-                onClick={() => setIsPublic(false)}
-              >
-                No
-              </Button>
-            </div>
-          </div>
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="font-medium">Show vote standings publicly</p>
-              <p className="text-sm text-muted-foreground">
-                Turn off to keep Player of the Season a surprise.
-              </p>
-            </div>
-            <div className="flex gap-1.5">
-              <Button
-                type="button"
-                size="sm"
-                variant={votesPublic ? "default" : "outline"}
-                className="w-14 px-2"
-                onClick={() => setVotesPublic(true)}
-              >
-                Yes
-              </Button>
-              <Button
-                type="button"
-                size="sm"
-                variant={!votesPublic ? "default" : "outline"}
-                className="w-14 px-2"
-                onClick={() => setVotesPublic(false)}
-              >
-                No
-              </Button>
-            </div>
-          </div>
-          <div className="flex gap-2">
-            <Input readOnly value={link} />
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => {
-                navigator.clipboard.writeText(link);
-                toast.success("Link copied");
-              }}
-            >
-              <Copy className="size-4" />
-            </Button>
-          </div>
-          <Button onClick={save}>Save sharing settings</Button>
-        </CardContent>
-      </Card>
       <ShareLinksCard teamId={data.team.id} />
       <TeamAdminsCard teamId={data.team.id} ownerId={data.team.owner_id} />
 

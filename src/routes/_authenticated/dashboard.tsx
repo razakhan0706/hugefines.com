@@ -80,13 +80,37 @@ function Dashboard() {
   }
 
 
+  const isSuperAdmin = useQuery({
+    queryKey: ["is-superadmin"],
+    queryFn: async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) return false;
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", uid)
+        .eq("role", "superadmin")
+        .maybeSingle();
+      return !!data;
+    },
+  });
+
   const teams = useQuery({
-    queryKey: ["my-teams"],
+    queryKey: ["my-teams", isSuperAdmin.data ?? false],
+    enabled: isSuperAdmin.isSuccess,
     queryFn: async () => {
       await supabase.rpc("claim_team_invites");
       const { data: userData } = await supabase.auth.getUser();
       const uid = userData.user?.id;
       if (!uid) return [];
+
+      if (isSuperAdmin.data) {
+        // Super admins see every team, including teams whose owner has left.
+        const all = await supabase.from("teams").select("*").order("created_at", { ascending: false });
+        if (all.error) throw all.error;
+        return (all.data ?? []) as unknown as Team[];
+      }
 
       const owned = await supabase.from("teams").select("*").eq("owner_id", uid);
       if (owned.error) throw owned.error;

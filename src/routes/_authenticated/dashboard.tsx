@@ -201,9 +201,11 @@ function Dashboard() {
       <main className="mx-auto max-w-5xl px-4 py-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">My teams</h1>
+            <h1 className="text-3xl font-bold">{isSuperAdmin.data ? "All teams" : "My teams"}</h1>
             <p className="mt-1 text-muted-foreground">
-              Each team gets its own season, players, fines, voting and AI summary.
+              {isSuperAdmin.data
+                ? "Super admin view — every team on Huge Fines, including closed accounts."
+                : "Each team gets its own season, players, fines, voting and AI summary."}
             </p>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>

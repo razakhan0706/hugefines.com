@@ -284,13 +284,26 @@ function Dashboard() {
           {teams.data?.map((t) => (
             <div key={t.id} className="relative group">
               <Link to="/team/$teamId" params={{ teamId: t.id }}>
-                <Card className="h-full transition-colors hover:border-accent">
+                <Card
+                  className={`h-full transition-colors hover:border-accent ${
+                    t.archived ? "border-dashed opacity-80" : ""
+                  }`}
+                >
                   <CardContent className="flex gap-4 p-6">
                     <PhotoAvatar url={t.logo_url} name={t.name} className="size-12" />
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">{t.sport}</p>
                       <h2 className="mt-1 text-xl font-bold">{t.name}</h2>
                       <p className="text-sm text-muted-foreground">{t.season_name}</p>
+                      {t.archived ? (
+                        <p className="mt-2 inline-flex items-center rounded-full border border-dashed px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          Closed account{t.former_owner_email ? ` — ${t.former_owner_email}` : ""}
+                        </p>
+                      ) : isSuperAdmin.data && t.owner_id !== currentUserId ? (
+                        <p className="mt-2 inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          Active member team
+                        </p>
+                      ) : null}
                       <p className="mt-4 text-xs text-muted-foreground">/t/{t.slug}</p>
                     </div>
                   </CardContent>

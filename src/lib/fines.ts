@@ -95,7 +95,10 @@ export interface Vote {
 
 export interface Team {
   id: string;
-  owner_id: string;
+  owner_id: string | null;
+  archived?: boolean;
+  archived_at?: string | null;
+  former_owner_email?: string | null;
   name: string;
   slug: string;
   sport: string;

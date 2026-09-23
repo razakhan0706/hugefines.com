@@ -368,13 +368,16 @@ export type Database = {
       teams: {
         Row: {
           accent_color: string
+          archived: boolean
+          archived_at: string | null
           created_at: string
           currency: string
+          former_owner_email: string | null
           id: string
           is_public: boolean
           logo_url: string | null
           name: string
-          owner_id: string
+          owner_id: string | null
           paid: boolean
           player_limit: number
           season_name: string
@@ -388,13 +391,16 @@ export type Database = {
         }
         Insert: {
           accent_color?: string
+          archived?: boolean
+          archived_at?: string | null
           created_at?: string
           currency?: string
+          former_owner_email?: string | null
           id?: string
           is_public?: boolean
           logo_url?: string | null
           name: string
-          owner_id: string
+          owner_id?: string | null
           paid?: boolean
           player_limit?: number
           season_name?: string
@@ -408,13 +414,16 @@ export type Database = {
         }
         Update: {
           accent_color?: string
+          archived?: boolean
+          archived_at?: string | null
           created_at?: string
           currency?: string
+          former_owner_email?: string | null
           id?: string
           is_public?: boolean
           logo_url?: string | null
           name?: string
-          owner_id?: string
+          owner_id?: string | null
           paid?: boolean
           player_limit?: number
           season_name?: string
@@ -425,6 +434,27 @@ export type Database = {
           trial_ends_at?: string
           vote_format?: string
           votes_public?: boolean
+        }
+        Relationships: []
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
         }
         Relationships: []
       }
@@ -507,12 +537,20 @@ export type Database = {
         }[]
       }
       get_share_bundle: { Args: { _token: string }; Returns: Json }
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
+      is_superadmin: { Args: never; Returns: boolean }
       team_is_public: { Args: { _team_id: string }; Returns: boolean }
       team_is_visible: { Args: { _team_id: string }; Returns: boolean }
       team_votes_public: { Args: { _team_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "superadmin" | "admin" | "user"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -639,6 +677,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["superadmin", "admin", "user"],
+    },
   },
 } as const

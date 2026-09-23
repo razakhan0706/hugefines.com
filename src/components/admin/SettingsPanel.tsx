@@ -91,7 +91,7 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
       </Card>
 
       <ShareLinksCard teamId={data.team.id} />
-      <TeamAdminsCard teamId={data.team.id} ownerId={data.team.owner_id} />
+      <TeamAdminsCard teamId={data.team.id} ownerId={data.team.owner_id ?? ""} />
 
       <Card>
         <CardContent className="space-y-4 p-5">

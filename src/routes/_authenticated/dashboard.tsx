@@ -80,13 +80,37 @@ function Dashboard() {
   }
 
 
+  const isSuperAdmin = useQuery({
+    queryKey: ["is-superadmin"],
+    queryFn: async () => {
+      const { data: userData } = await supabase.auth.getUser();
+      const uid = userData.user?.id;
+      if (!uid) return false;
+      const { data } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", uid)
+        .eq("role", "superadmin")
+        .maybeSingle();
+      return !!data;
+    },
+  });
+
   const teams = useQuery({
-    queryKey: ["my-teams"],
+    queryKey: ["my-teams", isSuperAdmin.data ?? false],
+    enabled: isSuperAdmin.isSuccess,
     queryFn: async () => {
       await supabase.rpc("claim_team_invites");
       const { data: userData } = await supabase.auth.getUser();
       const uid = userData.user?.id;
       if (!uid) return [];
+
+      if (isSuperAdmin.data) {
+        // Super admins see every team, including teams whose owner has left.
+        const all = await supabase.from("teams").select("*").order("created_at", { ascending: false });
+        if (all.error) throw all.error;
+        return (all.data ?? []) as unknown as Team[];
+      }
 
       const owned = await supabase.from("teams").select("*").eq("owner_id", uid);
       if (owned.error) throw owned.error;
@@ -177,9 +201,11 @@ function Dashboard() {
       <main className="mx-auto max-w-5xl px-4 py-10">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">My teams</h1>
+            <h1 className="text-3xl font-bold">{isSuperAdmin.data ? "All teams" : "My teams"}</h1>
             <p className="mt-1 text-muted-foreground">
-              Each team gets its own season, players, fines, voting and AI summary.
+              {isSuperAdmin.data
+                ? "Super admin view — every team on Huge Fines, including closed accounts."
+                : "Each team gets its own season, players, fines, voting and AI summary."}
             </p>
           </div>
           <Dialog open={open} onOpenChange={setOpen}>
@@ -260,13 +286,26 @@ function Dashboard() {
           {teams.data?.map((t) => (
             <div key={t.id} className="relative group">
               <Link to="/team/$teamId" params={{ teamId: t.id }}>
-                <Card className="h-full transition-colors hover:border-accent">
+                <Card
+                  className={`h-full transition-colors hover:border-accent ${
+                    t.archived ? "border-dashed opacity-80" : ""
+                  }`}
+                >
                   <CardContent className="flex gap-4 p-6">
                     <PhotoAvatar url={t.logo_url} name={t.name} className="size-12" />
                     <div>
                       <p className="text-xs font-semibold uppercase tracking-widest text-accent-strong">{t.sport}</p>
                       <h2 className="mt-1 text-xl font-bold">{t.name}</h2>
                       <p className="text-sm text-muted-foreground">{t.season_name}</p>
+                      {t.archived ? (
+                        <p className="mt-2 inline-flex items-center rounded-full border border-dashed px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          Closed account{t.former_owner_email ? ` — ${t.former_owner_email}` : ""}
+                        </p>
+                      ) : isSuperAdmin.data && t.owner_id !== currentUserId ? (
+                        <p className="mt-2 inline-flex items-center rounded-full border px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-muted-foreground">
+                          Active member team
+                        </p>
+                      ) : null}
                       <p className="mt-4 text-xs text-muted-foreground">/t/{t.slug}</p>
                     </div>
                   </CardContent>

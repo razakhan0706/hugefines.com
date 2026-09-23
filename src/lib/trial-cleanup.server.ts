@@ -1,14 +1,21 @@
-// Removes a team (and its data) when the owner cancels during the free trial,
-// plus any profiles that are left without a team afterwards.
+// When the owner cancels during the free trial we keep the team in the system
+// (archived, visible only to super admins) and remove the people attached to it
+// unless they belong to another live team.
 import { supabaseAdmin } from "@/integrations/supabase/client.server";
 
-export async function deleteTrialAccount(userId: string): Promise<{ teamsDeleted: number; profilesDeleted: number }> {
+export async function deleteTrialAccount(userId: string): Promise<{ teamsArchived: number; profilesDeleted: number }> {
   const { data: teams } = await supabaseAdmin
     .from("teams")
     .select("id")
     .eq("owner_id", userId);
 
   const teamIds = (teams ?? []).map((t) => t.id);
+
+  const { data: ownerProfile } = await supabaseAdmin
+    .from("profiles")
+    .select("email")
+    .eq("id", userId)
+    .maybeSingle();
 
   // Everyone linked to those teams is a cleanup candidate, plus the owner.
   const candidates = new Set<string>([userId]);
@@ -21,9 +28,22 @@ export async function deleteTrialAccount(userId: string): Promise<{ teamsDeleted
       if (row.user_id) candidates.add(row.user_id);
     }
 
-    // Team rows cascade to players, rounds, fines, votes, recaps, share links
-    // and team access.
-    await supabaseAdmin.from("teams").delete().in("id", teamIds);
+    // Archive rather than delete: super admins keep visibility of the team and
+    // its history after the owner leaves.
+    await supabaseAdmin
+      .from("teams")
+      .update({
+        archived: true,
+        archived_at: new Date().toISOString(),
+        former_owner_email: ownerProfile?.email ?? null,
+        owner_id: null,
+        is_public: false,
+        votes_public: false,
+      })
+      .in("id", teamIds);
+
+    // Co-admins lose access to the archived team.
+    await supabaseAdmin.from("team_access").delete().in("team_id", teamIds);
   }
 
   let profilesDeleted = 0;
@@ -48,5 +68,5 @@ export async function deleteTrialAccount(userId: string): Promise<{ teamsDeleted
     profilesDeleted += 1;
   }
 
-  return { teamsDeleted: teamIds.length, profilesDeleted };
+  return { teamsArchived: teamIds.length, profilesDeleted };
 }

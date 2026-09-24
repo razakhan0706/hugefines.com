@@ -290,6 +290,7 @@ export type Database = {
           created_by: string | null
           id: string
           show_fines: boolean
+          show_recaps: boolean
           show_votes: boolean
           team_id: string
           token: string
@@ -300,6 +301,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           show_fines?: boolean
+          show_recaps?: boolean
           show_votes?: boolean
           team_id: string
           token?: string
@@ -310,6 +312,7 @@ export type Database = {
           created_by?: string | null
           id?: string
           show_fines?: boolean
+          show_recaps?: boolean
           show_votes?: boolean
           team_id?: string
           token?: string
@@ -514,10 +517,24 @@ export type Database = {
     Functions: {
       can_edit_team: { Args: { _team_id: string }; Returns: boolean }
       claim_team_invites: { Args: never; Returns: number }
-      create_share_link: {
-        Args: { _show_fines: boolean; _show_votes: boolean; _team_id: string }
-        Returns: string
-      }
+      create_share_link:
+        | {
+            Args: {
+              _show_fines: boolean
+              _show_votes: boolean
+              _team_id: string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              _show_fines: boolean
+              _show_recaps?: boolean
+              _show_votes: boolean
+              _team_id: string
+            }
+            Returns: string
+          }
       get_public_teams: {
         Args: never
         Returns: {

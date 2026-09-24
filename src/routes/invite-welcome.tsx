@@ -6,7 +6,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { PasswordStrength } from "@/components/PasswordStrength";
 import logoAsset from "@/assets/Website_Logo.png.asset.json";
 
 export const Route = createFileRoute("/invite-welcome")({
@@ -105,7 +104,6 @@ function InviteWelcomePage() {
                     placeholder="Min. 6 characters"
                     required
                   />
-                  <PasswordStrength password={password} />
                 </div>
                 <Button type="submit" className="w-full" disabled={busy}>
                   {busy ? "Setting up…" : "Join Team"}

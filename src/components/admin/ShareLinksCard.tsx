@@ -9,12 +9,13 @@ import { toast } from "sonner";
 export function ShareLinksCard({ teamId }: { teamId: string }) {
   const [showFines, setShowFines] = useState(true);
   const [showVotes, setShowVotes] = useState(false);
+  const [showRecaps, setShowRecaps] = useState(false);
   const [creating, setCreating] = useState(false);
   const [generatedLink, setGeneratedLink] = useState("");
 
   async function createLink() {
-    if (!showFines && !showVotes) {
-      toast.error("Choose Fines, Votes, or both.");
+    if (!showFines && !showVotes && !showRecaps) {
+      toast.error("Choose Fines, Votes, AI summary, or a combination.");
       return;
     }
 
@@ -33,6 +34,7 @@ export function ShareLinksCard({ teamId }: { teamId: string }) {
         _team_id: teamId,
         _show_fines: showFines,
         _show_votes: showVotes,
+        _show_recaps: showRecaps,
       });
 
       if (error) {
@@ -77,8 +79,8 @@ export function ShareLinksCard({ teamId }: { teamId: string }) {
         <div>
           <h3 className="text-lg font-bold">Public link</h3>
           <p className="text-sm text-muted-foreground">
-            Create a link with its own Fines and Votes permissions. The link keeps these permissions even if the team's
-            normal public settings change later.
+            Create a link with its own Fines, Votes and AI summary permissions. The link keeps these permissions even
+            if the team's normal public settings change later.
           </p>
         </div>
 
@@ -128,6 +130,32 @@ export function ShareLinksCard({ teamId }: { teamId: string }) {
               variant={!showVotes ? "default" : "outline"}
               className="w-14 px-2"
               onClick={() => setShowVotes(false)}
+            >
+              No
+            </Button>
+          </div>
+        </div>
+
+        <div className="flex items-center justify-between gap-3">
+          <p className="font-medium">Show AI summary</p>
+
+          <div className="flex gap-1.5">
+            <Button
+              type="button"
+              size="sm"
+              variant={showRecaps ? "default" : "outline"}
+              className="w-14 px-2"
+              onClick={() => setShowRecaps(true)}
+            >
+              Yes
+            </Button>
+
+            <Button
+              type="button"
+              size="sm"
+              variant={!showRecaps ? "default" : "outline"}
+              className="w-14 px-2"
+              onClick={() => setShowRecaps(false)}
             >
               No
             </Button>

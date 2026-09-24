@@ -67,7 +67,7 @@ function ShareBoard() {
               showVotes={query.data.share.show_votes}
             />
 
-            {query.data.share.show_fines &&
+            {query.data.share.show_recaps &&
               query.data.recaps.length > 0 && (
                 <Card className="mt-6">
                   <CardContent className="p-5">

@@ -6,6 +6,7 @@ export interface ShareBundle extends TeamBundle {
   share: {
     show_fines: boolean;
     show_votes: boolean;
+    show_recaps: boolean;
   };
 }
 

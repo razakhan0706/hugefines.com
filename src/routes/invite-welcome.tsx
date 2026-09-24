@@ -38,7 +38,7 @@ function InviteWelcomePage() {
     try {
       const { error } = await supabase.auth.updateUser({
         password,
-        data: { display_name: name },
+        data: { display_name: name, password_set: true },
       });
       if (error) throw error;
       toast.success("You're all set!");

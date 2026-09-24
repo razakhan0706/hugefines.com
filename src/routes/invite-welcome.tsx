@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import logoAsset from "@/assets/Website_Logo.png.asset.json";
+import { PasswordStrength, isPasswordStrong } from "@/components/PasswordStrength";
 
 export const Route = createFileRoute("/invite-welcome")({
   head: () => ({
@@ -34,6 +35,10 @@ function InviteWelcomePage() {
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (!isPasswordStrong(password)) {
+      toast.error("Please choose a stronger password.");
+      return;
+    }
     setBusy(true);
     try {
       const { error } = await supabase.auth.updateUser({
@@ -101,11 +106,12 @@ function InviteWelcomePage() {
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Min. 6 characters"
+                    placeholder="Create a strong password"
                     required
                   />
+                  <PasswordStrength password={password} />
                 </div>
-                <Button type="submit" className="w-full" disabled={busy}>
+                <Button type="submit" className="w-full" disabled={busy || !isPasswordStrong(password)}>
                   {busy ? "Setting up…" : "Join Team"}
                 </Button>
               </form>

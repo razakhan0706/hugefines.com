@@ -14,6 +14,12 @@ export const Route = createFileRoute("/_authenticated")({
       });
     }
 
+    // Invited users must finish setting a password before entering the app.
+    const meta = data.user.user_metadata ?? {};
+    if (meta.invited_to_team && !meta.password_set) {
+      throw redirect({ to: "/invite-welcome" });
+    }
+
     // Billing must remain reachable so a customer can cancel a trial or renewal.
     if (location.pathname === "/billing") {
       return { user: data.user };

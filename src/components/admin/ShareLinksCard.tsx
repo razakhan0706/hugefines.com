@@ -79,8 +79,8 @@ export function ShareLinksCard({ teamId }: { teamId: string }) {
         <div>
           <h3 className="text-lg font-bold">Public link</h3>
           <p className="text-sm text-muted-foreground">
-            Create a link with its own Fines, Votes and AI summary permissions. The link keeps these permissions even
-            if the team's normal public settings change later.
+            Create a link with Fines, Votes and AI summary permissions. The link follows the team's public settings
+            live — if public fines or votes are turned off, the link hides them straight away.
           </p>
         </div>
 

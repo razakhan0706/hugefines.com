@@ -384,6 +384,9 @@ export type Database = {
           paid: boolean
           player_limit: number
           season_name: string
+          share_show_fines: boolean
+          share_show_recaps: boolean
+          share_show_votes: boolean
           slug: string
           sport: string
           stripe_customer_id: string | null
@@ -407,6 +410,9 @@ export type Database = {
           paid?: boolean
           player_limit?: number
           season_name?: string
+          share_show_fines?: boolean
+          share_show_recaps?: boolean
+          share_show_votes?: boolean
           slug: string
           sport?: string
           stripe_customer_id?: string | null
@@ -430,6 +436,9 @@ export type Database = {
           paid?: boolean
           player_limit?: number
           season_name?: string
+          share_show_fines?: boolean
+          share_show_recaps?: boolean
+          share_show_votes?: boolean
           slug?: string
           sport?: string
           stripe_customer_id?: string | null

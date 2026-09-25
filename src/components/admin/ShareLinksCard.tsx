@@ -193,7 +193,7 @@ export function ShareLinksCard({
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <Button type="button" variant="outline" onClick={saveChoices} disabled={saving || creating}>
+          <Button type="button" onClick={saveChoices} disabled={saving || creating}>
             {saving ? "Saving..." : "Save"}
           </Button>
           <Button type="button" onClick={createLink} disabled={creating || saving}>

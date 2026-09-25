@@ -43,6 +43,13 @@
       "when": 1790309180353,
       "tag": "0005_add_team_share_link_preferences",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1790309683924,
+      "tag": "0006_share_links_follow_team_share_choices",
+      "breakpoints": true
     }
   ]
 }

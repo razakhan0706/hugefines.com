@@ -10,7 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { slugify, type Team } from "@/lib/fines";
+import { slugify, DEFAULT_FINE_CATEGORIES, type Team } from "@/lib/fines";
 import { Plus, Trash2 } from "lucide-react";
 import { uploadPhoto } from "@/lib/photos";
 import { PhotoAvatar } from "@/components/PhotoAvatar";
@@ -31,14 +31,7 @@ export const Route = createFileRoute("/_authenticated/dashboard")({
   component: Dashboard,
 });
 
-const DEFAULT_CATEGORIES = [
-  "Late to game",
-  "Bad haircut",
-  "Shocking parking",
-  "Wrong kit",
-  "Dropped catch",
-  "Golden duck",
-];
+const DEFAULT_CATEGORIES = DEFAULT_FINE_CATEGORIES;
 
 function Dashboard() {
   const navigate = useNavigate();

@@ -6,12 +6,47 @@ import { Input } from "@/components/ui/input";
 import { Copy } from "lucide-react";
 import { toast } from "sonner";
 
-export function ShareLinksCard({ teamId }: { teamId: string }) {
-  const [showFines, setShowFines] = useState(true);
-  const [showVotes, setShowVotes] = useState(false);
-  const [showRecaps, setShowRecaps] = useState(false);
+interface ShareLinksCardProps {
+  teamId: string;
+  initialShowFines: boolean;
+  initialShowVotes: boolean;
+  initialShowRecaps: boolean;
+}
+
+export function ShareLinksCard({
+  teamId,
+  initialShowFines,
+  initialShowVotes,
+  initialShowRecaps,
+}: ShareLinksCardProps) {
+  const [showFines, setShowFines] = useState(initialShowFines);
+  const [showVotes, setShowVotes] = useState(initialShowVotes);
+  const [showRecaps, setShowRecaps] = useState(initialShowRecaps);
+  const [saving, setSaving] = useState(false);
   const [creating, setCreating] = useState(false);
   const [generatedLink, setGeneratedLink] = useState("");
+
+  async function saveChoices() {
+    setSaving(true);
+
+    try {
+      const { error } = await supabase
+        .from("teams")
+        .update({
+          share_show_fines: showFines,
+          share_show_votes: showVotes,
+          share_show_recaps: showRecaps,
+        })
+        .eq("id", teamId);
+
+      if (error) throw error;
+      toast.success("Public link choices saved");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not save choices");
+    } finally {
+      setSaving(false);
+    }
+  }
 
   async function createLink() {
     setCreating(true);
@@ -157,9 +192,14 @@ export function ShareLinksCard({ teamId }: { teamId: string }) {
           </div>
         </div>
 
-        <Button onClick={createLink} disabled={creating}>
-          {creating ? "Creating..." : "Create public link"}
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button type="button" onClick={saveChoices} disabled={saving || creating}>
+            {saving ? "Saving..." : "Save"}
+          </Button>
+          <Button type="button" onClick={createLink} disabled={creating || saving}>
+            {creating ? "Creating..." : "Create public link"}
+          </Button>
+        </div>
 
         {generatedLink && (
           <div className="border-t border-border pt-4">

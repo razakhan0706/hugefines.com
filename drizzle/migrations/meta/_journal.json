@@ -36,6 +36,13 @@
       "when": 1790304908111,
       "tag": "0004_drop_share_links_must_show_something",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1790309180353,
+      "tag": "0005_add_team_share_link_preferences",
+      "breakpoints": true
     }
   ]
 }

@@ -90,7 +90,12 @@ export function SettingsPanel({ data, refresh }: { data: TeamBundle; refresh: ()
         </CardContent>
       </Card>
 
-      <ShareLinksCard teamId={data.team.id} />
+      <ShareLinksCard
+        teamId={data.team.id}
+        initialShowFines={data.team.share_show_fines}
+        initialShowVotes={data.team.share_show_votes}
+        initialShowRecaps={data.team.share_show_recaps}
+      />
       <TeamAdminsCard teamId={data.team.id} ownerId={data.team.owner_id ?? ""} />
 
       <Card>

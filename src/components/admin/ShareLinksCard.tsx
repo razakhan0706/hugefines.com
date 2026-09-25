@@ -14,11 +14,6 @@ export function ShareLinksCard({ teamId }: { teamId: string }) {
   const [generatedLink, setGeneratedLink] = useState("");
 
   async function createLink() {
-    if (!showFines && !showVotes && !showRecaps) {
-      toast.error("Choose Fines, Votes, AI summary, or a combination.");
-      return;
-    }
-
     setCreating(true);
 
     try {

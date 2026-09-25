@@ -22,6 +22,20 @@
       "when": 1790277745529,
       "tag": "0002_share_links_follow_team_settings",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1790304857949,
+      "tag": "0003_share_link_allow_all_off",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1790304908111,
+      "tag": "0004_drop_share_links_must_show_something",
+      "breakpoints": true
     }
   ]
 }

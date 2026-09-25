@@ -1,0 +1,1 @@
+ALTER TABLE public.share_links DROP CONSTRAINT share_links_must_show_something;

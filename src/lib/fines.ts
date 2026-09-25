@@ -108,6 +108,9 @@ export interface Team {
   vote_format: VoteFormat;
   votes_public: boolean;
   is_public: boolean;
+  share_show_fines: boolean;
+  share_show_votes: boolean;
+  share_show_recaps: boolean;
   player_limit: number;
   currency: string;
 }

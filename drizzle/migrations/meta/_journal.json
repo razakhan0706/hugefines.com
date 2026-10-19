@@ -50,6 +50,13 @@
       "when": 1790309683924,
       "tag": "0006_share_links_follow_team_share_choices",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1792391043130,
+      "tag": "0007_editors_read_player_photos",
+      "breakpoints": true
     }
   ]
 }

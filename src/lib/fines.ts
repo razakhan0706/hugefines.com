@@ -370,7 +370,9 @@ export function roundTotals(fines: Fine[], rounds: Round[], splits?: Map<string,
       });
     }
   }
-  return rows.sort((a, b) => a.order - b.order).map(({ order: _o, ...rest }) => rest);
+  return rows
+    .sort((a, b) => a.order - b.order)
+    .map(({ order: _o, ...rest }, i) => ({ ...rest, name: String(i + 1) }));
 }
 
 export interface Award {

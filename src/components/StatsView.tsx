@@ -685,7 +685,7 @@ function FinesTabInner({ data }: { data: TeamBundle }) {
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardContent className="p-5">
-            <h3 className="text-lg font-bold uppercase tracking-wide">Fines by round</h3>
+            <h3 className="text-lg font-bold uppercase tracking-wide">Fines by week</h3>
             <div className="-ml-5 mt-4 h-80 sm:h-96">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={byRound} margin={{ top: 8, right: 8, bottom: 12, left: 0 }}>

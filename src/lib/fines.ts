@@ -355,17 +355,22 @@ export function categoryBreakdown(fines: Fine[], categories: FineCategory[]) {
 
 export function roundTotals(fines: Fine[], rounds: Round[], splits?: Map<string, FineSplit>) {
   const capSplits = splits ?? applyCaps(fines, rounds);
-  return [...rounds]
-    .sort((a, b) => a.round_number - b.round_number)
-    .map((r, index) => {
-      const mine = fines.filter((f) => f.round_id === r.id);
-      return {
-        name: String(index + 1),
-        total: mine.reduce((s, f) => s + (capSplits.get(f.id)?.counted ?? Number(f.amount)), 0),
-        discounted: mine.reduce((s, f) => s + (capSplits.get(f.id)?.discounted ?? 0), 0),
-        count: mine.length,
-      };
-    });
+  const rows: { name: string; order: number; total: number; discounted: number; count: number }[] = [];
+  for (const r of rounds) {
+    const mine = fines.filter((f) => f.round_id === r.id);
+    const days: (number | null)[] = r.two_day ? (r.day ? [r.day] : [1, 2]) : [null];
+    for (const d of days) {
+      const subset = d === null || r.day ? mine : mine.filter((f) => (f.week ?? 1) === d);
+      rows.push({
+        name: d === null ? String(r.round_number) : `${r.round_number} W${d}`,
+        order: r.round_number * 10 + (d ?? 0),
+        total: subset.reduce((s, f) => s + (capSplits.get(f.id)?.counted ?? Number(f.amount)), 0),
+        discounted: subset.reduce((s, f) => s + (capSplits.get(f.id)?.discounted ?? 0), 0),
+        count: subset.length,
+      });
+    }
+  }
+  return rows.sort((a, b) => a.order - b.order).map(({ order: _o, ...rest }) => rest);
 }
 
 export interface Award {

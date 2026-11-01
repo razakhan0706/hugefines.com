@@ -362,7 +362,7 @@ export function roundTotals(fines: Fine[], rounds: Round[], splits?: Map<string,
     for (const d of days) {
       const subset = d === null || r.day ? mine : mine.filter((f) => (f.week ?? 1) === d);
       rows.push({
-        name: d === null ? String(r.round_number) : `${r.round_number} W${d}`,
+        name: String(r.round_number),
         order: r.round_number * 10 + (d ?? 0),
         total: subset.reduce((s, f) => s + (capSplits.get(f.id)?.counted ?? Number(f.amount)), 0),
         discounted: subset.reduce((s, f) => s + (capSplits.get(f.id)?.discounted ?? 0), 0),

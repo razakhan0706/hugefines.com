@@ -321,7 +321,7 @@ export function buildPlayerStats(
         voteStreak: bestVoteStreak,
       };
     })
-    .sort((a, b) => b.total - a.total);
+    .sort((a, b) => b.total - a.total || b.discounted - a.discounted);
 }
 
 // ---------------------------------------------------------------------------

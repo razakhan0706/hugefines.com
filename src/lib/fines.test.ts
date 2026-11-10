@@ -1,5 +1,5 @@
-/// <reference types="bun" />
-import { describe, expect, test } from "bun:test";
+import { describe, test } from "node:test";
+import { deepStrictEqual } from "node:assert";
 import { buildPlayerStats, type Fine, type Player, type Round } from "./fines";
 
 const players: Player[] = ["Noah", "Rishe", "Will"].map((name) => ({
@@ -22,7 +22,7 @@ const fines: Fine[] = rounds.flatMap((round) =>
 describe("player fines leaderboard", () => {
   test("all masters: equal totals rank higher discounted fines first", () => {
     const stats = buildPlayerStats(players, fines, rounds, [], []);
-    expect(stats.map((s) => [s.player.name, s.total, s.discounted])).toEqual([
+    deepStrictEqual(stats.map((s) => [s.player.name, s.total, s.discounted]), [
       ["Rishe", 48, 2], ["Noah", 48, 0], ["Will", 46, 0],
     ]);
   });
@@ -31,7 +31,7 @@ describe("player fines leaderboard", () => {
     test(`${master}: equal $24 totals rank $1 discounted before $0`, () => {
       const filtered = fines.filter((fine) => fine.round_id === master);
       const stats = buildPlayerStats(players, filtered, rounds, [], []);
-      expect(stats.map((s) => [s.player.name, s.total, s.discounted])).toEqual([
+      deepStrictEqual(stats.map((s) => [s.player.name, s.total, s.discounted]), [
         ["Rishe", 24, 1], ["Noah", 24, 0], ["Will", 23, 0],
       ]);
     });

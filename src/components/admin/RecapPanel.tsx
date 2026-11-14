@@ -3,6 +3,7 @@ import { useServerFn } from "@tanstack/react-start";
 import { supabase } from "@/integrations/supabase/client";
 import { generateRecap } from "@/lib/recap.functions";
 import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Select,
@@ -26,6 +27,7 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
     return window.localStorage.getItem("huge-fines-include-votes") === "yes";
   });
   const [busy, setBusy] = useState(false);
+  const [instruction, setInstruction] = useState("");
 
   useEffect(() => {
     window.localStorage.setItem("huge-fines-include-votes", includeVotes ? "yes" : "no");
@@ -126,6 +128,7 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
           summary: buildSummary(),
           tone,
           scope: scope === "season" ? "Season wrap" : "Round recap",
+          instruction: instruction.trim(),
         },
       });
       const { error } = await supabase.from("recaps").insert({
@@ -217,6 +220,18 @@ export function RecapPanel({ data, refresh }: { data: TeamBundle; refresh: () =>
                 ? "The AI will add vote commentary and name the leaders."
                 : "Votes stay secret — the AI won't mention them."}
             </p>
+          </div>
+          <div className="grid gap-2 sm:col-span-3">
+            <label htmlFor="recap-instruction" className="text-sm font-medium">Instruction</label>
+            <Textarea
+              id="recap-instruction"
+              value={instruction}
+              onChange={(e) => setInstruction(e.target.value)}
+              placeholder="e.g. Roast Jono for being fined 4 times for his phone"
+              rows={3}
+              maxLength={500}
+            />
+            <p className="text-xs text-muted-foreground">Optional — the recap will centre on this.</p>
           </div>
           <div className="flex items-end sm:col-span-3">
             <Button className="w-full" onClick={generate} disabled={busy || !data.fines.length}>

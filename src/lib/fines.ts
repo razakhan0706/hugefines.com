@@ -355,7 +355,7 @@ export function categoryBreakdown(fines: Fine[], categories: FineCategory[]) {
 
 export function roundTotals(fines: Fine[], rounds: Round[], splits?: Map<string, FineSplit>) {
   const capSplits = splits ?? applyCaps(fines, rounds);
-  const rows: { name: string; order: number; total: number; discounted: number; count: number }[] = [];
+  const rows: { name: string; order: number; num: number; total: number; discounted: number; count: number }[] = [];
   for (const r of rounds) {
     const mine = fines.filter((f) => f.round_id === r.id);
     const days: (number | null)[] = r.two_day ? (r.day ? [r.day] : [1, 2]) : [null];
@@ -363,7 +363,8 @@ export function roundTotals(fines: Fine[], rounds: Round[], splits?: Map<string,
       const subset = d === null || r.day ? mine : mine.filter((f) => (f.week ?? 1) === d);
       rows.push({
         name: String(r.round_number),
-        order: r.round_number * 10 + (d ?? 0),
+        order: Date.parse(r.created_at ?? "") || 0,
+        num: r.round_number * 10 + (r.day ?? d ?? 0),
         total: subset.reduce((s, f) => s + (capSplits.get(f.id)?.counted ?? Number(f.amount)), 0),
         discounted: subset.reduce((s, f) => s + (capSplits.get(f.id)?.discounted ?? 0), 0),
         count: subset.length,
@@ -371,8 +372,8 @@ export function roundTotals(fines: Fine[], rounds: Round[], splits?: Map<string,
     }
   }
   return rows
-    .sort((a, b) => a.order - b.order)
-    .map(({ order: _o, ...rest }, i) => ({ ...rest, name: String(i + 1) }));
+    .sort((a, b) => a.order - b.order || a.num - b.num)
+    .map(({ order: _o, num: _n, ...rest }, i) => ({ ...rest, name: String(i + 1) }));
 }
 
 export interface Award {

@@ -9,14 +9,12 @@ export const generateRecap = createServerFn({ method: "POST" })
   }))
   .handler(async ({ data }) => {
     const formats = [
-      "a short savage roast of 50-80 words",
-      "a mock tabloid front page: headline plus 3-4 brutal one-liners",
-      "a fake awards night handing out insulting awards",
-      "a numbered list of roasts, one per offender",
-      "a mock police report or charge sheet",
-      "a dramatic fake press conference",
-      "a longer roast of 150-200 words",
-      "a series of fake text messages from the team group chat",
+      "a short, savage recap of 60-90 words",
+      "a medium recap of 100-140 words",
+      "a longer recap of 150-200 words",
+      "a recap that opens with one big roast, then rolls through the rest",
+      "a recap written like a dramatic match report",
+      "a recap written like a tabloid exposé",
     ];
     const format = formats[Math.floor(Math.random() * formats.length)];
     const apiKey = process.env.LOVABLE_API_KEY;
@@ -47,6 +45,7 @@ export const generateRecap = createServerFn({ method: "POST" })
               "No slurs, no personal attacks about appearance or health. " +
               "Your main job is comedy: roast the players hard using their fines. Do NOT just recap or list what happened — everyone already knows. Pick the funniest angles and build jokes on them; skip boring details entirely. " +
               "Every recap must feel different: vary the length, structure, opening line and running gags. Never start with 'Welcome' or 'What a round'. Use punchy sentences, players' names and the fine details you're given. " +
+              "Always write flowing recap paragraphs — no numbered lists, bullet points, headings or awards lists. " +
               "If the user gives an Instruction, make it the centrepiece of the recap.",
           },
           {
